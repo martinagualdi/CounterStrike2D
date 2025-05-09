@@ -1,0 +1,27 @@
+#ifndef SERVER_PROTOCOL_H
+#define SERVER_PROTOCOL_H
+
+#include "../common_src/socket.h"
+
+class ServerProtocol {
+private:
+    Socket& skt;
+
+public:
+    explicit ServerProtocol(Socket& skt) : skt(skt) {}
+
+    /*
+    
+    IDEA:
+
+    Si este protocolo es solo para server finalmente, podemos crearle unicamente dos funciones publicas: enviar y recibir, ambas
+    con el "all" ya que siempre sabemos el tamaño de los mensajes. Al hacerlo de esta manera podemos hacer que herede de una clase madre
+    "Protocol" que ya las tenga implementadas y que solo se encargue de usar funciones abstactas que se van a implementar en cada
+    una de las clases hijas "ServerProtocol" y "ClientProtocol". De esta manera no tenemos que repetir el mismo codigo en ambas clases.
+
+    
+    */
+
+};
+
+#endif

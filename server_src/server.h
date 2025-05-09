@@ -1,56 +1,41 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <atomic>
-#include <memory>
-#include <unordered_map>
-#include <vector>
-#include <map>
-#include "gameloop.h"
-#include "game_state.h"
-#include "../common_src/thread.h"
+#include "mensaje_dto.h"
+#include "../common_src/socket.h"
 
-class Accepter;
-class ServerMonitor;
-class Client;
-class GameLoop;
+#include "acceptor.h"
+#include "lista_queues.h"
+#include "queue.h"
 
-class Server: public Thread {
+#define EXIT_SERVER "q"
+
+class Server {
 private:
-    std::shared_ptr<GameLoop> gameloop;  // Cambiar a shared_ptr
-    std::shared_ptr<ServerMonitor> monitor;
-    std::shared_ptr<Accepter> accepter;  // Cambiar a unique_ptr
-    std::map<uint8_t, std::shared_ptr<Client>> clients;
+    Queue<MensajeDTO> queue_juego;
+    ListaQueues lista_queues;
+    Acceptor aceptador;
 
-    // Cierra todas las conexiones de clientes activos.
-    void closeClients();
+    // Lanza el thread aceptador
+    void comenzar_a_aceptar();
+
+    // Chequea que los argumentos de la funcion main sean correctos
+    static bool argumentos_validos(int argc, char* argv[]);
+
+    // Lee la entrada standard y loopea en esa entrada hasta que se ingrese una 'q'
+    void leer_entrada();
+
+    // Termina el hilo procesador y aceptador y cierra el socket
+    void terminar_juego();
 
 public:
-    explicit Server(int port);
+    explicit Server(const char* servname);
 
-    // Ejecuta el servidor.
-    void run() override;
+    // Inicia la logica del server. Inicializa el aceptador, procesador y las queues.
+    void start();
 
-    // Detiene el servidor y cierra todas las conexiones.
-    void stop() override;
-
-    // Agrega un cliente nuevo al servidor.
-    void addClient(uint8_t idClient, std::shared_ptr<Client> client);
-
-    // Elimina un cliente del servidor.
-    void removeClient(uint8_t idClient);
-
-    // Maneja la entrada del usuario desde la consola.
-    void handleInput();
-
-    // Verifica si el servidor está en ejecución.
-    bool esta_corriendo() const { return _keep_running; }
-
-    // Devuelve los Senders de los usuarios.
-    std::map<uint8_t, std::shared_ptr<Client>>& getClients();
-
-    // Destruye el servidor, liberando todos los recursos reservados.
     ~Server();
 };
 
-#endif  // SERVER_H
+
+#endif

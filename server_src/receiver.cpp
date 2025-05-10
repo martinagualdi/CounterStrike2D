@@ -4,8 +4,8 @@
 
 #include "mensaje_dto.h"
 
-Receiver::Receiver(Socket& s, Queue<MensajeDTO>& queue):
-        protocol(s), queue_juego(queue), alive(true) {}
+Receiver::Receiver(Socket &s, Queue<MensajeDTO> &queue)
+    : protocol(s), queue_juego(queue), alive(true) {}
 
 void Receiver::run() {
 
@@ -20,4 +20,6 @@ void Receiver::run() {
     }
 }
 
-Receiver::~Receiver() { this->join(); }
+Receiver::~Receiver() {
+    this->join();
+}

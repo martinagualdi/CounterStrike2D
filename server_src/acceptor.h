@@ -9,19 +9,19 @@
 
 #include "clienthandler.h"
 #include "lista_queues.h"
-#include "queue.h"
-#include "thread.h"
+#include "../common_src/queue.h"
+#include "../common_src/thread.h"
 
 #define RW_CLOSE 2
 #define EXCEPCION_ESPERADA "Excepcion esperada: "
 
-class Acceptor: public Thread {
-private:
+class Acceptor : public Thread {
+  private:
     Socket skt;
-    std::list<ClientHandler*> clients;  // cppcheck-suppress unusedStructMember
+    std::list<ClientHandler *> clients;
     std::atomic<bool> aceptando_clientes;
-    Queue<MensajeDTO>& queue_juego;
-    ListaQueues& queues_clientes;
+    Queue<MensajeDTO> &queue_juego;
+    ListaQueues &queues_clientes;
 
     // Recorre la lista de clientes y elimina a los clientes que ya no se encuentran activos,
     // asegurando que no hay memoria ocupada por threads que ya terminaron
@@ -29,10 +29,10 @@ private:
 
     // Corta la conexion del thread con el cliente verdadero, elimina su queue de mensajes y luego
     // elimina al thread
-    void eliminar_cliente(ClientHandler* client);
+    void eliminar_cliente(ClientHandler *client);
 
-public:
-    explicit Acceptor(const char* servname, Queue<MensajeDTO>& q, ListaQueues& l);
+  public:
+    explicit Acceptor(const char *servname, Queue<MensajeDTO> &q, ListaQueues &l);
 
     // Realiza el loop aceptando nuevos clientes y lanzando nuevos hilos para manejar a cada nuevo
     // cliente. En cada iteracion se encarga de eliminar a los clientes que ya hayan terminado

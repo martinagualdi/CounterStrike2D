@@ -6,29 +6,29 @@
 
 #include "../common_src/liberror.h"
 
-
-Acceptor::Acceptor(const char* servname, Queue<MensajeDTO>& q, ListaQueues& l):
-        skt(servname), aceptando_clientes(true), queue_juego(q), queues_clientes(l) {}
+Acceptor::Acceptor(const char *servname, Queue<MensajeDTO> &q, ListaQueues &l)
+    : skt(servname), aceptando_clientes(true), queue_juego(q), queues_clientes(l) {}
 
 void Acceptor::run() {
     int id = 0;
     while (aceptando_clientes) {
         try {
             Socket peer = skt.accept();
-            ClientHandler* client = new ClientHandler(std::move(peer), queue_juego, id);
+            ClientHandler *client = new ClientHandler(std::move(peer), queue_juego, id);
             queues_clientes.agregar_queue(client->get_queue(), id);
             client->conectar_con_cliente();
             clients.push_back(client);
             id++;
             recolectar();
-        } catch (const LibError& e) {
+            std::cout << "Cliente conectado"
+                      << "\n";
+        } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",
                        EXCEPCION_ESPERADA, e.what());
             } else {
                 syslog(LOG_ERR, "%s%s\n", EXCEPCION_INESPERADA, e.what());
             }
-            break;
         } catch (...) {
             syslog(LOG_ERR, "%s\n", EXCEPCION_DESCONOCIDA);
             break;
@@ -36,7 +36,7 @@ void Acceptor::run() {
     }
 }
 
-void Acceptor::eliminar_cliente(ClientHandler* client) {
+void Acceptor::eliminar_cliente(ClientHandler *client) {
     client->cortar_conexion();
     int id = client->get_id();
     queues_clientes.eliminar_queue(id);
@@ -44,7 +44,7 @@ void Acceptor::eliminar_cliente(ClientHandler* client) {
 }
 
 void Acceptor::recolectar() {
-    clients.remove_if([this](ClientHandler* c) {
+    clients.remove_if([this](ClientHandler *c) {
         if (c->is_dead()) {
             eliminar_cliente(c);
             return true;
@@ -53,10 +53,12 @@ void Acceptor::recolectar() {
     });
 }
 
-void Acceptor::dejar_de_aceptar() { this->aceptando_clientes = false; }
+void Acceptor::dejar_de_aceptar() {
+    this->aceptando_clientes = false;
+}
 
 Acceptor::~Acceptor() {
-    for (auto& c: clients) {
+    for (auto &c : clients) {
         eliminar_cliente(c);
     }
     clients.clear();

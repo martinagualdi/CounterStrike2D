@@ -58,6 +58,7 @@ function(
       -Wnull-dereference # warn if a null dereference is detected
       -Wformat=2 # warn on security issues around functions that format output (ie printf)
       -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
+      -Wmismatched-tags # warn if for type, it is tagged as struct in one place and as class as another
   )
 
   set(GCC_WARNINGS

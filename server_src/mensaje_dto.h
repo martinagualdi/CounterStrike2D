@@ -1,14 +1,13 @@
 #ifndef MENSAJEDTO_H
 #define MENSAJEDTO_H
+#include <string>
+#include <iostream>
 
 struct MensajeDTO {
     // cppcheck-suppress unusedStructMember
-    int codigo;
+    std::string tipo_mensaje;
 
     // cppcheck-suppress unusedStructMember
-    int largo;
-
-    // cppcheck-suppress unusedStructMember
-    int informacion;
+    std::string informacion;
 };
 #endif

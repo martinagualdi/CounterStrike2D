@@ -8,6 +8,7 @@ void ListaQueues::broadcast(const MensajeDTO &msg) {
     std::lock_guard<std::mutex> lck(mtx);
 
     if (lista_queues.empty()) {
+        std::cout << "No hay clientes conectados" << std::endl;
         return;
     }
 

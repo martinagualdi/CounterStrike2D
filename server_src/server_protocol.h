@@ -2,14 +2,18 @@
 #define SERVER_PROTOCOL_H
 
 #include "../common_src/socket.h"
+#include "mensaje_dto.h"
 
 class ServerProtocol {
 private:
     Socket& skt;
 
 public:
-    explicit ServerProtocol(Socket& skt) : skt(skt) {}
+    explicit ServerProtocol(Socket& skt);
 
+    bool enviar_a_cliente(const MensajeDTO& mensaje);
+
+    bool recibir_de_cliente(MensajeDTO& mensaje);
     /*
     
     IDEA:

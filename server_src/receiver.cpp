@@ -14,6 +14,9 @@ void Receiver::run() {
             /*
              *  LOGICA DE RECEPCION POR PROTOCOLO Y PUSH A LA QUEUE
              */
+            MensajeDTO mensaje;
+            protocol.recibir_de_cliente(mensaje);
+            queue_juego.push(mensaje);
         } catch (...) {
             break;
         }

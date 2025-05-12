@@ -11,6 +11,8 @@ void Sender::run() {
             /*
              * LOGICA DE "POP" A LA QUEUE Y ENVIO POR PROTOCOLO
              */
+            MensajeDTO mensaje = queue.pop();
+            protocol.enviar_a_cliente(mensaje);
         } catch (const ClosedQueue&) {
             break;
         }

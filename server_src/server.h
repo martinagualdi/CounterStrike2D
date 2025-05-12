@@ -3,7 +3,7 @@
 
 #include "mensaje_dto.h"
 #include "../common_src/socket.h"
-
+#include "processor.h"
 #include "acceptor.h"
 #include "lista_queues.h"
 #include "../common_src/queue.h"
@@ -15,9 +15,12 @@ class Server {
     Queue<MensajeDTO> queue_juego;
     ListaQueues lista_queues;
     Acceptor aceptador;
+    Processor procesador_de_mensajes;
 
     // Lanza el thread aceptador
     void comenzar_a_aceptar();
+
+    void comenzar_a_procesar();
 
     // Chequea que los argumentos de la funcion main sean correctos
     static bool argumentos_validos(int argc, char *argv[]);

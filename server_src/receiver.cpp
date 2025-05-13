@@ -16,7 +16,7 @@ void Receiver::run() {
              */
             MensajeDTO mensaje;
             protocol.recibir_de_cliente(mensaje);
-            queue_juego.push(mensaje);
+            queue_juego.try_push(mensaje);
         } catch (...) {
             break;
         }

@@ -2,7 +2,7 @@
 
 #define RW_CLOSE 2
 
-ProtocoloCliente::ProtocoloCliente(const char *hostname, const char *servname) : socket(Socket(hostname, servname)) {}
+ProtocoloCliente::ProtocoloCliente(const char *hostname, const char *servname) /* :socket(Socket(hostname, servname))*/ {}
 
 void ProtocoloCliente::enviarComando(uint8_t comando)
 {
@@ -14,6 +14,6 @@ Snapshot ProtocoloCliente::recibirSnapshot()
 }
 
 ProtocoloCliente::~ProtocoloCliente(){
-    socket.shutdown(RW_CLOSE);
-    socket.close();
+   // socket.shutdown(RW_CLOSE);
+   // socket.close();
 }

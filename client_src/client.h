@@ -5,6 +5,7 @@
 #include "client_sender.h"
 #include "client_event_handler.h"
 #include "client_receiver.h"
+#include "client_dibujador.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "../common_src/socket.h"
@@ -15,12 +16,14 @@ class Client{
 private:
     ProtocoloCliente protocolo;
     const char* username;
+    int cliente_id;
+    bool clienteActivo;
     Queue<uint8_t> cola_enviador;
     Queue<Snapshot> cola_recibidor;
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
-
-
+    EventHandler eventHandler;
+    Dibujador dibujador;
 public:
 
     explicit Client(const char* hostname, const char* servname, const char* username);

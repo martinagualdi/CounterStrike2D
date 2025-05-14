@@ -14,6 +14,7 @@ int main(int argc, char* argv[]){
         const char* username = argv[3]; // A modificar luego con SDL
 
         Client client(hostname, servname, username);
+        client.iniciar();
 
     } catch (const std::exception& e){
         std::cerr << "Algo salió mal: " << e.what() << std::endl;

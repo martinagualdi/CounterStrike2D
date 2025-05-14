@@ -5,7 +5,7 @@
 #include "mensaje_dto.h"
 
 Receiver::Receiver(Socket &s, Queue<MensajeDTO> &queue)
-    : protocol(s), queue_juego(queue), alive(true) {}
+    : protocol(s), queue_recibidora(queue), alive(true) {}
 
 void Receiver::run() {
 
@@ -14,9 +14,10 @@ void Receiver::run() {
             /*
              *  LOGICA DE RECEPCION POR PROTOCOLO Y PUSH A LA QUEUE
              */
+            
             MensajeDTO mensaje;
             protocol.recibir_de_cliente(mensaje);
-            queue_juego.try_push(mensaje);
+            queue_recibidora.try_push(mensaje);
         } catch (...) {
             break;
         }

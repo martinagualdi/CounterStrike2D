@@ -6,15 +6,24 @@
 
 #include "../common_src/liberror.h"
 
-Acceptor::Acceptor(const char *servname, Queue<MensajeDTO> &q, ListaQueues &l)
-    : skt(servname), aceptando_clientes(true), queue_juego(q), queues_clientes(l) {}
+Acceptor::Acceptor(const char *servname)
+    : skt(servname), 
+    clients(), 
+    aceptando_clientes(true), 
+    queue_recibidora(50), /*  Valor basico como tope de la queue, despues lo modificamos con uno acorde al juego  */
+    queues_clientes(), 
+    processor(queue_recibidora, queues_clientes) {
+        /* LA IDEA DEL PROCESADOR ES LO QUE LUEGO VA SUCEDER CON LA PARTIDA*/
+        /* HAY QUE MANDAR LAS QUEUES Y SOCKETS PARA LA PARTIDA Y ALMACENAR/PROCESAR AHI */
+        processor.start();
+    }
 
 void Acceptor::run() {
     int id = 0;
     while (aceptando_clientes) {
         try {
             Socket peer = skt.accept();
-            ClientHandler *client = new ClientHandler(std::move(peer), queue_juego, id);
+            ClientHandler *client = new ClientHandler(std::move(peer), queue_recibidora, id);
             queues_clientes.agregar_queue(client->get_queue(), id);
             client->conectar_con_cliente();
             clients.push_back(client);
@@ -62,7 +71,7 @@ Acceptor::~Acceptor() {
         eliminar_cliente(c);
     }
     clients.clear();
-    queue_juego.close();
+    queue_recibidora.close();
     skt.shutdown(RW_CLOSE);
     skt.close();
     this->join();

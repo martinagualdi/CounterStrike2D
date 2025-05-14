@@ -8,6 +8,9 @@
 ServerProtocol::ServerProtocol(Socket& skt) : skt(skt) {}
 
 bool ServerProtocol::enviar_a_cliente(const MensajeDTO& mensaje) {    
+    if (mensaje.informacion.size() <= 0) {
+        return false;
+    }
     std::vector<uint8_t> buffer;
     uint8_t tipo_mensaje = 0x00;
     if (mensaje.tipo_mensaje == "movimiento"){
@@ -18,7 +21,7 @@ bool ServerProtocol::enviar_a_cliente(const MensajeDTO& mensaje) {
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
     buffer.insert(buffer.end(), mensaje.informacion.begin(), mensaje.informacion.end());
-
+    
 
     skt.sendall(buffer.data(), buffer.size());
     return true;

@@ -13,7 +13,7 @@
 class Sender : public Thread {
   private:
     ServerProtocol protocol;
-    Queue<MensajeDTO> &queue;
+    Queue<MensajeDTO> &queue_enviadora;
     std::atomic<bool> &is_alive;
 
   public:

@@ -12,14 +12,14 @@
 class ClientHandler {
   private:
     Socket skt;
-    Queue<MensajeDTO> queue_juego;
+    Queue<MensajeDTO> queue_enviadora;
     std::atomic<bool> is_alive;
     Receiver r;
     Sender s;
     int id_client;
 
   public:
-    explicit ClientHandler(Socket &&skt, Queue<MensajeDTO> &queue, int id);
+    explicit ClientHandler(Socket skt, Queue<MensajeDTO> &queue_recibidora, int id);
 
     // Inicia los threads receiver y sender
     void conectar_con_cliente();
@@ -34,7 +34,7 @@ class ClientHandler {
 
     // Devuelve la queue de mensajes del cliente
     Queue<MensajeDTO> &get_queue() {
-        return this->queue_juego;
+        return this->queue_enviadora;
     }
 
     // Devuelve el id del cliente

@@ -12,10 +12,7 @@
 
 class Server {
   private:
-    Queue<MensajeDTO> queue_juego;
-    ListaQueues lista_queues;
     Acceptor aceptador;
-    Processor procesador_de_mensajes;
 
     // Lanza el thread aceptador
     void comenzar_a_aceptar();

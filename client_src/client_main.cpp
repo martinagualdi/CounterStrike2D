@@ -8,6 +8,7 @@ int main(int argc, char* argv[]){
             std::cerr << "Error. Para iniciar: ./client <hostname> <servname> <username>\n";
             return 1;
         }
+
         const char* hostname = argv[1];
         const char* servname = argv[2];
         const char* username = argv[3]; // A modificar luego con SDL

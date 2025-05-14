@@ -3,6 +3,7 @@
 
 #include "client_protocol.h"
 #include "client_sender.h"
+#include "client_event_handler.h"
 #include "client_receiver.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
@@ -18,6 +19,7 @@ private:
     Queue<Snapshot> cola_recibidor;
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
+
 
 public:
 

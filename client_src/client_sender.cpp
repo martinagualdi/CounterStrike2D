@@ -4,8 +4,8 @@ ClientSender::ClientSender(ProtocoloCliente &protocolo, Queue<uint8_t> &cola) : 
 
 void ClientSender::run(){
 
-    while(_keep_running){
-        uint8_t comando;
+    while(should_keep_running()){
+        uint8_t comando = 0;
         try{          
             cola_comandos.try_pop(comando);
         } catch(const ClosedQueue&){
@@ -23,6 +23,6 @@ void ClientSender::run(){
     } catch(...){}
 }
 
-bool ClientSender::sigue_vivo(){
-	return _keep_running;
+ClientSender::~ClientSender()
+{
 }

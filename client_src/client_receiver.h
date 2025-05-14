@@ -15,7 +15,6 @@ public:
 
     explicit ClientReceiver(ProtocoloCliente& protocolo, Queue<Snapshot>& cola);
     void run() override;
-    bool sigue_vivo();
     ClientReceiver(const ClientReceiver&) = delete;
     ClientReceiver& operator=(const ClientReceiver&) = delete;
     ClientReceiver(ClientReceiver&&) = default;

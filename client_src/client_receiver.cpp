@@ -4,7 +4,7 @@
 ClientReceiver::ClientReceiver(ProtocoloCliente& protocolo, Queue<Snapshot>& cola) : protocolo(protocolo), cola_snapshots(cola) {}
 
 void ClientReceiver::run(){
-    while(_keep_running){
+    while(should_keep_running()){
         Snapshot snapshot;
         try{
             snapshot = protocolo.recibirSnapshot(); 
@@ -23,6 +23,6 @@ void ClientReceiver::run(){
     } catch(...){}
 }
 
-bool ClientReceiver::sigue_vivo(){
-	return _keep_running;
+ClientReceiver::~ClientReceiver()
+{
 }

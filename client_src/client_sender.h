@@ -15,7 +15,6 @@ public:
 
     explicit ClientSender(ProtocoloCliente& protocolo, Queue<uint8_t>& cola);
     void run() override;
-    bool sigue_vivo();
     ClientSender(const ClientSender&) = delete;
     ClientSender& operator=(const ClientSender&) = delete;
     ClientSender(ClientSender&&) = default;

@@ -8,6 +8,8 @@
 #include "comando_dto.h"
 #include "clienthandler.h"
 #include "lista_queues.h"
+#include "gameloop.h"
+#include "snapshot.h"
 #include "../common_src/queue.h"
 
 class Partida{
@@ -16,6 +18,7 @@ private:
     std::list<ClientHandler*> jugadores;
     Queue<ComandoDTO> queue_comandos;
     ListaQueues jugadores_queues;
+    GameLoop gameloop;
     std::mutex mtx;
 
 public:
@@ -24,7 +27,7 @@ public:
 
     std::string get_codigo_partida() {return this->codigo_partida;};
 
-    void agregar_jugador(Socket&& peer);
+    void agregar_jugador(Socket&& peer, int id);
 
 
 };

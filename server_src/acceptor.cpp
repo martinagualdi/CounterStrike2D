@@ -34,7 +34,7 @@ void Acceptor::run() {
             recolectar();*/
             std::cout << "Cliente conectado"
                       << "\n";
-            partida->agregar_jugador(std::move(peer));
+            partida->agregar_jugador(std::move(peer), id);
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",

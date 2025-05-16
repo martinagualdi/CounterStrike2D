@@ -21,6 +21,8 @@ class ListaQueues {
     // que esten cerradas
     void broadcast(const Snapshot &msg);
 
+    int get_size() { return lista_queues.size(); }
+
     // Agrega una nueva queue a la lista de queues, con su id correspondiente
     void agregar_queue(Queue<Snapshot> &q, int id_client);
 

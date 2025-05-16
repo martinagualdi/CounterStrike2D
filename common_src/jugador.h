@@ -3,12 +3,13 @@
 
 class Jugador {
 private:
+    int id; 
     int x;
     int y;
 
 public:
     
-    Jugador(int posX = 0, int posY = 0) : x(posX), y(posY) {}
+    Jugador(int id, int posX = 0, int posY = 0) : x(posX), y(posY), id(id) {}
 
     
     int getX() const { return x; }

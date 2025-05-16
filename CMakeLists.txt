@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 project(taller_tp
     VERSION 1.0
-    HOMEPAGE_URL "https://github.com/URL-HERE"
+    HOMEPAGE_URL "https://github.com/martinagualdi/CounterStrike2D/"
     LANGUAGES CXX
     )
 
@@ -53,109 +53,77 @@ target_include_directories(taller_common PUBLIC .)
 # Install libSDL2 and libSDL2pp (for client or editor)
 # HEY!! TODO XXX: add more dependendies (either for client, server or editor)
 if(TALLER_CLIENT OR TALLER_EDITOR)
-    include(FetchContent)
-    FetchContent_Declare(
-        SDL2
-        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-        GIT_TAG release-2.30.8
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        OVERRIDE_FIND_PACKAGE
-    )
+   include(FetchContent)
+   FetchContent_Declare(
+       libSDL2pp
+       URL https://github.com/libSDL2pp/libSDL2pp/archive/cc198c9a5657048bee67ece82de620b2d5661084.zip
+   )
 
-    FetchContent_Declare(
-        SDL2_image
-        GIT_REPOSITORY https://github.com/libsdl-org/SDL_image.git
-        GIT_TAG release-2.8.2
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        OVERRIDE_FIND_PACKAGE
-    )
+   # set up SDL2pp library
+   set(SDL2PP_WITH_IMAGE YES)
+   set(SDL2PP_WITH_TTF YES)
+   set(SDL2PP_WITH_MIXER YES)
 
-    FetchContent_Declare(
-        SDL2_mixer
-        GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-        GIT_TAG release-2.8.0
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        OVERRIDE_FIND_PACKAGE
-    )
 
-    FetchContent_Declare(
-        SDL2_ttf
-        GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-        GIT_TAG release-2.22.0
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        OVERRIDE_FIND_PACKAGE
-    )
-
-    FetchContent_Declare(
-        libSDL2pp
-        OVERRIDE_FIND_PACKAGE
-        URL https://github.com/libSDL2pp/libSDL2pp/archive/cc198c9a5657048bee67ece82de620b2d5661084.zip
-    )
-
-    FetchContent_MakeAvailable(SDL2 SDL2_image SDL2_mixer SDL2_ttf libSDL2pp)
+   FetchContent_MakeAvailable(libSDL2pp)
 endif()
 
 # Program section
 # ---------------
 if(TALLER_CLIENT)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_client)
+   # HEY!! TODO XXX: Change the name of the executable to the one you like!
+   add_executable(taller_client)
 
-    # Make them depend on taller_common lib
-    add_dependencies(taller_client taller_common SDL2pp::SDL2pp)
+   # Make them depend on taller_common lib
+   add_dependencies(taller_client taller_common SDL2pp::SDL2pp)
 
-    # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(client)
+   # Add source files and enable warnings
+   # HEY!! TODO XXX: add more subfolders here
+   add_subdirectory(client)
 
-    set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+   set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
-    # add libSDL2pp's headers
-    target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
+   # add libSDL2pp's headers
+   target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
-    # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp)
+   # Link the taller_common lib target
+   target_link_libraries(taller_client taller_common SDL2pp::SDL2pp)
 endif()
 
 if(TALLER_SERVER)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_server)
+   # HEY!! TODO XXX: Change the name of the executable to the one you like!
+   add_executable(taller_server)
 
-    # Make them depend on taller_common lib
-    add_dependencies(taller_server taller_common)
+   # Make them depend on taller_common lib
+   add_dependencies(taller_server taller_common)
 
-    # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(server)
+   # Add source files and enable warnings
+   # HEY!! TODO XXX: add more subfolders here
+   add_subdirectory(server)
 
-    set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+   set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
-    # Link the taller_common lib target
-    target_link_libraries(taller_server taller_common)
+   # Link the taller_common lib target
+   target_link_libraries(taller_server taller_common yaml-cpp)
 endif()
 
 if(TALLER_EDITOR)
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_editor)
+   # HEY!! TODO XXX: Change the name of the executable to the one you like!
+   add_executable(taller_editor)
 
-    # Make them depend on taller_common lib
-    add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
+   # Make them depend on taller_common lib
+   add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
+   # Add source files and enable warnings
+   # HEY!! TODO XXX: add more subfolders here
+   add_subdirectory(editor)
 
-    # Add source files and enable warnings
-    # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(editor)
+   set_project_warnings(taller_editor ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
-    set_project_warnings(taller_editor ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+   # add libSDL2pp's headers
+   target_include_directories(taller_editor PRIVATE ${libSDL2pp_SOURCE_DIR})
 
-    # add libSDL2pp's headers
-    target_include_directories(taller_editor PRIVATE ${libSDL2pp_SOURCE_DIR})
-
-    # Link the taller_common lib target
-    target_link_libraries(taller_editor taller_common SDL2pp::SDL2pp)
+   # Link the taller_common lib target
+   target_link_libraries(taller_editor taller_common SDL2pp::SDL2pp)
 endif()
 
 
@@ -163,49 +131,52 @@ endif()
 # ---------------
 
 if(TALLER_TESTS)
-    # Let's use google test
-    include(FetchContent)
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-    )
+   # Let's use google test
+   include(FetchContent)
+   FetchContent_Declare(
+       googletest
+       URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+   )
 
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    # (borrowed from https://google.github.io/googletest/quickstart-cmake.html)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-    include(GoogleTest)
+   # For Windows: Prevent overriding the parent project's compiler/linker settings
+   # (borrowed from https://google.github.io/googletest/quickstart-cmake.html)
+   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+   FetchContent_MakeAvailable(googletest)
+   include(GoogleTest)
 
-    # target for testing
-    # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_tests)
+   # target for testing
+   # HEY!! TODO XXX: Change the name of the executable to the one you like!
+   add_executable(taller_tests
+	tests/tests_protocolo.cpp
+	client/protocolo_cliente.cpp
+	server/protocol.cpp
+)
 
-    # HEY!! TODO XXX: I'm assuming that the code under testing is in taller_common
-    # Change this if you have to.
-    add_dependencies(taller_tests taller_common)
+   # HEY!! TODO XXX: I'm assuming that the code under testing is in taller_common
+   # Change this if you have to.
+   add_dependencies(taller_tests taller_common)
 
-    # Say where to find the xoz headers
-    # HEY!! TODO XXX: add more subfolders here
-    target_include_directories(taller_tests PUBLIC .)
+   # Say where to find the xoz headers
+   # HEY!! TODO XXX: add more subfolders here
+   target_include_directories(taller_tests PUBLIC .)
 
-    # Add the source files to the taller_tests target
-    # HEY!! TODO XXX: add more subfolders here
-    add_subdirectory(tests/)
+   # Add the source files to the taller_tests target
+   # HEY!! TODO XXX: add more subfolders here
+   add_subdirectory(tests/)
+   # Set the compiler warnings to the tests target (but be a little lesser strict)
+   set_project_warnings(taller_tests ${TALLER_MAKE_WARNINGS_AS_ERRORS} TRUE)
 
-    # Set the compiler warnings to the tests target (but be a little lesser strict)
-    set_project_warnings(taller_tests ${TALLER_MAKE_WARNINGS_AS_ERRORS} TRUE)
+   # Say where googletest headers can be found
+   target_include_directories(taller_tests
+       PUBLIC
+       ${gtest_SOURCE_DIR}/include
+       ${gmock_SOURCE_DIR}/include
+       )
 
-    # Say where googletest headers can be found
-    target_include_directories(taller_tests
-        PUBLIC
-        ${gtest_SOURCE_DIR}/include
-        ${gmock_SOURCE_DIR}/include
-        )
-
-    # HEY!! TODO XXX: I'm assuming that the code under testing is in taller_common
-    # Change this if you have to.
-    target_link_libraries(taller_tests
-        taller_common
-        GTest::gtest_main
-    )
+   # HEY!! TODO XXX: I'm assuming that the code under testing is in taller_common
+   # Change this if you have to.
+   target_link_libraries(taller_tests
+       taller_common
+       GTest::gtest_main
+   )
 endif()

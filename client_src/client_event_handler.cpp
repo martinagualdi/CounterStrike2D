@@ -31,13 +31,11 @@ EventHandler::EventHandler(Queue<uint8_t> &cola_enviador) :
 
 void EventHandler::procesarTeclado(const SDL_Event &event)
 {
-    if (event.type == SDL_KEYDOWN) {
+    if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
         auto it = codigos_teclado.find(event.key.keysym.scancode);
         if (it != codigos_teclado.end()) {
             cola_enviador.try_push(it->second);
         }
-    } else if(event.type == SDL_KEYUP){
-        
     }
 }
 

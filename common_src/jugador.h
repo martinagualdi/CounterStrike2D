@@ -3,20 +3,20 @@
 
 class Jugador {
 private:
-    float x;
-    float y;
+    int x;
+    int y;
 
 public:
     
-    Jugador(float posX = 0.0f, float posY = 0.0f) : x(posX), y(posY) {}
+    Jugador(int posX = 0, int posY = 0) : x(posX), y(posY) {}
 
     
-    float getX() const { return x; }
-    float getY() const { return y; }
+    int getX() const { return x; }
+    int getY() const { return y; }
 
     
-    void setX(float posX) { x = posX; }
-    void setY(float posY) { y = posY; }
+    void setX(int posX) { x = posX; }
+    void setY(int posY) { y = posY; }
 };
 
 #endif 

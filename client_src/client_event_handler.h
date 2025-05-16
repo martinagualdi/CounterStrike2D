@@ -8,7 +8,7 @@ class EventHandler {
 
 private:
     Queue<uint8_t>& cola_enviador;
-    const std::map<SDL_Scancode, uint8_t> codigos_teclado;
+    std::map<SDL_Scancode, uint8_t> codigos_teclado;
     void procesarTeclado(const SDL_Event& event);
     void procesarMouse(const SDL_Event& event);
 

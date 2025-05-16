@@ -4,7 +4,7 @@
 #include <atomic>
 #include <list>
 
-#include "mensaje_dto.h"
+#include "../common_src/snapshot.h"
 #include "../common_src/socket.h"
 #include "processor.h"
 #include "clienthandler.h"
@@ -20,7 +20,7 @@ class Acceptor : public Thread {
     Socket skt;
     std::list<ClientHandler *> clients;
     std::atomic<bool> aceptando_clientes;
-    Queue<MensajeDTO> queue_recibidora;
+    Queue<Snapshot> queue_recibidora;
     ListaQueues queues_clientes;
     Processor processor;
 

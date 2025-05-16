@@ -3,21 +3,20 @@
 
 #include <atomic>
 
-#include "mensaje_dto.h"
 #include "server_protocol.h"
 #include "../common_src/socket.h"
-
+#include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "../common_src/thread.h"
 
 class Sender : public Thread {
   private:
     ServerProtocol protocol;
-    Queue<MensajeDTO> &queue_enviadora;
+    Queue<Snapshot> &queue_enviadora;
     std::atomic<bool> &is_alive;
 
   public:
-    explicit Sender(Socket &skt, Queue<MensajeDTO> &queue, std::atomic<bool> &is_alive);
+    explicit Sender(Socket &skt, Queue<Sanpshot> &queue, std::atomic<bool> &is_alive);
 
     // Hace try_pop() de la queue de mensajes. Envia esos mensajes al cliente
     virtual void run() override;

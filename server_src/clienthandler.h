@@ -1,8 +1,7 @@
 #ifndef CLIENTHANDLER_H
 #define CLIENTHANDLER_H
 
-#include "mensaje_dto.h"
-
+#include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "receiver.h"
 #include "sender.h"
@@ -12,14 +11,14 @@
 class ClientHandler {
   private:
     Socket skt;
-    Queue<MensajeDTO> queue_enviadora;
+    Queue<Snapshot> queue_enviadora;
     std::atomic<bool> is_alive;
     Receiver r;
     Sender s;
     int id_client;
 
   public:
-    explicit ClientHandler(Socket skt, Queue<MensajeDTO> &queue_recibidora, int id);
+    explicit ClientHandler(Socket skt, Queue<Snapshot> &queue_recibidora, int id);
 
     // Inicia los threads receiver y sender
     void conectar_con_cliente();
@@ -33,7 +32,7 @@ class ClientHandler {
     void cortar_conexion();
 
     // Devuelve la queue de mensajes del cliente
-    Queue<MensajeDTO> &get_queue() {
+    Queue<Snapshot> &get_queue() {
         return this->queue_enviadora;
     }
 

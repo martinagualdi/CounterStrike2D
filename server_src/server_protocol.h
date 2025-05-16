@@ -2,7 +2,8 @@
 #define SERVER_PROTOCOL_H
 
 #include "../common_src/socket.h"
-#include "mensaje_dto.h"
+#include "../common_src/snapshot.h"
+#include "comando_dto.h"
 
 class ServerProtocol {
 private:
@@ -11,9 +12,9 @@ private:
 public:
     explicit ServerProtocol(Socket& skt);
 
-    bool enviar_a_cliente(const MensajeDTO& mensaje);
+    bool enviar_a_cliente(const Snapshot& snapshot);
 
-    bool recibir_de_cliente(MensajeDTO& mensaje);
+    bool recibir_de_cliente(ComandoDTO& comando);
     /*
     
     IDEA:

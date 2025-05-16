@@ -4,19 +4,17 @@
 
 #include <syslog.h>
 
-#include "mensaje_dto.h"
-
-Processor::Processor(Queue<MensajeDTO>& q, ListaQueues& l):
+Processor::Processor(Queue<Snapshot>& q, ListaQueues& l):
         queue(q), juego_activo(true), queues_clientes(l) {
 }
 
-void Processor::broadcast(MensajeDTO& msg) {
+void Processor::broadcast(Snapshot& msg) {
     msg.informacion = msg.informacion + " (fue reenviado por el servidor)";
     queues_clientes.broadcast(msg);
 }
 
 void Processor::chequear_mensajes() {
-    MensajeDTO msg;
+    Snapshot msg;
     while (queue.try_pop(msg)) {
         std::cout << "Muestro la informacion del mensaje: \n" << msg.informacion << "\n" << std::endl;
         broadcast(msg);

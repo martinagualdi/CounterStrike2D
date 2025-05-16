@@ -4,7 +4,7 @@
 
 #include "mensaje_dto.h"
 
-Receiver::Receiver(Socket &s, Queue<MensajeDTO> &queue)
+Receiver::Receiver(Socket &s, Queue<Snapshot> &queue)
     : protocol(s), queue_recibidora(queue), alive(true) {}
 
 void Receiver::run() {

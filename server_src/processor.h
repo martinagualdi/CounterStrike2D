@@ -3,8 +3,8 @@
 
 #include <list>
 
-#include "mensaje_dto.h"
 
+#include "../common_src/snapshot.h"
 #include "lista_queues.h"
 #include "../common_src/queue.h"
 #include "../common_src/socket.h"
@@ -14,16 +14,16 @@
 
 class Processor: public Thread {
 private:
-    Queue<MensajeDTO>& queue;
+    Queue<Snapshot>& queue;
     bool juego_activo;  
     ListaQueues& queues_clientes;
 
     void chequear_mensajes();
 
-    void broadcast(MensajeDTO& msg);
+    void broadcast(Snapshot& msg);
 
 public:
-    explicit Processor(Queue<MensajeDTO>& q, ListaQueues& l);
+    explicit Processor(Queue<Snapshot>& q, ListaQueues& l);
 
     virtual void run() override;
 

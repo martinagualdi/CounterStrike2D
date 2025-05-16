@@ -23,7 +23,7 @@ private:
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
     EventHandler eventHandler;
-    Dibujador dibujador;
+    
 public:
 
     explicit Client(const char* hostname, const char* servname, const char* username);

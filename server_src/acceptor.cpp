@@ -6,13 +6,14 @@
 
 #include "../common_src/liberror.h"
 
-Acceptor::Acceptor(const char *servname)
-    : skt(servname), 
+Acceptor::Acceptor(const char *servname, std::vector<Partida*>& partidas) :
+    skt(servname), 
     clients(), 
     aceptando_clientes(true), 
     queue_recibidora(50), /*  Valor basico como tope de la queue, despues lo modificamos con uno acorde al juego  */
     queues_clientes(), 
-    processor(queue_recibidora, queues_clientes) {
+    processor(queue_recibidora, queues_clientes),
+    partidas(partidas) {
         /* LA IDEA DEL PROCESADOR ES LO QUE LUEGO VA SUCEDER CON LA PARTIDA*/
         /* HAY QUE MANDAR LAS QUEUES Y SOCKETS PARA LA PARTIDA Y ALMACENAR/PROCESAR AHI */
         processor.start();

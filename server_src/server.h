@@ -1,17 +1,23 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <vector>
+#include <string>
+#include <iostream>
+
 #include "mensaje_dto.h"
 #include "../common_src/socket.h"
 #include "processor.h"
 #include "acceptor.h"
 #include "lista_queues.h"
 #include "../common_src/queue.h"
+#include "partida.h"
 
 #define EXIT_SERVER "q"
 
 class Server {
   private:
+    std::vector<Partida*> partidas_activas;;
     Acceptor aceptador;
 
     // Lanza el thread aceptador

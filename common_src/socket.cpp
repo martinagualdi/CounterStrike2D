@@ -15,12 +15,18 @@
 #include "liberror.h"
 #include "resolver.h"
 
+#define STREAM_SEND_CLOSED 0x01
+#define STREAM_RECV_CLOSED 0x02
+#define STREAM_BOTH_CLOSED 0x03
+#define STREAM_BOTH_OPEN 0x00
+
 Socket::Socket(const char* hostname, const char* servname) {
     Resolver resolver(hostname, servname, false);
 
     int s = -1;
     int skt = -1;
     this->closed = true;
+    this->stream_status = STREAM_BOTH_CLOSED;
 
     /*
      * Por cada dirección obtenida tenemos que ver cual es realmente funcional.
@@ -64,6 +70,7 @@ Socket::Socket(const char* hostname, const char* servname) {
          * Conexión exitosa!
          * */
         this->closed = false;
+        this->stream_status = STREAM_BOTH_OPEN;
         this->skt = skt;
         return;
     }
@@ -95,6 +102,7 @@ Socket::Socket(const char* servname) {
     int s = -1;
     int skt = -1;
     this->closed = true;
+    this->stream_status = STREAM_BOTH_CLOSED;
     while (resolver.has_next()) {
         struct addrinfo* addr = resolver.next();
 
@@ -173,6 +181,7 @@ Socket::Socket(const char* servname) {
          * Setup exitoso!
          * */
         this->closed = false;
+        this->stream_status = STREAM_BOTH_OPEN;
         this->skt = skt;
         return;
     }
@@ -190,6 +199,7 @@ Socket::Socket(Socket&& other) {
     /* Nos copiamos del otro socket... */
     this->skt = other.skt;
     this->closed = other.closed;
+    this->stream_status = other.closed;
 
     /* ...pero luego le sacamos al otro socket
      * el ownership del recurso.
@@ -204,6 +214,7 @@ Socket::Socket(Socket&& other) {
      * */
     other.skt = -1;
     other.closed = true;
+    other.stream_status = STREAM_BOTH_CLOSED;
 }
 
 Socket& Socket::operator=(Socket&& other) {
@@ -229,13 +240,13 @@ Socket& Socket::operator=(Socket&& other) {
     this->closed = other.closed;
     other.skt = -1;
     other.closed = true;
+    other.stream_status = STREAM_BOTH_CLOSED;
 
     return *this;
 }
 
-int Socket::recvsome(void* data, unsigned int sz, bool* was_closed) {
+int Socket::recvsome(void* data, unsigned int sz) {
     chk_skt_or_fail();
-    *was_closed = false;
     int s = recv(this->skt, (char*)data, sz, 0);
     if (s == 0) {
         /*
@@ -244,7 +255,7 @@ int Socket::recvsome(void* data, unsigned int sz, bool* was_closed) {
          * que la conexión se cierra" en cuyo caso el cierre del socket
          * no es un error sino algo esperado.
          * */
-        *was_closed = true;
+        stream_status |= STREAM_RECV_CLOSED;
         return 0;
     } else if (s == -1) {
         /*
@@ -256,9 +267,8 @@ int Socket::recvsome(void* data, unsigned int sz, bool* was_closed) {
     }
 }
 
-int Socket::sendsome(const void* data, unsigned int sz, bool* was_closed) {
+int Socket::sendsome(const void* data, unsigned int sz) {
     chk_skt_or_fail();
-    *was_closed = false;
     /*
      * Cuando se hace un send, el sistema operativo puede aceptar
      * la data pero descubrir luego que el socket fue cerrado
@@ -289,36 +299,35 @@ int Socket::sendsome(const void* data, unsigned int sz, bool* was_closed) {
             /*
              * Puede o no ser un error (véase el comentario en `Socket::recvsome`)
              * */
-            *was_closed = true;
+            stream_status |= STREAM_SEND_CLOSED;
             return 0;
         }
 
         /* En cualquier otro caso supondremos un error
          * y lanzamos una excepción.
          * */
-        *was_closed = true;
         throw LibError(errno, "socket send failed");
     } else if (s == 0) {
         /*
          * Jamas debería pasar.
          * */
-        assert(false);
+        stream_status |= STREAM_SEND_CLOSED;
+        return 0;
     } else {
         return s;
     }
 }
 
-int Socket::recvall(void* data, unsigned int sz, bool* was_closed) {
+int Socket::recvall(void* data, unsigned int sz) {
     unsigned int received = 0;
-    *was_closed = false;
 
     while (received < sz) {
-        int s = recvsome((char*)data + received, sz - received, was_closed);
+        int s = recvsome((char*)data + received, sz - received);
 
         if (s <= 0) {
             /*
              * Si el socket fue cerrado (`s == 0`) o hubo un error
-             * `Socket::recvsome` ya debería haber seteado `was_closed`
+             * `Socket::recvsome` ya debería haber seteado `stream_status`
              * y haber notificado el error.
              *
              * Nosotros podemos entonces meramente
@@ -344,12 +353,11 @@ int Socket::recvall(void* data, unsigned int sz, bool* was_closed) {
 }
 
 
-int Socket::sendall(const void* data, unsigned int sz, bool* was_closed) {
+int Socket::sendall(const void* data, unsigned int sz) {
     unsigned int sent = 0;
-    *was_closed = false;
 
     while (sent < sz) {
-        int s = sendsome((char*)data + sent, sz - sent, was_closed);
+        int s = sendsome((char*)data + sent, sz - sent);
 
         /* Véase los comentarios de `Socket::recvall` */
         if (s <= 0) {
@@ -369,6 +377,7 @@ int Socket::sendall(const void* data, unsigned int sz, bool* was_closed) {
 Socket::Socket(int skt) {
     this->skt = skt;
     this->closed = false;
+    this->stream_status = STREAM_BOTH_OPEN;
 }
 
 Socket Socket::accept() {
@@ -404,11 +413,30 @@ void Socket::shutdown(int how) {
     if (::shutdown(this->skt, how) == -1) {
         throw LibError(errno, "socket shutdown failed");
     }
+
+    switch (how) {
+        case 0:
+            stream_status |= STREAM_RECV_CLOSED;
+            break;
+        case 1:
+            stream_status |= STREAM_SEND_CLOSED;
+            break;
+        case 2:
+            stream_status |= STREAM_BOTH_CLOSED;
+            break;
+        default:
+            throw std::runtime_error("Unknow shutdown value");
+    }
 }
+
+bool Socket::is_stream_send_closed() const { return stream_status & STREAM_SEND_CLOSED; }
+
+bool Socket::is_stream_recv_closed() const { return stream_status & STREAM_RECV_CLOSED; }
 
 int Socket::close() {
     chk_skt_or_fail();
     this->closed = true;
+    this->stream_status = STREAM_BOTH_CLOSED;
     return ::close(this->skt);
 }
 

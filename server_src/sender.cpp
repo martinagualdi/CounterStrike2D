@@ -2,8 +2,8 @@
 
 #include "../common_src/liberror.h"
 
-Sender::Sender(Socket &skt, Queue<MensajeDTO> &q, std::atomic<bool> &is_alive)
-    : protocol(skt), queue_enviadora(q), is_alive(is_alive) {}
+Sender::Sender(Socket &skt, Queue<Snapshot> &q, std::atomic<bool> &is_alive, int player_id)
+    : protocol(skt), is_alive(is_alive), queue_enviadora(q), player_id(player_id) {}
 
 void Sender::run() {
     while (is_alive) {
@@ -11,9 +11,9 @@ void Sender::run() {
             /*
              * LOGICA DE "POP" A LA QUEUE Y ENVIO POR PROTOCOLO
              */
-            MensajeDTO mensaje;
-            queue_enviadora.try_pop(mensaje); 
-            protocol.enviar_a_cliente(mensaje); 
+            Snapshot snapshot;
+            queue_enviadora.try_pop(snapshot); 
+            protocol.enviar_a_cliente(snapshot); 
         } catch (const ClosedQueue &) {
             break;
         }

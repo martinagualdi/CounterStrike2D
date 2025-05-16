@@ -4,8 +4,8 @@
 
 #include "mensaje_dto.h"
 
-Receiver::Receiver(Socket &s, Queue<Snapshot> &queue)
-    : protocol(s), queue_recibidora(queue), alive(true) {}
+Receiver::Receiver(Socket &skt, Queue<ComandoDTO> &queue, std::atomic<bool> &is_alive, int player_id)
+    : protocol(skt), queue_comandos(queue), alive(is_alive), player_id(player_id) {}
 
 void Receiver::run() {
 
@@ -15,9 +15,9 @@ void Receiver::run() {
              *  LOGICA DE RECEPCION POR PROTOCOLO Y PUSH A LA QUEUE
              */
             
-            MensajeDTO mensaje;
-            protocol.recibir_de_cliente(mensaje);
-            queue_recibidora.try_push(mensaje);
+            ComandoDTO comando;
+            protocol.recibir_de_cliente(comando);
+            queue_comandos.try_push(comando);
         } catch (...) {
             break;
         }

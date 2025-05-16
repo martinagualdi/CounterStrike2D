@@ -18,10 +18,10 @@ class ClientHandler {
     int id_client;
 
   public:
-    explicit ClientHandler(Socket skt, Queue<Snapshot> &queue_recibidora, int id);
+    explicit ClientHandler(Socket skt, Queue<ComandoDTO> &queue_comandos, int id);
 
     // Inicia los threads receiver y sender
-    void conectar_con_cliente();
+    void iniciar();
 
     // Devuelve true si el thread actual finalizo
     bool is_dead() {

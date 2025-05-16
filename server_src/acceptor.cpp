@@ -21,17 +21,20 @@ Acceptor::Acceptor(const char *servname, std::vector<Partida*>& partidas) :
 
 void Acceptor::run() {
     int id = 0;
+    Partida *partida = new Partida("partida1");
+    partidas.push_back(partida);
     while (aceptando_clientes) {
         try {
             Socket peer = skt.accept();
-            ClientHandler *client = new ClientHandler(std::move(peer), queue_recibidora, id);
+            /*ClientHandler *client = new ClientHandler(std::move(peer), queue_recibidora, id);
             queues_clientes.agregar_queue(client->get_queue(), id);
             client->conectar_con_cliente();
             clients.push_back(client);
             id++;
-            recolectar();
+            recolectar();*/
             std::cout << "Cliente conectado"
                       << "\n";
+            partida->agregar_jugador(std::move(peer));
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",

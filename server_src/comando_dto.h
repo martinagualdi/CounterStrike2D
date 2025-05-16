@@ -4,7 +4,8 @@
 #include <string>
 
 struct ComandoDTO {
+    int id_jugador;
     std::string movimiento;
-}
+};
 
 #endif

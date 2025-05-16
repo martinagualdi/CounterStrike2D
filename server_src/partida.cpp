@@ -6,11 +6,9 @@ Partida::Partida(const std::string& codigo):
     queue_comandos(),
     jugadores_queues() {}
 
-std::string Partida::generar_codigo_partida() {
-    std::string codigo_partida;
-    const char caracteres[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for (int i = 0; i < 6; ++i) {
-        codigo_partida += caracteres[rand() % (sizeof(caracteres) - 1)];
-    }
-    return codigo_partida;
+void Partida::agregar_jugador(Socket&& peer) {
+    ClientHandler* client = new ClientHandler(std::move(peer), queue_comandos, jugadores.size());
+    jugadores.push_back(client);
+    jugadores_queues.agregar_queue(client->get_queue(), jugadores.size());
+    client->iniciar();
 }

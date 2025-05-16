@@ -21,10 +21,10 @@ private:
 public:
     Partida(const std::string& codigo);
 
-    // "Static" para validarlo por fuera antes de crearlo, asi no hay dos partidas con el mismo codigo
-    static std::string generar_codigo_partida();
 
     std::string get_codigo_partida() {return this->codigo_partida;};
+
+    void agregar_jugador(Socket&& peer);
 
 
 };

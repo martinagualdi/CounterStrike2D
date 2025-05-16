@@ -14,9 +14,10 @@ class Sender : public Thread {
     ServerProtocol protocol;
     Queue<Snapshot> &queue_enviadora;
     std::atomic<bool> &is_alive;
+    int player_id;
 
   public:
-    explicit Sender(Socket &skt, Queue<Sanpshot> &queue, std::atomic<bool> &is_alive);
+    explicit Sender(Socket &skt, Queue<Snapshot> &queue, std::atomic<bool> &is_alive, int player_id);
 
     // Hace try_pop() de la queue de mensajes. Envia esos mensajes al cliente
     virtual void run() override;

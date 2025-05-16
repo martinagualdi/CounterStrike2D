@@ -8,7 +8,7 @@
 
 class ProtocoloCliente {
 private:
-  //  Socket socket;
+    Socket socket;
 
 public:
 

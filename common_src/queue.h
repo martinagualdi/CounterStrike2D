@@ -242,7 +242,6 @@ class Queue<void*> {
     private:
         Queue(const Queue&) = delete;
         Queue& operator=(const Queue&) = delete;
-
 };
 
 
@@ -255,6 +254,7 @@ class Queue<T*> : private Queue<void*> {
         bool try_push(T* const& val) {
             return Queue<void*>::try_push(val);
         }
+
 
         bool try_pop(T*& val) {
             return Queue<void*>::try_pop((void*&)val);

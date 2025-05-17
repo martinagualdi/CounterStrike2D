@@ -23,7 +23,7 @@ class Acceptor : public Thread {
     std::atomic<bool> aceptando_clientes;
     Queue<Snapshot> queue_recibidora;
     ListaQueues queues_clientes;
-    Processor processor;
+    //Processor processor;
     std::vector<Partida*>& partidas;
 
     // Recorre la lista de clientes y elimina a los clientes que ya no se encuentran activos,

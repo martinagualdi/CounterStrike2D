@@ -5,34 +5,26 @@
 ListaQueues::ListaQueues() {}
 
 void ListaQueues::broadcast(const Snapshot &msg) {
-    /*
     std::lock_guard<std::mutex> lck(mtx);
-
     if (lista_queues.empty()) {
-        std::cout << "No hay clientes conectados" << std::endl;
         return;
     }
-
     for (auto &p : lista_queues) {
-        Queue<MensajeDTO> &q = p.first;
+        Queue<Snapshot> &q = p.first;
         try {
             q.try_push(msg);
         } catch (const ClosedQueue &e) {
             syslog(LOG_INFO, "La queue a la que se intento agregar esta cerrada. %s\n", e.what());
         }
     }
-        */
 }
 
 void ListaQueues::agregar_queue(Queue<Snapshot> &q, int id_cliente) {
-    /*
     std::lock_guard<std::mutex> lck(mtx);
     lista_queues.push_back(std::make_pair(std::ref(q), id_cliente));
-    */
 }
 
 void ListaQueues::eliminar_queue(int id) {
-    /*
     std::lock_guard<std::mutex> lck(mtx);
     auto i = lista_queues.begin();
     bool borrado = false;
@@ -45,5 +37,4 @@ void ListaQueues::eliminar_queue(int id) {
             i++;
         }
     }
-    */
 }

@@ -4,8 +4,8 @@
 
 #include "mensaje_dto.h"
 
-Receiver::Receiver(Socket &skt, Queue<ComandoDTO> &queue, std::atomic<bool> &is_alive, int player_id)
-    : protocol(skt), queue_comandos(queue), alive(is_alive), player_id(player_id) {}
+Receiver::Receiver(ServerProtocol &protocolo, Queue<ComandoDTO> &queue, std::atomic<bool> &is_alive, int player_id)
+    : protocol(protocolo), queue_comandos(queue), alive(is_alive), player_id(player_id) {}
 
 void Receiver::run() {
 

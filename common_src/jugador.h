@@ -11,7 +11,10 @@ public:
     
     Jugador();
 
+    bool comparar_id(int id) { return this->id == id; }
     
+    int getId() const { return id; }
+
     int getX() const { return x; }
     int getY() const { return y; }
 

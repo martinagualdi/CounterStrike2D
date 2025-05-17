@@ -2,8 +2,10 @@
 
 #include "../common_src/liberror.h"
 
-Sender::Sender(Socket &skt, Queue<Snapshot> &q, std::atomic<bool> &is_alive, int player_id)
-    : protocol(skt), is_alive(is_alive), queue_enviadora(q), player_id(player_id) {}
+Sender::Sender(ServerProtocol &protocol, Queue<Snapshot> &q, std::atomic<bool> &is_alive, int player_id)
+    : protocol(protocol), is_alive(is_alive), queue_enviadora(q), player_id(player_id) {
+        protocol.enviarID(player_id);
+    }
 
 void Sender::run() {
     while (is_alive) {

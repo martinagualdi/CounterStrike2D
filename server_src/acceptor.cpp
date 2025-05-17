@@ -12,12 +12,7 @@ Acceptor::Acceptor(const char *servname, std::vector<Partida*>& partidas) :
     aceptando_clientes(true), 
     queue_recibidora(50), /*  Valor basico como tope de la queue, despues lo modificamos con uno acorde al juego  */
     queues_clientes(), 
-    processor(queue_recibidora, queues_clientes),
-    partidas(partidas) {
-        /* LA IDEA DEL PROCESADOR ES LO QUE LUEGO VA SUCEDER CON LA PARTIDA*/
-        /* HAY QUE MANDAR LAS QUEUES Y SOCKETS PARA LA PARTIDA Y ALMACENAR/PROCESAR AHI */
-        processor.start();
-    }
+    partidas(partidas) {}
 
 void Acceptor::run() {
     int id = 0;
@@ -26,17 +21,9 @@ void Acceptor::run() {
     while (aceptando_clientes) {
         try {
             Socket peer = skt.accept();
-            /*ClientHandler *client = new ClientHandler(std::move(peer), queue_recibidora, id);
-            queues_clientes.agregar_queue(client->get_queue(), id);
-            client->conectar_con_cliente();
-            clients.push_back(client);
-            id++;
-            recolectar();*/
-            std::cout << "Cliente conectado"
-                      << "\n";
+            std::cout << "Cliente conectado" << "\n";
             partida->agregar_jugador(std::move(peer), id);
             id++;
-            // Aca deberiamos mandar el id al cliente (necesitamos el protocolo o hacerlo desde el Handler)
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",

@@ -9,8 +9,9 @@
 #define RW_CLOSE 2
 
 class ClientHandler {
-  private:
+private:
     Socket skt;
+    ServerProtocol protocolo;
     Queue<Snapshot> queue_enviadora;
     std::atomic<bool> is_alive;
     Receiver r;

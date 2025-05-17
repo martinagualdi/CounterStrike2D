@@ -24,6 +24,7 @@ private:
     ClientReceiver hilo_recibidor;
     EventHandler eventHandler;
     
+    
 public:
 
     explicit Client(const char* hostname, const char* servname, const char* username);

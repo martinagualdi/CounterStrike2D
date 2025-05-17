@@ -14,9 +14,12 @@ Client::Client(const char *hostname, const char *servname, const char* username)
     hilo_recibidor(protocolo, cola_recibidor), eventHandler(cola_enviador) {}
 
 void Client::iniciar() {
+    hilo_enviador.set_cliente_id(cliente_id);
     hilo_enviador.start();
     hilo_recibidor.start();
+    std::string comando;
 
+    /*
     SDL sdl(SDL_INIT_VIDEO);
     Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -42,7 +45,12 @@ void Client::iniciar() {
         t1 += std::chrono::milliseconds(ms_per_frame);
         frame_count++;
     }
+    */
 }
+
+
+
+
 
 Client::~Client(){
     hilo_enviador.stop();

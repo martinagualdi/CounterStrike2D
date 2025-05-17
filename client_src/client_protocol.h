@@ -16,7 +16,7 @@ public:
     explicit ProtocoloCliente(const char* hostname, const char* servname);
     void enviarComando(int id_jugador,uint8_t comando);
     Snapshot recibirSnapshot();
-    void recibirID(int& id_jugador);
+    int recibirID();
     ProtocoloCliente(const ProtocoloCliente&) = delete;
     ProtocoloCliente& operator=(const ProtocoloCliente&) = delete;
     ProtocoloCliente(ProtocoloCliente&&) = delete;

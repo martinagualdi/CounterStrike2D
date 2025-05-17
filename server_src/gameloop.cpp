@@ -7,7 +7,7 @@ GameLoop::GameLoop(Queue<ComandoDTO>& queue_comandos, ListaQueues& queues_jugado
     activo(true){}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
-    Jugador* jugador = new Jugador(id, 0, 0);
+    Jugador* jugador = new Jugador();
     jugadores.push_back(jugador);
 }
 

@@ -9,13 +9,14 @@
 
 class ProtocoloCliente {
 private:
-   // Socket socket;
+   Socket socket;
 
 public:
 
     explicit ProtocoloCliente(const char* hostname, const char* servname);
-    void enviarComando(uint8_t comando);
+    void enviarComando(int id_jugador,uint8_t comando);
     Snapshot recibirSnapshot();
+    void recibirID(int& id_jugador);
     ProtocoloCliente(const ProtocoloCliente&) = delete;
     ProtocoloCliente& operator=(const ProtocoloCliente&) = delete;
     ProtocoloCliente(ProtocoloCliente&&) = delete;

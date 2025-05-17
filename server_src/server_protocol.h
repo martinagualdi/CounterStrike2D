@@ -15,6 +15,8 @@ public:
     bool enviar_a_cliente(const Snapshot& snapshot);
 
     bool recibir_de_cliente(ComandoDTO& comando);
+
+    bool enviarID(int id_jugador) ;
     /*
     
     IDEA:

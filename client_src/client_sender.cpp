@@ -12,7 +12,7 @@ void ClientSender::run(){
             break;
         }
         try{
-            protocolo.enviarComando(comando);
+            protocolo.enviarComando(0,comando);// Necesitamos el id del jugador
         } catch(std::exception& e){
             std::cerr << "Falla en el hilo ClientSender: " << e.what() << std::endl;
         }

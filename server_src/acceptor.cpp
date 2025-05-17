@@ -35,6 +35,8 @@ void Acceptor::run() {
             std::cout << "Cliente conectado"
                       << "\n";
             partida->agregar_jugador(std::move(peer), id);
+            id++;
+            // Aca deberiamos mandar el id al cliente (necesitamos el protocolo o hacerlo desde el Handler)
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",

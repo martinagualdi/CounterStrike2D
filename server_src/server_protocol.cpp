@@ -34,8 +34,14 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
     uint16_t id;
     skt.recvall(&id, sizeof(id));
     comando.id_jugador = ntohs(id);
-    uint16_t comando;
-    skt.recvall(&comando, sizeof(comando));
-    comando.movimiento = std::string(reinterpret_cast<char*>(&comando), sizeof(comando));
+    uint16_t accion;
+    skt.recvall(&accion, sizeof(accion));
+    comando.movimiento = ntohs(accion);
+    return true;
+}
+
+bool ServerProtocol::enviarID(int id_jugador) {
+    uint16_t id = htons(static_cast<uint16_t>(id_jugador));
+    skt.sendall(&id, sizeof(id));
     return true;
 }

@@ -9,14 +9,14 @@ Processor::Processor(Queue<Snapshot>& q, ListaQueues& l):
 }
 
 void Processor::broadcast(Snapshot& msg) {
-    msg.informacion = msg.informacion + " (fue reenviado por el servidor)";
+    //msg.informacion = msg.informacion + " (fue reenviado por el servidor)";
     queues_clientes.broadcast(msg);
 }
 
 void Processor::chequear_mensajes() {
     Snapshot msg;
     while (queue.try_pop(msg)) {
-        std::cout << "Muestro la informacion del mensaje: \n" << msg.informacion << "\n" << std::endl;
+        std::cout << "Muestro la informacion del mensaje: \n"; //<< msg.informacion << "\n" << std::endl;
         broadcast(msg);
     }
 }

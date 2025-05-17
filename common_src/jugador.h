@@ -9,7 +9,7 @@ private:
 
 public:
     
-    Jugador(int id, int posX = 0, int posY = 0) : x(posX), y(posY), id(id) {}
+    Jugador();
 
     
     int getX() const { return x; }
@@ -18,6 +18,12 @@ public:
     
     void setX(int posX) { x = posX; }
     void setY(int posY) { y = posY; }
+
+    Jugador(const Jugador&) = default;
+    Jugador& operator=(const Jugador&) = default;
+    Jugador(Jugador&&) = default;
+    Jugador& operator=(Jugador&&) = default;
+    
 };
 
 #endif 

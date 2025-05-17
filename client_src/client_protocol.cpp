@@ -17,7 +17,9 @@ void ProtocoloCliente::enviarComando(int id_jugador, uint8_t comando) {
 }
 
 Snapshot ProtocoloCliente::recibirSnapshot() {
-   
+
+
+   /*
    uint8_t largo_buf[2];
    if (!socket.recvall(largo_buf, 2)) {
       throw std::runtime_error("Error al recibir el tamaño del snapshot");
@@ -48,9 +50,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.jugadores.push_back(jugador);
    }
    return snapshot;
+   */
 }
 
-void ProtocoloCliente::recibirID(int &id_jugador) {
+int ProtocoloCliente::recibirID() {
+   u_int16_t id_jugador;
    uint8_t id_buf[2];
    if (!socket.recvall(id_buf, 2)) {
       throw std::runtime_error("Error al recibir el id del jugador");

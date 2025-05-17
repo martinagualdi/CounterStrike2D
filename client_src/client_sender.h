@@ -10,11 +10,14 @@ class ClientSender : public Thread {
 private:
     ProtocoloCliente& protocolo;
     Queue<uint8_t>& cola_comandos;
+    int cliente_id;
+    void enviarMensaje();
 
 public:
 
     explicit ClientSender(ProtocoloCliente& protocolo, Queue<uint8_t>& cola);
     void run() override;
+    void set_cliente_id(int id);
     ClientSender(const ClientSender&) = delete;
     ClientSender& operator=(const ClientSender&) = delete;
     ClientSender(ClientSender&&) = default;

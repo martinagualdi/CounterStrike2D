@@ -30,7 +30,7 @@ void ClientSender::set_cliente_id(int id){
 
 void ClientSender::enviarMensaje(){
     std::string comando_str;
-    std::cout << "Ingrese comando: ";
+    //std::cout << "Ingrese comando: ";
     if (!std::getline(std::cin, comando_str)) {
         return ;
     }

@@ -20,11 +20,11 @@ void GameLoop::run() {
                 if (comando.movimiento == 1) {
                     movimiento = "W";
                 } else if (comando.movimiento == 2) {
-                    movimiento = "D";
+                    movimiento = "A";
                 } else if (comando.movimiento == 3) {
                     movimiento = "S";
                 } else if (comando.movimiento == 4) {
-                    movimiento = "A";
+                    movimiento = "D";
                 }
                 std::cout << "Comando recibido: El jugador (id: " << comando.id_jugador << ") hizo el comando: " << movimiento << "\n";
                 /*W,A,S,D = 1, 2, 3, 4*/
@@ -38,13 +38,13 @@ void GameLoop::run() {
                                 jugador->setY(jugador->getY() - 1);
                                 break;
                             case 2:
-                                jugador->setX(jugador->getX() + 1);
+                                jugador->setX(jugador->getX() - 1);
                                 break;
                             case 3:
                                 jugador->setY(jugador->getY() + 1);
                                 break;
                             case 4:
-                                jugador->setX(jugador->getX() - 1);
+                                jugador->setX(jugador->getX() + 1);
                                 break;
                         }
                     }
@@ -52,6 +52,7 @@ void GameLoop::run() {
             }
             
             Snapshot snapshot(jugadores);
+            
             queues_jugadores.broadcast(snapshot);
         } catch (const ClosedQueue&) {
             break;

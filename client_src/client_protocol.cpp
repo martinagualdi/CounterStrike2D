@@ -15,7 +15,6 @@ void ProtocoloCliente::enviarComando(int id_jugador, uint8_t comando) {
       throw std::runtime_error("Error al enviar el comando");
    }
 }
-
 Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo;
    socket.recvall(&largo, sizeof(largo));

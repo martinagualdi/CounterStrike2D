@@ -1,4 +1,4 @@
-target_sources(taller_server
+target_sources(server
     PRIVATE
     # .cpp files
     server_main.cpp
@@ -11,6 +11,7 @@ target_sources(taller_server
     sender.cpp
     server.cpp
     processor.cpp
+    partida.cpp
     PUBLIC
     # .h files
     acceptor.h
@@ -23,4 +24,5 @@ target_sources(taller_server
     server.h
     processor.h
     mensaje_dto.h
+    partida.h
     )

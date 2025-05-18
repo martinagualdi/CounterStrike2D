@@ -106,43 +106,47 @@ endif()
 # Program section
 # ---------------
 if(TALLER_CLIENT)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_client)
+    add_executable(client)
 
     # Make them depend on taller_common lib
-    add_dependencies(taller_client taller_common SDL2pp::SDL2pp)
+    add_dependencies(client taller_common SDL2pp::SDL2pp)
 
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(client_src)
 
-    set_project_warnings(taller_client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+    set_project_warnings(client ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
 
     # add libSDL2pp's headers
-    target_include_directories(taller_client PRIVATE ${libSDL2pp_SOURCE_DIR})
+    target_include_directories(client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
     # Link the taller_common lib target
-    target_link_libraries(taller_client taller_common SDL2pp::SDL2pp)
+    target_link_libraries(client taller_common SDL2pp::SDL2pp)
 endif()
 
 if(TALLER_SERVER)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
-    add_executable(taller_server)
+    add_executable(server)
 
     # Make them depend on taller_common lib
-    add_dependencies(taller_server taller_common)
+    add_dependencies(server taller_common)
 
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here
     add_subdirectory(server_src)
 
-    set_project_warnings(taller_server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+    set_project_warnings(server ${TALLER_MAKE_WARNINGS_AS_ERRORS} FALSE)
+    target_compile_options(server PRIVATE -Wno-error=suggest-override)
 
     # Link the taller_common lib target
-    target_link_libraries(taller_server taller_common)
+    target_link_libraries(server taller_common)
 endif()
 
 if(TALLER_EDITOR)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
     # HEY!! TODO XXX: Change the name of the executable to the one you like!
     add_executable(taller_editor)
 

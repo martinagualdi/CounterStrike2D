@@ -1,4 +1,4 @@
-target_sources(taller_client
+target_sources(client
     PRIVATE
     client_event_handler.cpp
     client_main.cpp

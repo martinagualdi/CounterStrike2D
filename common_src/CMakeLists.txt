@@ -4,6 +4,7 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
+    jugador.cpp
     PUBLIC
     liberror.h
     queue.h
@@ -12,4 +13,5 @@ target_sources(taller_common
     snapshot.h
     socket.h
     thread.h
+    jugador.h
     )

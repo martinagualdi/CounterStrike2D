@@ -7,7 +7,7 @@ GameLoop::GameLoop(Queue<ComandoDTO>& queue_comandos, ListaQueues& queues_jugado
     activo(true){}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
-    Jugador* jugador = new Jugador();
+    Jugador* jugador = new Jugador(id);
     jugadores.push_back(jugador);
 }
 
@@ -27,29 +27,30 @@ void GameLoop::run() {
                     movimiento = "A";
                 }
                 std::cout << "Comando recibido: El jugador (id: " << comando.id_jugador << ") hizo el comando: " << movimiento << "\n";
-            }
-            /*W,A,S,D = 1, 2, 3, 4*/
-            for (Jugador* jugador : jugadores) {
-                /*
-                ACTUALIZO LA POSICION DEL JUGADOR DEPENDIENDO EL COMANDO Y EL ID QUE VIENE EN EL
-                */
-                if (jugador->comparar_id(comando.id_jugador)) {
-                    switch (comando.movimiento) {
-                        case 1:
-                            jugador->setY(jugador->getY() - 1);
-                            break;
-                        case 2:
-                            jugador->setX(jugador->getX() + 1);
-                            break;
-                        case 3:
-                            jugador->setY(jugador->getY() + 1);
-                            break;
-                        case 4:
-                            jugador->setX(jugador->getX() - 1);
-                            break;
+                /*W,A,S,D = 1, 2, 3, 4*/
+                for (Jugador* jugador : jugadores) {
+                    /*
+                    ACTUALIZO LA POSICION DEL JUGADOR DEPENDIENDO EL COMANDO Y EL ID QUE VIENE EN EL
+                    */
+                    if (jugador->comparar_id(comando.id_jugador)) {
+                        switch (comando.movimiento) {
+                            case 1:
+                                jugador->setY(jugador->getY() - 1);
+                                break;
+                            case 2:
+                                jugador->setX(jugador->getX() + 1);
+                                break;
+                            case 3:
+                                jugador->setY(jugador->getY() + 1);
+                                break;
+                            case 4:
+                                jugador->setX(jugador->getX() - 1);
+                                break;
+                        }
                     }
                 }
             }
+            
             Snapshot snapshot(jugadores);
             queues_jugadores.broadcast(snapshot);
         } catch (const ClosedQueue&) {

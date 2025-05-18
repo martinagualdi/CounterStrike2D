@@ -1,24 +1,29 @@
 #include "client.h"
-#include <SDL2pp/SDL2pp.hh>
-#include <SDL2/SDL.h>
+//#include <SDL2pp/SDL2pp.hh>
+//#include <SDL2/SDL.h>
 
 #define CS2D_TITLE "Counter Strike 2D"
 #define ANCHO_MIN 960
 #define ALTO_MIN 720
 #define FPS 30
 
-using namespace SDL2pp;
+//using namespace SDL2pp;
 
 Client::Client(const char *hostname, const char *servname, const char* username) : protocolo(hostname, servname), 
     username(username), cliente_id(-1), clienteActivo(true), cola_enviador(), cola_recibidor(), hilo_enviador(protocolo, cola_enviador),
-    hilo_recibidor(protocolo, cola_recibidor), eventHandler(cola_enviador) {}
+    hilo_recibidor(protocolo, cola_recibidor)/*, eventHandler(cola_enviador) */{}
 
 void Client::iniciar() {
-    hilo_enviador.set_cliente_id(cliente_id);
+    int id_recibido = protocolo.recibirID();
+    std::cout << "Cliente ID: " << id_recibido << std::endl;
+    cliente_id = id_recibido;
+    hilo_enviador.set_cliente_id(id_recibido);
     hilo_enviador.start();
     hilo_recibidor.start();
-    std::string comando;
 
+    while (clienteActivo && hilo_recibidor.esta_vivo()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
     /*
     SDL sdl(SDL_INIT_VIDEO);
     Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);

@@ -4,12 +4,14 @@
 class Jugador {
 private:
     int id; 
-    int x;
-    int y;
+    int x = 10;
+    int y = 10;
 
 public:
     
-    Jugador();
+    Jugador(int id) : id(id) {};
+
+    explicit Jugador(int id, int x, int y) : id(id), x(x), y(y) {}
 
     bool comparar_id(int id) { return this->id == id; }
     

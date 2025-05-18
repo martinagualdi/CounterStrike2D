@@ -5,19 +5,22 @@ target_sources(taller_server
     acceptor.cpp
     gameloop.cpp
     server_protocol.cpp
-    client_handler.cpp
+    clienthandler.cpp
     lista_queues.cpp
     receiver.cpp
     sender.cpp
     server.cpp
+    processor.cpp
     PUBLIC
     # .h files
     acceptor.h
     gameloop.h
     server_protocol.h
-    client_handler.h
+    clienthandler.h
     lista_queues.h
     receiver.h
     sender.h
     server.h
+    processor.h
+    mensaje_dto.h
     )

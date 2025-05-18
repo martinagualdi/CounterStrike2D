@@ -5,12 +5,16 @@ target_sources(taller_client
     client_protocol.cpp
     client_receiver.cpp
     client_sender.cpp
+    client_parseador.h
     client.cpp
-    main.cpp
+    client_main.cpp
+    client_dibujador.cpp
     PUBLIC
     client_event_handler.h
     client_protocol.h
     client_receiver.h
     client_sender.h
     client.h
+    client_parseador.h
+    client_dibujador.h
     )

@@ -10,8 +10,7 @@ class ClientReceiver : public Thread {
 private:
     ProtocoloCliente& protocolo;
     Queue<Snapshot>& cola_snapshots;
-    int cliente_id;
-    void mostrar_mensaje() const;
+    void mostrar_mensaje(Snapshot& snapshot);
 
 public:
 

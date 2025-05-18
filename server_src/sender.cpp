@@ -3,7 +3,8 @@
 #include "../common_src/liberror.h"
 
 Sender::Sender(ServerProtocol &protocol, Queue<Snapshot> &q, std::atomic<bool> &is_alive, int player_id)
-    : protocol(protocol), is_alive(is_alive), queue_enviadora(q), player_id(player_id) {
+    : protocol(protocol), queue_enviadora(q), is_alive(is_alive), player_id(player_id) {
+        std::cout << "Sender creado para el jugador " << player_id << std::endl;
         protocol.enviarID(player_id);
     }
 

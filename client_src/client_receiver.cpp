@@ -4,7 +4,7 @@
 ClientReceiver::ClientReceiver(ProtocoloCliente& protocolo, Queue<Snapshot>& cola) : protocolo(protocolo), cola_snapshots(cola){}
 
 void ClientReceiver::run(){
-    
+    Snapshot snapshot_anterior;
     while(should_keep_running()){
         Snapshot snapshot;
         try{
@@ -17,7 +17,7 @@ void ClientReceiver::run(){
         } catch(const ClosedQueue&){
             break;
         }
-        mostrar_mensaje();
+        mostrar_mensaje(snapshot_anterior);
     }
 
     try{
@@ -25,10 +25,20 @@ void ClientReceiver::run(){
     } catch(...){}
 }
 
-void ClientReceiver::mostrar_mensaje() const {
+void ClientReceiver::mostrar_mensaje(Snapshot& snap_anterior) {
+
     Snapshot snapshot;
     cola_snapshots.try_pop(snapshot);
-    std::cout << "Snapshot recibido: " << snapshot.jugadores.size() << " jugadores." << std::endl;
+    if (snapshot.son_iguales(snap_anterior)) {
+        return;
+    }
+    std::cout << "Snapshot recibido: " << snapshot.info_jugadores.size() << " jugadores." << std::endl;
+    std::cout << "Jugadores en el snapshot:" << std::endl;
+
+    for (const auto& jugador : snapshot.info_jugadores) {
+        std::cout << "Jugador ID: " << jugador.getId() << ", Posicion: (" << jugador.getX() << ", " << jugador.getY() << ")" << std::endl;
+    }
+    snap_anterior.actualizar_snapshot(snapshot);
 }
 
 ClientReceiver::~ClientReceiver()

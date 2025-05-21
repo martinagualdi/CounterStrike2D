@@ -2,6 +2,8 @@
 #define CLIENT_PROTOCOL_H
 
 #include <map>
+#include <vector>
+#include "../common_src/comando_dto.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "../common_src/thread.h"
@@ -9,12 +11,14 @@
 
 class ProtocoloCliente {
 private:
-   Socket socket;
-
+    Socket socket;
+    void push_back_uint16(std::vector<uint8_t>& message, uint16_t value);
+    void serializar_comando(ComandoDTO& comando, std::vector<uint8_t>& mensaje);
 public:
 
     explicit ProtocoloCliente(const char* hostname, const char* servname);
-    void enviarComando(int id_jugador,uint8_t comando);
+    void enviarComando(ComandoDTO comando);
+    
     Snapshot recibirSnapshot();
     int recibirID();
     ProtocoloCliente(const ProtocoloCliente&) = delete;

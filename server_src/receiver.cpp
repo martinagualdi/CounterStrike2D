@@ -14,8 +14,8 @@ void Receiver::run() {
             /*
              *  LOGICA DE RECEPCION POR PROTOCOLO Y PUSH A LA QUEUE
              */
-            
             ComandoDTO comando;
+            comando.id_jugador = player_id;
             protocol.recibir_de_cliente(comando);
             queue_comandos.try_push(comando);
         } catch (...) {

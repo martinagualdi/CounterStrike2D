@@ -14,8 +14,7 @@ void Sender::run() {
             /*
              * LOGICA DE "POP" A LA QUEUE Y ENVIO POR PROTOCOLO
              */
-            Snapshot snapshot;
-            queue_enviadora.try_pop(snapshot); 
+            Snapshot snapshot = queue_enviadora.pop(); 
             protocol.enviar_a_cliente(snapshot); 
         } catch (const ClosedQueue &) {
             break;

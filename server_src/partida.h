@@ -5,7 +5,7 @@
 #include <string>
 #include <list>
 #include <mutex>
-#include "comando_dto.h"
+#include "../common_src/comando_dto.h"
 #include "clienthandler.h"
 #include "lista_queues.h"
 #include "gameloop.h"

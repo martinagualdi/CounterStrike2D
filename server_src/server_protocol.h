@@ -3,7 +3,7 @@
 
 #include "../common_src/socket.h"
 #include "../common_src/snapshot.h"
-#include "comando_dto.h"
+#include "../common_src/comando_dto.h"
 
 class ServerProtocol {
 private:

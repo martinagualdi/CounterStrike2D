@@ -18,11 +18,11 @@ private:
     const char* username;
     int cliente_id;
     bool clienteActivo;
-    Queue<uint8_t> cola_enviador;
+    Queue<ComandoDTO> cola_enviador;
     Queue<Snapshot> cola_recibidor;
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
-    //EventHandler eventHandler;
+    EventHandler eventHandler;
     
     
 public:

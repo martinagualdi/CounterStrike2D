@@ -1,6 +1,7 @@
 #ifndef CLIENT_SENDER_H
 #define CLIENT_SENDER_H
 
+#include "../common_src/comando_dto.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "../common_src/thread.h"
@@ -9,15 +10,12 @@
 class ClientSender : public Thread {
 private:
     ProtocoloCliente& protocolo;
-    Queue<uint8_t>& cola_comandos;
-    int cliente_id;
-    void enviarMensaje();
+    Queue<ComandoDTO>& cola_comandos;
 
 public:
 
-    explicit ClientSender(ProtocoloCliente& protocolo, Queue<uint8_t>& cola);
+    explicit ClientSender(ProtocoloCliente& protocolo, Queue<ComandoDTO>& cola);
     void run() override;
-    void set_cliente_id(int id);
     ClientSender(const ClientSender&) = delete;
     ClientSender& operator=(const ClientSender&) = delete;
     ClientSender(ClientSender&&) = default;

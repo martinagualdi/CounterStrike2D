@@ -1,72 +1,100 @@
-// #include "client_event_handler.h"
-// #include <map>
+#include "client_event_handler.h"
+#include <map>
+#include <cmath>
+#include <iostream>
 
-// #define CMD_ARRIBA 0x01
-// #define CMD_ABAJO 0x02
-// #define CMD_IZQUIERDA 0x03
-// #define CMD_DERECHA 0x04
-// #define CMD_COMPRAR 0x05
-// #define CMD_ESTADISTICAS 0x06
-// #define CMD_COMPRAR_BALAS_PRIMARIA 0x07
-// #define CMD_COMPRAR_BALAS_SECUNDARIA 0x08
-// #define CMD_CLICK_IZQUIERDO 0x09
-// #define CMD_SCROLL_ARRIBA 0x10
-// #define CMD_SCROLL_ABAJO 0x11
-// #define CMD_EXIT 0x12
+#define ALTO_MIN 720
 
-// EventHandler::EventHandler(Queue<uint8_t> &cola_enviador) :
-//     cola_enviador(cola_enviador),
-//     codigos_teclado({
-//         {SDL_SCANCODE_W, CMD_ARRIBA}, 
-//         {SDL_SCANCODE_S, CMD_ABAJO}, 
-//         {SDL_SCANCODE_A, CMD_IZQUIERDA},
-//         {SDL_SCANCODE_D, CMD_DERECHA},
-//         {SDL_SCANCODE_B, CMD_COMPRAR},
-//         {SDL_SCANCODE_TAB, CMD_ESTADISTICAS},
-//         {SDL_SCANCODE_PERIOD, CMD_COMPRAR_BALAS_PRIMARIA},
-//         {SDL_SCANCODE_COMMA, CMD_COMPRAR_BALAS_SECUNDARIA},
-//     })
-// {
-// }
+enum {CMD_ARRIBA, CMD_ABAJO, CMD_IZQUIERDA, CMD_DERECHA, CMD_COMPRAR};
 
-// void EventHandler::procesarTeclado(const SDL_Event &event)
-// {
-//     if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-//         auto it = codigos_teclado.find(event.key.keysym.scancode);
-//         if (it != codigos_teclado.end()) {
-//             cola_enviador.try_push(it->second);
-//         }
-//     }
-// }
+#define CMD_ESTADISTICAS 5
+#define CMD_COMPRAR_BALAS_PRIMARIA 7
+#define CMD_COMPRAR_BALAS_SECUNDARIA 8
+#define CMD_CLICK_IZQUIERDO 9
+#define CMD_SCROLL_ARRIBA 10
+#define CMD_SCROLL_ABAJO 11
+#define CMD_EXIT 12
 
-// void EventHandler::procesarMouse(const SDL_Event &event)
-// {
-//     if (event.button.button == SDL_BUTTON_LEFT) {
-//         cola_enviador.try_push(CMD_CLICK_IZQUIERDO);
-//     }  else if (event.type == SDL_MOUSEWHEEL) {
-//         if (event.wheel.y > 0) {
-//             cola_enviador.try_push(CMD_SCROLL_ARRIBA);
-//         } else if (event.wheel.y < 0) {
-//             cola_enviador.try_push(CMD_SCROLL_ABAJO);
-//         }
-//     }
+EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador) :
+    cola_enviador(cola_enviador),
+    codigos_teclado({
+        {SDL_SCANCODE_W, CMD_ARRIBA}, 
+        {SDL_SCANCODE_S, CMD_ABAJO}, 
+        {SDL_SCANCODE_A, CMD_IZQUIERDA},
+        {SDL_SCANCODE_D, CMD_DERECHA},
+        {SDL_SCANCODE_B, CMD_COMPRAR},
+        {SDL_SCANCODE_TAB, CMD_ESTADISTICAS},
+        {SDL_SCANCODE_PERIOD, CMD_COMPRAR_BALAS_PRIMARIA},
+        {SDL_SCANCODE_COMMA, CMD_COMPRAR_BALAS_SECUNDARIA},
+     })
+ {
+}
+
+void EventHandler::procesarTeclado(const SDL_Event &event)
+{
+    if (event.type == SDL_KEYDOWN) {
+        auto it = codigos_teclado.find(event.key.keysym.scancode);
+        if (it != codigos_teclado.end()) {
+            ComandoDTO comando;
+            if(it->second <= 3){
+                comando.tipo = MOVIMIENTO;
+                comando.movimiento = (enum Movimiento)it->second;
+                cola_enviador.try_push(comando);
+            }
+
+        }
+    } 
+
+}
+
+void EventHandler::procesarBotonesMouse(const SDL_Event &event)
+{
+    if (event.button.button == SDL_BUTTON_LEFT) {
+        ComandoDTO comando;
+        comando.tipo = DISPARO;
+        cola_enviador.try_push(comando);
+    }  else if (event.type == SDL_MOUSEWHEEL) {
+        if (event.wheel.y > 0) {
+           // cola_enviador.try_push(CMD_SCROLL_ARRIBA);
+        } else if (event.wheel.y < 0) {
+           // cola_enviador.try_push(CMD_SCROLL_ABAJO);
+        }
+    }
     
-// }
+}
 
-// void EventHandler::manejarEventos(bool &jugador_activo)
-// {
-//     SDL_Event event;
-//     while(SDL_PollEvent(&event)){
-//         if(event.type == SDL_QUIT){
-//             jugador_activo = false;
-//             cola_enviador.try_push(CMD_EXIT);
-//         } 
-//         procesarMouse(event);
-//         procesarTeclado(event);
+void EventHandler::convertir_coordenadas(int &x, int &y) {
+    x = x;
+    y = ALTO_MIN - y;
+}
 
-//     }
-// }
+void EventHandler::procesarPuntero() {
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+    convertir_coordenadas(mouseX, mouseY);
+    ComandoDTO comando;
+    comando.tipo = ROTACION;
+    comando.mouseX = static_cast<uint16_t>(mouseX);
+    comando.mouseY = static_cast<uint16_t>(mouseY);
+    cola_enviador.try_push(comando);
+}
 
-// EventHandler::~EventHandler()
-// {
-// }
+void EventHandler::manejarEventos(bool &jugador_activo)
+{
+    SDL_Event event;
+     while(SDL_PollEvent(&event)){
+         if(event.type == SDL_QUIT){
+            jugador_activo = false;
+            //cola_enviador.try_push(CMD_EXIT);
+            return;
+        } 
+        procesarPuntero();
+        procesarBotonesMouse(event);
+        procesarTeclado(event);
+
+    }
+}
+
+EventHandler::~EventHandler()
+{
+}

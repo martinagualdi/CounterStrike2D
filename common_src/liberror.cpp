@@ -22,8 +22,9 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
-
+#include <string.h>  
 #include <errno.h>
+#include <cerrno>
 
 LibError::LibError(int error_code, const char* fmt, ...) noexcept {
     /* Aquí empieza la magia arcana proveniente de C.

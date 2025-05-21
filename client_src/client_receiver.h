@@ -10,8 +10,6 @@ class ClientReceiver : public Thread {
 private:
     ProtocoloCliente& protocolo;
     Queue<Snapshot>& cola_snapshots;
-    void mostrar_mensaje(Snapshot& snapshot);
-
 public:
 
     explicit ClientReceiver(ProtocoloCliente& protocolo, Queue<Snapshot>& cola);

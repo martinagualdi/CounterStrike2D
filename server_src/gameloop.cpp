@@ -20,16 +20,18 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         case ARRIBA:
             jugador->setY(jugador->getY() + VELOCIDAD);
             break;
-        case ABAJO:
+        case ABAJO: {
             float y = jugador->getY() - VELOCIDAD;
             if(y > 0)
                 jugador->setY(y);
             break;
-        case IZQUIERDA:
+        }
+        case IZQUIERDA: {
             float x = jugador->getX() - VELOCIDAD;
             if(x > 0)
                 jugador->setX(x);
             break;
+        }
         case DERECHA:
             jugador->setX(jugador->getX() + VELOCIDAD);
             break;
@@ -81,6 +83,7 @@ void GameLoop::run() {
                         // logica disparo
                         std::cout << "Angulo recibido: " << comando.angulo << std::endl;
                         break;
+                    
                     default:
                         break;
                 }

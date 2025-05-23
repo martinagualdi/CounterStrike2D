@@ -4,9 +4,9 @@
 #include <atomic>
 
 #include "server_protocol.h"
+#include "monitor_partidas.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/socket.h"
-
 #include "../common_src/queue.h"
 #include "../common_src/thread.h"
 
@@ -21,12 +21,17 @@ HAY QUE HACER USO DEL PROTOCOLO, NO LO IMPLEMENTE TODAVIA
 class Receiver : public Thread {
   private:
     ServerProtocol& protocol;
-    Queue<ComandoDTO> &queue_comandos;
+    MonitorPartidas& monitor_partidas;
     std::atomic<bool>& alive;
     int player_id;
+    Queue<ComandoDTO>* queue_comandos = nullptr;
+    Queue<Snapshot>& queue_enviadora;
+
+    void comunicacion_del_lobby();
+    void comunicacion_de_partida();
 
   public:
-    explicit Receiver(ServerProtocol &protocolo, Queue<ComandoDTO> &queue, std::atomic<bool> &is_alive, int player_id);
+    explicit Receiver(ServerProtocol &protocolo, MonitorPartidas& monitor_partidas, std::atomic<bool> &is_alive, int player_id, Queue<Snapshot>& queue_enviadora);
 
     // Recibe el mensaje del cliente y lo agrega a la queue de mensajes del procesador
     virtual void run() override;

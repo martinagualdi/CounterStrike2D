@@ -5,6 +5,7 @@ target_sources(server
     acceptor.cpp
     gameloop.cpp
     server_protocol.cpp
+    monitor_partidas.cpp
     clienthandler.cpp
     lista_queues.cpp
     receiver.cpp
@@ -19,6 +20,7 @@ target_sources(server
     gameloop.h
     lista_queues.h
     mensaje_dto.h
+    monitor_partidas.h
     partida.h
     processor.h
     receiver.h

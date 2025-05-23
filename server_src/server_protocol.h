@@ -17,6 +17,12 @@ public:
     bool recibir_de_cliente(ComandoDTO& comando);
 
     bool enviarID(int id_jugador) ;
+
+    std::vector<std::string> recibir_inicio_juego();
+
+    void enviar_lista_partidas(const std::vector<std::string>& lista_partidas);
+
+    void enviar_mensaje(const std::string& mensaje);
     /*
     
     IDEA:

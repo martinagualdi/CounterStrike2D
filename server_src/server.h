@@ -17,7 +17,6 @@
 
 class Server {
   private:
-    std::vector<Partida*> partidas_activas;
     Acceptor aceptador;
 
     // Lanza el thread aceptador

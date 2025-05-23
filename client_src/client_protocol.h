@@ -21,6 +21,11 @@ public:
     
     Snapshot recibirSnapshot();
     int recibirID();
+    void enviar_crear_partida();
+    void enviar_unirse_partida(int id_partida);
+    void enviar_listar_partida();
+    std::string recibir_lista_partidas();
+
     ProtocoloCliente(const ProtocoloCliente&) = delete;
     ProtocoloCliente& operator=(const ProtocoloCliente&) = delete;
     ProtocoloCliente(ProtocoloCliente&&) = delete;

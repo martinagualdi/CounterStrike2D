@@ -21,10 +21,6 @@ class Acceptor : public Thread {
     Socket skt;
     std::list<ClientHandler *> clients;
     std::atomic<bool> aceptando_clientes;
-    Queue<Snapshot> queue_recibidora;
-    ListaQueues queues_clientes;
-    //Processor processor;
-    std::vector<Partida*>& partidas;
 
     // Recorre la lista de clientes y elimina a los clientes que ya no se encuentran activos,
     // asegurando que no hay memoria ocupada por threads que ya terminaron
@@ -35,7 +31,7 @@ class Acceptor : public Thread {
     void eliminar_cliente(ClientHandler *client);
 
   public:
-    explicit Acceptor(const char *servname, std::vector<Partida*>& partidas);
+    explicit Acceptor(const char *servname);
 
     // Realiza el loop aceptando nuevos clientes y lanzando nuevos hilos para manejar a cada nuevo
     // cliente. En cada iteracion se encarga de eliminar a los clientes que ya hayan terminado

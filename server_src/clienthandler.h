@@ -5,6 +5,7 @@
 #include "../common_src/queue.h"
 #include "receiver.h"
 #include "sender.h"
+#include "monitor_partidas.h"
 
 #define RW_CLOSE 2
 
@@ -19,7 +20,7 @@ private:
     int id_client;
 
   public:
-    explicit ClientHandler(Socket skt, Queue<ComandoDTO> &queue_comandos, int id);
+    explicit ClientHandler(Socket skt, MonitorPartidas& monitor_partidas, int id);
 
     // Inicia los threads receiver y sender
     void iniciar();

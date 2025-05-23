@@ -6,7 +6,6 @@
 #include <list>
 #include <mutex>
 #include "../common_src/comando_dto.h"
-#include "clienthandler.h"
 #include "lista_queues.h"
 #include "gameloop.h"
 #include "../common_src/snapshot.h"
@@ -14,22 +13,20 @@
 
 class Partida{
 private: 
-    std::string codigo_partida;
-    std::list<ClientHandler*> jugadores;
+    int codigo_partida;
     Queue<ComandoDTO> queue_comandos;
     ListaQueues jugadores_queues;
     GameLoop gameloop;
     std::mutex mtx;
 
 public:
-    Partida(const std::string& codigo);
+    Partida(const int codigo);
 
+    int get_codigo_partida() {return this->codigo_partida;};
 
-    std::string get_codigo_partida() {return this->codigo_partida;};
+    void agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
 
-    void agregar_jugador(Socket&& peer, int id);
-
-
+    Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
 };
 
 #endif

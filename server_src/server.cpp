@@ -3,7 +3,7 @@
 #include <string>
 
 Server::Server(const char* servname):
-        aceptador(servname, partidas_activas) {}
+        aceptador(servname) {}
 
 void Server::comenzar_a_aceptar() { aceptador.start(); }
 

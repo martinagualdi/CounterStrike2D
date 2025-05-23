@@ -5,24 +5,23 @@
 #include <syslog.h>
 
 #include "../common_src/liberror.h"
+#include "monitor_partidas.h"
 
-Acceptor::Acceptor(const char *servname, std::vector<Partida*>& partidas) :
+Acceptor::Acceptor(const char *servname) :
     skt(servname), 
     clients(), 
-    aceptando_clientes(true), 
-    queue_recibidora(50), /*  Valor basico como tope de la queue, despues lo modificamos con uno acorde al juego  */
-    queues_clientes(), 
-    partidas(partidas) {}
+    aceptando_clientes(true){}
 
 void Acceptor::run() {
     int id = 0;
-    Partida *partida = new Partida("partida1");
-    partidas.push_back(partida);
+    MonitorPartidas monitor;
     while (aceptando_clientes) {
         try {
+
             Socket peer = skt.accept();
-            std::cout << "Cliente conectado" << "\n";
-            partida->agregar_jugador(std::move(peer), id);
+            ClientHandler *client = new ClientHandler(std::move(peer), monitor, id);
+            client->iniciar();
+            clients.push_back(client);
             id++;
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
@@ -40,8 +39,8 @@ void Acceptor::run() {
 
 void Acceptor::eliminar_cliente(ClientHandler *client) {
     client->cortar_conexion();
-    int id = client->get_id();
-    queues_clientes.eliminar_queue(id);
+    //int id = client->get_id();
+    //queues_clientes.eliminar_queue(id);
     delete client;
 }
 
@@ -64,7 +63,7 @@ Acceptor::~Acceptor() {
         eliminar_cliente(c);
     }
     clients.clear();
-    queue_recibidora.close();
+    //queue_recibidora.close();
     skt.shutdown(RW_CLOSE);
     skt.close();
     this->join();

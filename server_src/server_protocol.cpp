@@ -72,3 +72,42 @@ bool ServerProtocol::enviarID(int id_jugador) {
     skt.sendall(&id, sizeof(id));
     return true;
 }
+
+std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
+    uint8_t codigo;
+    std::cout << "Esperando comando..." << std::endl;
+    skt.recvall(&codigo, sizeof(codigo));
+    std::vector<std::string> comando;
+    if (codigo == 0x0A) {
+        /* Caso: Crear partida */
+        comando.push_back("crear");
+        std::cout << "Creando partida..." << std::endl;
+    }else if (codigo == 0x0B) {
+        /* Caso: Unirse a partida */
+        comando.push_back("unirse");
+        uint16_t id_partida;
+        skt.recvall(&id_partida, sizeof(id_partida));
+        comando.push_back(std::to_string(ntohs(id_partida)));
+    } else {
+        /* Caso: Listar partidas */
+        comando.push_back("listar");
+    }
+    return comando;
+}
+
+void ServerProtocol::enviar_lista_partidas(const std::vector<std::string>& lista_partidas) {
+    std::string mensaje = "Lista de partidas: \n";
+    for (const std::string& info : lista_partidas) {
+        mensaje += " - " + info + "\n";
+    }
+    enviar_mensaje(mensaje);
+}
+
+void ServerProtocol::enviar_mensaje(const std::string& mensaje) {
+    std::vector<uint8_t> buffer;
+    uint16_t largo = htons(static_cast<uint16_t>(mensaje.size()));
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
+    buffer.insert(buffer.end(), mensaje.begin(), mensaje.end());
+    skt.sendall(buffer.data(), buffer.size());
+}

@@ -15,6 +15,32 @@ Client::Client(const char *hostname, const char *servname, const char* username)
 
 void Client::iniciar() {
     cliente_id = protocolo.recibirID();
+    std::cout << "Bienvenido a Counter Strike 2D, " << username << "! Que desea hacer?" << std::endl;
+    std::cout << " - crear: Nueva partida desde 0\n - unirse <id partida>: Unirse a una partida ya iniciada o por iniciar\n - listar: muestra los id`s de las partidas que te puedes unir\n";
+    while (clienteActivo) {
+        std::string input;
+        std::getline(std::cin, input);
+        if(input.empty()){
+            std::cout << "Comando no reconocido. Intente de nuevo." << std::endl;
+            continue;
+        }
+        if (input == "crear") {
+            protocolo.enviar_crear_partida();
+            std::cout << "Partida creada con exito!" << std::endl;
+            break;
+        } else if (input.substr(0, 6) == "unirse") {
+            int id_partida = std::stoi(input.substr(7));
+            protocolo.enviar_unirse_partida(id_partida);
+            std::cout << "Unidose a la partida con ID: " << id_partida << "..." << std::endl;
+            break;
+        } else if (input == "listar") {
+            protocolo.enviar_listar_partida();
+            std::string lista = protocolo.recibir_lista_partidas();
+            std::cout << lista << std::endl;
+        } else {
+            std::cout << "Comando no reconocido. Intente de nuevo." << std::endl;
+        }
+    }
     hilo_enviador.start();
     hilo_recibidor.start();
     

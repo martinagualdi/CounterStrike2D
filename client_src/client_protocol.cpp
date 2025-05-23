@@ -68,7 +68,41 @@ int ProtocoloCliente::recibirID() {
    socket.recvall(&id_jugador, sizeof(id_jugador));
    id_jugador = ntohs(id_jugador);
    return id_jugador;
-}  
+}
+
+void ProtocoloCliente::enviar_crear_partida() {
+   uint8_t comando = 0x0A;
+   if (!socket.sendall(&comando, sizeof(comando))) {
+      throw std::runtime_error("Error al enviar el comando de crear partida");
+   }
+}
+
+void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
+   std::vector<uint8_t> buffer(2);
+   uint8_t comando = 0x0B;
+   buffer.push_back(comando);
+   push_back_uint16(buffer, (uint16_t)id_partida);
+   if (!socket.sendall(buffer.data(), buffer.size())) {
+      throw std::runtime_error("Error al enviar el comando de unirse a partida");
+   }
+}
+
+void ProtocoloCliente::enviar_listar_partida() {
+   uint8_t comando = 0x0C;
+   if (!socket.sendall(&comando, sizeof(comando))) {
+      throw std::runtime_error("Error al enviar el comando de listar partidas");
+   }
+}
+
+std::string ProtocoloCliente::recibir_lista_partidas() {
+   uint16_t largo;
+   socket.recvall(&largo, sizeof(largo));
+   largo = ntohs(largo);
+   std::vector<uint8_t> buffer(largo);
+   socket.recvall(buffer.data(), largo);
+   std::string lista_partidas(buffer.begin(), buffer.end());
+   return lista_partidas;
+}
 
 ProtocoloCliente::~ProtocoloCliente(){
    socket.shutdown(RW_CLOSE);

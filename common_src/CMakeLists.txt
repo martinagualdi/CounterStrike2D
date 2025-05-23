@@ -4,9 +4,11 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
-    jugador.cpp
     PUBLIC
+    comando_dto.h
+    jugador.h
     liberror.h
+    prefijos_protocolo.h
     queue.h
     resolver.h
     resolvererror.h

@@ -6,7 +6,7 @@ void ClientSender::run(){
 
     while(should_keep_running()){
         ComandoDTO comando;
-        try{          
+        try{
             comando = cola_comandos.pop();
         } catch(const ClosedQueue&){
             break;
@@ -17,10 +17,6 @@ void ClientSender::run(){
             std::cerr << "Falla en el hilo ClientSender: " << e.what() << std::endl;
         }
     }
-
-    try{
-        cola_comandos.close();
-    } catch(...){}
 }
 
 ClientSender::~ClientSender()

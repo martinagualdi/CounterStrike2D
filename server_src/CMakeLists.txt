@@ -15,14 +15,14 @@ target_sources(server
     PUBLIC
     # .h files
     acceptor.h
-    gameloop.h
-    server_protocol.h
     clienthandler.h
+    gameloop.h
     lista_queues.h
-    receiver.h
-    sender.h
-    server.h
-    processor.h
     mensaje_dto.h
     partida.h
+    processor.h
+    receiver.h
+    sender.h
+    server_protocol.h
+    server.h
     )

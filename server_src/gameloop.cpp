@@ -1,6 +1,8 @@
 #include "gameloop.h"
 #include <cmath>
 
+#define VELOCIDAD 0.3
+
 GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
       activo(true) {}
@@ -10,64 +12,90 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     jugadores.push_back(jugador);
 }
 
-float GameLoop::calcularAngulo(int x_personaje, int y_personaje, int x_mouse, int y_mouse) {
-    int dx = x_mouse - x_personaje;
-    int dy = y_mouse - y_personaje;
-    float angulo_radianes = std::atan2(dy, dx);
-    float angulo_grados = angulo_radianes * (180.0 / M_PI);
-    return angulo_grados;
-}
+void GameLoop::ejecutar_movimiento(Jugador *jugador) {
 
-void GameLoop::ejecutar_movimiento(Jugador *jugador, enum Movimiento movimiento) {
-    switch (movimiento) {
-    case ARRIBA:
-        jugador->setY(jugador->getY() + 5);
-        break;
-    case ABAJO:
-        jugador->setY(jugador->getY() - 5);
-        break;
-    case IZQUIERDA:
-        jugador->setX(jugador->getX() - 5);
-        break;
-    case DERECHA:
-        jugador->setX(jugador->getX() + 5);
-        break;
+    float velocidad_diagonal = VELOCIDAD / std::sqrt(2.0f);
+
+    switch (jugador->getMovimiento()) {
+        case ARRIBA:
+            jugador->setY(jugador->getY() + VELOCIDAD);
+            break;
+        case ABAJO:
+            float y = jugador->getY() - VELOCIDAD;
+            if(y > 0)
+                jugador->setY(y);
+            break;
+        case IZQUIERDA:
+            float x = jugador->getX() - VELOCIDAD;
+            if(x > 0)
+                jugador->setX(x);
+            break;
+        case DERECHA:
+            jugador->setX(jugador->getX() + VELOCIDAD);
+            break;
+        case DIAGONAL_SUP_IZQ:
+            jugador->setX(jugador->getX() - velocidad_diagonal);
+            jugador->setY(jugador->getY() + velocidad_diagonal);
+            break;
+        case DIAGONAL_SUP_DER:
+            jugador->setX(jugador->getX() + velocidad_diagonal);
+            jugador->setY(jugador->getY() + velocidad_diagonal);
+            break;
+        case DIAGONAL_INF_IZQ:
+            jugador->setX(jugador->getX() - velocidad_diagonal);
+            jugador->setY(jugador->getY() - velocidad_diagonal);
+            break;
+        case DIAGONAL_INF_DER:
+            jugador->setX(jugador->getX() + velocidad_diagonal);
+            jugador->setY(jugador->getY() - velocidad_diagonal);
+            break;
+        case DETENER:
+            break;
     }
 }
 
-void GameLoop::ejecutar_rotacion(Jugador *jugador, int mouseX, int mouseY) {
-    float angulo = calcularAngulo(jugador->getX(), jugador->getY(), mouseX, mouseY);
-    jugador->setAngulo(angulo);
+Jugador *GameLoop::findJugador(int id_jugador_buscado) {
+    for (Jugador *j : jugadores) {
+        if(j->getId() == id_jugador_buscado)
+            return j;
+    }
+
+    return nullptr;
 }
 
 void GameLoop::run() {
     while (activo) {
         try {
             ComandoDTO comando;
-            if (queue_comandos.try_pop(comando)) {
-                for (Jugador *jugador : jugadores) {
-                    if (jugador->comparar_id(comando.id_jugador)) {
-                        switch (comando.tipo) {
-                        case MOVIMIENTO:
-                            ejecutar_movimiento(jugador, comando.movimiento);
-                            break;
-                        case ROTACION:
-                            ejecutar_rotacion(jugador, comando.mouseX, comando.mouseY);
-                            break;
-                        case DISPARO:
-                            //...
-                            break;
-                        default:
-                            break;
-                        }
-                    }
+            while (queue_comandos.try_pop(comando)) {
+                Jugador* jugador = findJugador(comando.id_jugador);
+                if (!jugador) continue;
+                switch (comando.tipo) {
+                    case MOVIMIENTO:
+                        jugador->setMovimiento(comando.movimiento);
+                        break;
+                    case ROTACION:
+                        jugador->setAngulo(comando.angulo);
+                        break;
+                    case DISPARO:
+                        // logica disparo
+                        std::cout << "Angulo recibido: " << comando.angulo << std::endl;
+                        break;
+                    default:
+                        break;
                 }
-
-                Snapshot snapshot(jugadores);
-
-                queues_jugadores.broadcast(snapshot);
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
+
+            for (Jugador *jugador : jugadores) {
+                if(jugador->estaMoviendo()){
+                    ejecutar_movimiento(jugador);
+                }
+            }
+
+            Snapshot snapshot(jugadores);
+            queues_jugadores.broadcast(snapshot);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            
         } catch (const ClosedQueue &) {
             break;
         }

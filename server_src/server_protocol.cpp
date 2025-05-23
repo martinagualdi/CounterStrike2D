@@ -4,7 +4,6 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-
 ServerProtocol::ServerProtocol(Socket& skt) : skt(skt) {}
 
 bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) { 
@@ -12,24 +11,26 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         return false;
     }
     std::vector<uint8_t> buffer;
-    uint16_t largo = htons(static_cast<uint16_t>(10));
+    uint16_t largo = htons(static_cast<uint16_t>(12 * snapshot.info_jugadores.size()));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
     for (const Jugador& j : snapshot.info_jugadores) {
         uint16_t id = htons(static_cast<uint16_t>(j.getId()));
         buffer.push_back(reinterpret_cast<uint8_t*>(&id)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&id)[1]);
-        uint16_t pos_X = htons(static_cast<uint16_t>(j.getX()));
+        uint32_t pos_X = htonl(static_cast<uint32_t>(j.getX() * 100));
         buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[1]);
-        uint16_t pos_Y = htons(static_cast<uint16_t>(j.getY()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[2]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[3]);
+        uint32_t pos_Y = htonl(static_cast<uint32_t>(j.getY() * 100));
         buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[1]);
-        uint32_t anguloParaEnviar = htons(j.getAngulo() * 100);
-        buffer.push_back(reinterpret_cast<uint8_t*>(&anguloParaEnviar)[0]);
-        buffer.push_back(reinterpret_cast<uint8_t*>(&anguloParaEnviar)[1]);
-        buffer.push_back(reinterpret_cast<uint8_t*>(&anguloParaEnviar)[2]);
-        buffer.push_back(reinterpret_cast<uint8_t*>(&anguloParaEnviar)[3]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[2]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[3]);
+        uint16_t angulo = htons(static_cast<uint16_t>(j.getAngulo() * 100));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[1]);
     }
     skt.sendall(buffer.data(), buffer.size());
     return true;
@@ -47,15 +48,17 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             skt.recvall(&m, 1);
             comando.movimiento = m;
             break;
+        case PREFIJO_DISPARAR:
+            comando.tipo = DISPARO;
+            uint16_t angulo_disparo;
+            skt.recvall(&angulo_disparo, 2);
+            comando.angulo = static_cast<float>(ntohs(angulo_disparo))/100;
+            break;
         case PREFIJO_ROTACION:
             comando.tipo = ROTACION;
-            uint16_t posicionesMouse[2];
-            skt.recvall(&posicionesMouse, sizeof(uint16_t) * 2);
-            comando.mouseX = ntohs(posicionesMouse[0]);
-            comando.mouseY = ntohs(posicionesMouse[1]);
-            break;
-        case PREFIJO_DISPARAR:
-            //....
+            uint16_t angulo;
+            skt.recvall(&angulo, 2);
+            comando.angulo = static_cast<float>(ntohs(angulo))/100;
             break;
         default:
             break;

@@ -19,16 +19,16 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_MOVIMIENTO);
       mensaje.push_back(static_cast<uint8_t>(comando.movimiento));
    } 
-   else if(comando.tipo == ROTACION){
-      mensaje.push_back(PREFIJO_ROTACION);
-      push_back_uint16(mensaje, comando.mouseX);
-      push_back_uint16(mensaje, comando.mouseY);
-   } 
    else if(comando.tipo == DISPARO){
       mensaje.push_back(PREFIJO_DISPARAR);
-      //.... 
+      uint16_t angulo = static_cast<uint16_t>(comando.angulo * 100);      
+      push_back_uint16(mensaje, angulo);
    }
-
+   else if(comando.tipo == ROTACION){
+      mensaje.push_back(PREFIJO_ROTACION);
+      uint16_t angulo = static_cast<uint16_t>(comando.angulo * 100);      
+      push_back_uint16(mensaje, angulo);
+   }
 
 }
 
@@ -47,16 +47,16 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo;
    socket.recvall(&largo, sizeof(largo));
    largo = ntohs(largo);
-   size_t num_jugadores = largo / 10;
+   size_t num_jugadores = largo / 12;
    std::vector<Jugador> jugadores;
    while (num_jugadores > 0) {
-      std::vector<uint8_t> buffer(10);
-      socket.recvall(buffer.data(), 10);
-      uint16_t id = (static_cast<uint16_t>(buffer[0]) << 8) | buffer[1];
-      uint16_t pos_X = (static_cast<uint16_t>(buffer[2]) << 8) | buffer[3];
-      uint16_t pos_Y = (static_cast<uint16_t>(buffer[4]) << 8) | buffer[5];
-      uint32_t angulo = (static_cast<uint32_t>(buffer[6]) << 24) | buffer[7] << 16 | buffer[8] << 8  | buffer[9];
-      Jugador jugador(static_cast<int>(id), static_cast<int>(pos_X), static_cast<int>(pos_Y), static_cast<float>(angulo/100));
+      uint8_t buffer[12];
+      socket.recvall(buffer, 12);
+      uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
+      uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
+      uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
+      uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
+      Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
       jugadores.push_back(jugador);
       num_jugadores--;
    }

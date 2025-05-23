@@ -14,9 +14,8 @@ class GameLoop : public Thread {
     ListaQueues &queues_jugadores;
     std::vector<Jugador *> jugadores;
     std::atomic<bool> activo;
-    void ejecutar_movimiento(Jugador *jugador, enum Movimiento movimiento);
-    void ejecutar_rotacion(Jugador *jugador, int x, int y);
-    float calcularAngulo(int x_personaje, int y_personaje, int x_mouse, int y_mouse);
+    void ejecutar_movimiento(Jugador *jugador);
+    Jugador* findJugador(int id_jugador);
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores);

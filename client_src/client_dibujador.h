@@ -18,15 +18,17 @@ using namespace SDL2pp;
 class Dibujador{
 private:
     const int client_id;
-    Queue<Snapshot>& cola_snapshots;
     Renderer& renderer;
-    Snapshot ultimo_snapshot_recibido;
     Texture fondo;
     Texture player;
+    Texture player_legs;
+    Texture sight;
+    void dibujar_pies();
+    void dibujar_sight();
 
 public:
-    Dibujador(const int id, Renderer& renderer, Queue<Snapshot>& cola_snapshots);
-    void renderizar(/*bool& jugador_activo*/);
+    Dibujador(const int id, Renderer& renderer);
+    void renderizar(Snapshot& snapshot/*, bool& jugador_activo*/);
     Dibujador(const Dibujador&) = delete;
     Dibujador& operator=(const Dibujador&) = delete;
     Dibujador(Dibujador&&) = default;

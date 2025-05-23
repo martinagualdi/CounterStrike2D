@@ -1,44 +1,56 @@
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
+#include "comando_dto.h"
+
 class Jugador {
   private:
     int id;
-    int x = 10;
-    int y = 10;
-    float angulo = 0;
+    float x;
+    float y;
+    float angulo;
+    enum Movimiento movimiento_actual;
 
   public:
-    explicit Jugador(int id) : id(id) {};
-    Jugador(int id, int x, int y, float angulo) : id(id), x(x), y(y), angulo(angulo) {}
-
-    bool comparar_id(int id) {
-        return this->id == id;
-    }
+    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER) {};
+    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo) {}
 
     int getId() const {
         return id;
     }
 
-    int getX() const {
+    float getX() const {
         return x;
     }
-    int getY() const {
+    float getY() const {
         return y;
+    }
+
+    void setX(float posX) {
+        this->x = posX;
+    }
+    void setY(float posY) {
+        this->y = posY;
+    }
+
+    void setAngulo(float angulo){
+        this->angulo = angulo;
     }
 
     float getAngulo() const {
         return angulo;
     }
-    void setAngulo(float angulo) {
-        this->angulo = angulo;
+
+    bool estaMoviendo() const {
+        return movimiento_actual != DETENER;
     }
 
-    void setX(int posX) {
-        this->x = posX;
+    enum Movimiento getMovimiento() const {
+        return movimiento_actual;
     }
-    void setY(int posY) {
-        this->y = posY;
+
+    void setMovimiento(enum Movimiento m){
+        this->movimiento_actual = m;
     }
 
     Jugador(const Jugador &) = default;

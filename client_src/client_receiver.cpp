@@ -6,21 +6,18 @@ void ClientReceiver::run(){
     while(should_keep_running()){
         Snapshot snapshot;
         try{
+            if(should_keep_running())
             snapshot = protocolo.recibirSnapshot(); 
             
         } catch (const std::exception& e){
             break;
         }
-        try{     
+        try{   
             cola_snapshots.try_push(snapshot);
         } catch(const ClosedQueue&){
             break;
         }
     }
-
-    try{
-        cola_snapshots.close();
-    } catch(...){}
 }
 
 ClientReceiver::~ClientReceiver()

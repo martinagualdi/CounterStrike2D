@@ -16,6 +16,10 @@ project(taller_tp
     LANGUAGES CXX
     )
 
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Multimedia MultimediaWidgets)
+set(CMAKE_AUTOMOC ON)
+
 option(TALLER_TESTS "Enable / disable tests." OFF)
 option(TALLER_CLIENT "Enable / disable client program." ON)
 option(TALLER_SERVER "Enable / disable server program." ON)
@@ -124,6 +128,10 @@ if(TALLER_CLIENT)
 
     # Link the taller_common lib target
     target_link_libraries(client taller_common SDL2pp::SDL2pp SDL2_image)
+
+    target_link_libraries(client Qt6::Widgets)
+    target_link_libraries(client Qt6::Multimedia)
+
 endif()
 
 if(TALLER_SERVER)

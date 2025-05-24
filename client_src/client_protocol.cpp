@@ -78,7 +78,7 @@ void ProtocoloCliente::enviar_crear_partida() {
 }
 
 void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
-   std::vector<uint8_t> buffer(2);
+   std::vector<uint8_t> buffer; 
    uint8_t comando = 0x0B;
    buffer.push_back(comando);
    push_back_uint16(buffer, (uint16_t)id_partida);

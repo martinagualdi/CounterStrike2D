@@ -9,6 +9,8 @@ target_sources(client
     client.cpp
     client_main.cpp
     client_dibujador.cpp
+    lobby_window.cpp
+    inicio_window.cpp
     PUBLIC
     client_event_handler.h
     client_protocol.h
@@ -17,4 +19,7 @@ target_sources(client
     client.h
     client_parseador.h
     client_dibujador.h
+    lobby_window.h
+    inicio_window.h
+    mensaje_popup.h
     )

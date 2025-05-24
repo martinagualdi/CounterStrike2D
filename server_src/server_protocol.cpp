@@ -44,9 +44,9 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
     switch(prefijo){
         case PREFIJO_MOVIMIENTO:
             comando.tipo = MOVIMIENTO;
-            enum Movimiento m;
+            uint8_t m;
             skt.recvall(&m, 1);
-            comando.movimiento = m;
+            comando.movimiento = static_cast<enum Movimiento>(m);
             break;
         case PREFIJO_DISPARAR:
             comando.tipo = DISPARO;

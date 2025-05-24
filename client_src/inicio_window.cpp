@@ -41,7 +41,7 @@ Inicio::Inicio(QWidget *parent) : QWidget(parent), ui(nullptr) {
     hostEdit->setAlignment(Qt::AlignCenter);
 
     // Puerto
-    auto *portLabel = new QLabel("Puerto:", this);
+    auto *portLabel = new QLabel("Port:", this);
     portLabel->setFont(font);
     portLabel->setAlignment(Qt::AlignCenter);
 

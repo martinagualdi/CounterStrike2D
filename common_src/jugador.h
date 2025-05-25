@@ -19,15 +19,13 @@ class Jugador {
     enum Movimiento movimiento_actual;
     int vida = 100;
     int dinero = 0;
-    int municion_secundaria = 0;
-    int municion_primaria = 0;
     enum Equipo equipo_actual;
     bool vivo = true;
     Cuchillo cuchillo;
     Arma* arma_actual = &cuchillo;
     Glock glock;
-    Arma* arma_secundaria = &glock;
-    Arma* arma_primaria = nullptr;
+    ArmaDeFuego* arma_secundaria = &glock;
+    ArmaDeFuego* arma_primaria = nullptr;
 
 
   public:
@@ -75,16 +73,20 @@ class Jugador {
     int getVida() const {
         return vida;
     }
-    void setArma(Arma* nuevaArma) {
+    void setArma(ArmaDeFuego* nuevaArma) {
         if (arma_primaria != nullptr) {
             delete arma_primaria;
         }
         arma_primaria = nuevaArma;
     }
-    Arma* getArmaPrimaria() const {
+
+    void setArmaActual(Arma* nuevaArma) {
+        this->arma_actual = nuevaArma;
+    }
+    ArmaDeFuego* getArmaPrimaria() const {
         return arma_primaria;
     }
-    Arma* getArmaSecundaria() const {
+    ArmaDeFuego* getArmaSecundaria() const {
         return arma_secundaria;
     }
 
@@ -95,16 +97,16 @@ class Jugador {
         this->dinero = dinero+recompensa;
     }
     int getMunicionSecundaria() const {
-        return municion_secundaria;
+        return arma_secundaria->getMunicion();
     }
     void recibirMunicionSecundaria(int cantidad) {
-        this->municion_secundaria = municion_secundaria+cantidad;
+        this->arma_secundaria->setMunicion(cantidad);
     }
     int getMunicionPrimaria() const {
-        return municion_primaria;
+        return arma_primaria->getMunicion();
     }
     void recibirMunicionPrimaria(int cantidad) {
-        this->municion_primaria = municion_primaria+cantidad;
+        this->arma_primaria->setMunicion(cantidad);
     }
     
 

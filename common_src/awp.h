@@ -1,9 +1,12 @@
-#include "arma.h"
+#include "armaDeFuego.h"
 
-class AWP : public Arma {
+class AWP : public ArmaDeFuego {
+
+
 public:
-    AWP() : Arma() {}
-    int disparar(float /*distancia*/) override {
+    // Valores Hardcodeados hasta tener YAML
+    AWP() : ArmaDeFuego("Awp", 0.7f, 35.0f, 50, 100, false,25) {}
+    int accion(float /*distancia*/) override {
         if (municion_actual <= 0) return 0;
         municion_actual--;
         std::random_device rd; std::mt19937 gen(rd());
@@ -14,13 +17,5 @@ public:
         }
         return 0;
     }
-private:
-    std::string nombre = "AWP";
-    int municion_max = 50;
-    int municion_actual = 0;
-    float precision = 0.7f; 
-    float alcance = 30.0f;  
-    int min_danio = 50;
-    int max_danio = 100;
-    bool es_automatica = false;
+
 };

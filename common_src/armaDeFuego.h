@@ -1,0 +1,27 @@
+#ifndef ARMADEFUEGO_H
+#define ARMADEFUEGO_H
+
+#include <string>
+#include <random>
+#include "arma.h"
+
+class ArmaDeFuego: public Arma {
+protected:
+    int municion_actual ;
+    const int municion_max;
+
+public:
+ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_danio, int max_danio, bool es_automatica, int municion_max)
+    : Arma(nombre, precision, alcance, min_danio, max_danio, es_automatica),
+      municion_actual(municion_max), municion_max(municion_max) {}
+
+    virtual ~ArmaDeFuego() = default;
+
+    virtual bool puede_disparar() const { return municion_actual > 0; }
+    virtual void recargar() { municion_actual = municion_max; }
+    void setMunicion(int municion) { municion_actual = municion_actual+municion; }
+    virtual int getMunicion() const { return municion_actual; }
+    virtual int getMunicionMax() const { return municion_max; }
+    virtual bool esAutomatica() const { return es_automatica; }
+};
+#endif

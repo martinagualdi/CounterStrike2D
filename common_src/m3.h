@@ -1,9 +1,14 @@
-#include "arma.h"
+#include "armaDeFuego.h"
 
-class M3 : public Arma {
+
+class M3 : public ArmaDeFuego {
+
+
+
 public:
-    M3() : Arma() {}
-    int disparar(float distancia) override {
+    // Valores Hardcodeados hasta tener YAML
+    M3() : ArmaDeFuego("M3", 0.7f, 15.0f, 20, 70, false,100) {}
+    int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         municion_actual--;
         float factor_precision = precision - (distancia / alcance) * 0.7f;
@@ -23,14 +28,4 @@ public:
         }
         return total_danio;
     }
-
-private:
-    std::string nombre = "M3";
-    int municion_actual = 0;
-    int municion_max = 100; 
-    float precision = 0.7f; 
-    float alcance = 15.0f;
-    int min_danio = 5;
-    int max_danio = 20;
-    bool es_automatica = false;
 };

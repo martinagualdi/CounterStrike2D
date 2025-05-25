@@ -1,9 +1,11 @@
-#include "arma.h"
+#include "armaDeFuego.h"
 
-class Glock : public Arma {
+class Glock : public ArmaDeFuego {
+    
 public:
-    Glock() : Arma() {}
-    int disparar(float distancia) override {
+    // Valores Hardcodeados hasta tener YAML
+    Glock() : ArmaDeFuego("Glock", 0.8f, 20.0f, 10, 40, false,50) {}
+    int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         municion_actual--;
         float factor_precision = precision - (distancia / alcance) * 0.5f;
@@ -19,14 +21,5 @@ public:
         }
         return 0;
     }
-
-private:
-    std::string nombre = "Glock";
-    int municion_actual = 0;
-    int municion_max = 100;
-    float alcance   = 20.0f; 
-    float precision = 0.8f;  
-    int min_danio = 5;
-    int max_danio = 35;
-    bool es_automatica  = false;
+    
 };

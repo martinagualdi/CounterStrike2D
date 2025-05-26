@@ -18,11 +18,12 @@ public:
           min_danio(min_danio), max_danio(max_danio), es_automatica(es_automatica) {}
 ; 
 
-    virtual ~Arma() = default;
-
-    virtual int accion(float distancia); // Devuelve el daño causado (0 si falla)
+    virtual int accion(float distancia)=0; // Devuelve el daño causado (0 si falla)
     virtual std::string getNombre() const { return nombre; }
     virtual bool esAutomatica() const { return es_automatica; }
+
+    virtual ~Arma() = default; 
+   
 };
 
 #endif

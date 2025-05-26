@@ -36,7 +36,6 @@ public:
     bool estaDetonada() const { return detonada; }
 
     int getTiempoParaDetonar() const { return tiempo_para_detonar; }
-    
 };
 
 #endif

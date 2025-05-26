@@ -1,6 +1,6 @@
 #ifndef JUGADOR_H
 #define JUGADOR_H
-
+#include <memory>
 #include "comando_dto.h"
 #include "cuchillo.h"
 #include "arma.h"
@@ -17,22 +17,21 @@ class Jugador {
     float y;
     float angulo;
     enum Movimiento movimiento_actual;
-    int vida = 100;
-    int dinero = 0;
-    int municion_secundaria = 0;
-    int municion_primaria = 0;
+    int vida;
+    int dinero;
     enum Equipo equipo_actual;
     bool vivo = true;
-    Cuchillo cuchillo;
-    Arma* arma_actual = &cuchillo;
-    Glock glock;
-    Arma* arma_secundaria = &glock;
-    Arma* arma_primaria = nullptr;
-
+    //std::unique_ptr<Cuchillo> cuchillo;
+    //Arma* arma_actual;
+    //std::unique_ptr<ArmaDeFuego> arma_secundaria;
+    //std::unique_ptr<ArmaDeFuego> arma_primaria;
 
   public:
-    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER) {};
-    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo) {}
+    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)/*
+    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr)*/ {};
+
+    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)/*
+    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr)*/{};
 
     int getId() const {
         return id;
@@ -75,17 +74,25 @@ class Jugador {
     int getVida() const {
         return vida;
     }
-    void setArma(Arma* nuevaArma) {
-        if (arma_primaria != nullptr) {
-            delete arma_primaria;
-        }
-        arma_primaria = nuevaArma;
+    /*
+    void setArmaPrimaria(std::unique_ptr<ArmaDeFuego> nuevaArma) {
+        arma_primaria = std::move(nuevaArma);
     }
-    Arma* getArmaPrimaria() const {
-        return arma_primaria;
+
+    void cambiarASecundaria() {
+        arma_actual = arma_secundaria.get();
     }
-    Arma* getArmaSecundaria() const {
-        return arma_secundaria;
+    void cambiarAPrimaria() {
+        arma_actual = arma_primaria.get();
+    }
+    void cambiarACuchillo() {
+        arma_actual = cuchillo.get();
+    }
+    ArmaDeFuego* getArmaPrimaria() const {
+        return arma_primaria.get();
+    }
+    ArmaDeFuego* getArmaSecundaria() const {
+        return arma_secundaria.get();
     }
 
     int getDinero() const {
@@ -95,18 +102,49 @@ class Jugador {
         this->dinero = dinero+recompensa;
     }
     int getMunicionSecundaria() const {
-        return municion_secundaria;
+        return arma_secundaria->getMunicion();
     }
     void recibirMunicionSecundaria(int cantidad) {
-        this->municion_secundaria = municion_secundaria+cantidad;
+        this->arma_secundaria->setMunicion(cantidad);
     }
     int getMunicionPrimaria() const {
-        return municion_primaria;
+        return arma_primaria->getMunicion();
     }
     void recibirMunicionPrimaria(int cantidad) {
-        this->municion_primaria = municion_primaria+cantidad;
+        this->arma_primaria->setMunicion(cantidad);
+    }
+
+    void recibirDanio(int danio) {
+        if (danio < 0) return; // No se puede recibir daño negativo
+        vida -= danio;
+        if (vida <= 0) {
+            vida = 0;
+            vivo = false;
+        }
+    }
+    bool estaVivo() const {
+        return vivo;
+    }
+    void revivir() {
+        vida = 100;
+        vivo = true;
+    }
+    void setEquipo(enum Equipo equipo) {
+        this->equipo_actual = equipo;
+    }
+    enum Equipo getEquipo() const {
+        return equipo_actual;
     }
     
+    int disparar(float distancia) {
+        return arma_actual->accion(distancia);
+    }
+
+    */
+    
+    ~Jugador() {
+       
+    }
 
     Jugador(const Jugador &) = default;
     Jugador &operator=(const Jugador &) = default;

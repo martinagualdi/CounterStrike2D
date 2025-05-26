@@ -15,5 +15,12 @@ target_sources(taller_common
     snapshot.h
     socket.h
     thread.h
-    jugador.h
+    arma.h
+    armaDeFuego.h
+    awp.h
+    m3.h
+    ak47.h
+    glock.h
+    cuchillo.h
+    bomba.h
     )

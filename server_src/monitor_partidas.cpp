@@ -1,0 +1,39 @@
+#include "monitor_partidas.h"
+
+int MonitorPartidas::crear_partida(int player_id, Queue<Snapshot>& queue_enviadora) {
+    std::lock_guard<std::mutex> lock(mtx);
+    partidas[id_para_partidas] = std::make_unique<Partida>(id_para_partidas);
+    partidas[id_para_partidas]->agregar_jugador(player_id, queue_enviadora);
+    id_para_partidas++;
+    return id_para_partidas - 1;
+}
+
+bool MonitorPartidas::unirse_a_partida(int id_partida, int player_id, Queue<Snapshot>& queue_enviadora) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto it = partidas.find(id_partida);
+    if (it != partidas.end()) {
+        it->second->agregar_jugador(player_id, queue_enviadora);
+        return true;
+    }
+    return false;
+}
+
+std::vector<std::string> MonitorPartidas::listar_partidas() {
+    std::lock_guard<std::mutex> lock(mtx);
+    std::vector<std::string> lista_partidas;
+    for (const auto& partida : partidas) {
+        std::string nueva_partida = "Id: " + std::to_string(partida.first) + "\n";
+        lista_partidas.push_back(nueva_partida);
+    }
+    return lista_partidas;
+}
+
+Queue<ComandoDTO>* MonitorPartidas::obtener_queue_de_partida(int id_partida) {
+    std::lock_guard<std::mutex> lock(mtx);
+    for (const auto& partida : partidas) {
+        if (partida.first == id_partida) {
+            return &partida.second->get_queue();
+        }
+    }
+    return nullptr;
+}

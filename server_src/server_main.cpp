@@ -1,22 +1,27 @@
+#include <cstring>
+#include <exception>
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "server.h"
 
-const int CANTIDAD_ARGS = 2;
-const int FIRST_ARG = 0;
-const int SECOND_ARG = 1;
-const int ERROR = 1;
-const int SUCCESS = 0;
+#define MIN_ARGUMNENTOS_SERVIDOR 2
+#define RET_ERROR 1
+#define RET_EXITO 0
 
-void verificar_argumentos(int argc, const char** argv) {
-    if (argc != CANTIDAD_ARGS) {
-        std::cout << "Uso: " << argv[FIRST_ARG] << " <puerto>" << std::endl;
-        exit(ERROR);
+int main(int argc, char *argv[]) {
+
+    if (argc != MIN_ARGUMNENTOS_SERVIDOR)
+        return RET_ERROR;
+    try {
+        const char *port = argv[1];
+
+        Server server(port);
+        server.start();
+    } catch (const std::exception &e) {
+        std::cerr << "Error al ejecutar el servidor: " << e.what() << std::endl;
+        return RET_ERROR;
     }
-}
-
-int main(int argc, const char** argv) {
-    verificar_argumentos(argc, argv);
-
-    Server server(std::stoi(argv[SECOND_ARG]));
-    server.run();
-    return SUCCESS;
+    return RET_EXITO;
 }

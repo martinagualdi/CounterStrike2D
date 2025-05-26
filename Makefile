@@ -11,4 +11,5 @@ run-tests: compile-debug
 all: clean run-tests
 
 clean:
-	rm -Rf build/
+	find build/ -type f \( -name '*.o' -o -name '*.a' -o -name '*.so' -o -name '*.exe' -o -name 'server' -o -name 'client' -o -name 'taller_tests' -o -name '*.dir' \) -delete
+	find build/ -type d -name '*.dir' -exec rm -rf {} +

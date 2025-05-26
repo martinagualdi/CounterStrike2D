@@ -1,7 +1,30 @@
-target_sources(taller_server
+target_sources(server
     PRIVATE
     # .cpp files
-    main.cpp
+    server_main.cpp
+    acceptor.cpp
+    gameloop.cpp
+    server_protocol.cpp
+    monitor_partidas.cpp
+    clienthandler.cpp
+    lista_queues.cpp
+    receiver.cpp
+    sender.cpp
+    server.cpp
+    processor.cpp
+    partida.cpp
     PUBLIC
     # .h files
+    acceptor.h
+    clienthandler.h
+    gameloop.h
+    lista_queues.h
+    mensaje_dto.h
+    monitor_partidas.h
+    partida.h
+    processor.h
+    receiver.h
+    sender.h
+    server_protocol.h
+    server.h
     )

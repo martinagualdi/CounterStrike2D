@@ -1,7 +1,25 @@
-target_sources(taller_client
+target_sources(client
     PRIVATE
-    # .cpp files
-    main.cpp
+    client_event_handler.cpp
+    client_main.cpp
+    client_protocol.cpp
+    client_receiver.cpp
+    client_sender.cpp
+    client_parseador.h
+    client.cpp
+    client_main.cpp
+    client_dibujador.cpp
+    lobby_window.cpp
+    inicio_window.cpp
     PUBLIC
-    # .h files
+    client_event_handler.h
+    client_protocol.h
+    client_receiver.h
+    client_sender.h
+    client.h
+    client_parseador.h
+    client_dibujador.h
+    lobby_window.h
+    inicio_window.h
+    mensaje_popup.h
     )

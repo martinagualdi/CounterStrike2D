@@ -1,8 +1,26 @@
 target_sources(taller_common
     PRIVATE
-    # .cpp files
-    foo.cpp
+    liberror.cpp
+    resolver.cpp
+    resolvererror.cpp
+    socket.cpp
     PUBLIC
-    # .h files
-    foo.h
+    comando_dto.h
+    jugador.h
+    liberror.h
+    prefijos_protocolo.h
+    queue.h
+    resolver.h
+    resolvererror.h
+    snapshot.h
+    socket.h
+    thread.h
+    arma.h
+    armaDeFuego.h
+    awp.h
+    m3.h
+    ak47.h
+    glock.h
+    cuchillo.h
+    bomba.h
     )

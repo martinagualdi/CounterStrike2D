@@ -1,56 +1,45 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <atomic>
-#include <memory>
-#include <unordered_map>
 #include <vector>
-#include <map>
-#include "gameloop.h"
-#include "game_state.h"
-#include "../common_src/thread.h"
+#include <string>
+#include <iostream>
 
-class Accepter;
-class ServerMonitor;
-class Client;
-class GameLoop;
+#include "mensaje_dto.h"
+#include "../common_src/socket.h"
+#include "processor.h"
+#include "acceptor.h"
+#include "lista_queues.h"
+#include "../common_src/queue.h"
+#include "partida.h"
 
-class Server: public Thread {
-private:
-    std::shared_ptr<GameLoop> gameloop;  // Cambiar a shared_ptr
-    std::shared_ptr<ServerMonitor> monitor;
-    std::shared_ptr<Accepter> accepter;  // Cambiar a unique_ptr
-    std::map<uint8_t, std::shared_ptr<Client>> clients;
+#define EXIT_SERVER "q"
 
-    // Cierra todas las conexiones de clientes activos.
-    void closeClients();
+class Server {
+  private:
+    Acceptor aceptador;
 
-public:
-    explicit Server(int port);
+    // Lanza el thread aceptador
+    void comenzar_a_aceptar();
 
-    // Ejecuta el servidor.
-    void run() override;
+    void comenzar_a_procesar();
 
-    // Detiene el servidor y cierra todas las conexiones.
-    void stop() override;
+    // Chequea que los argumentos de la funcion main sean correctos
+    static bool argumentos_validos(int argc, char *argv[]);
 
-    // Agrega un cliente nuevo al servidor.
-    void addClient(uint8_t idClient, std::shared_ptr<Client> client);
+    // Lee la entrada standard y loopea en esa entrada hasta que se ingrese una 'q'
+    void leer_entrada();
 
-    // Elimina un cliente del servidor.
-    void removeClient(uint8_t idClient);
+    // Termina el hilo procesador y aceptador y cierra el socket
+    void terminar_juego();
 
-    // Maneja la entrada del usuario desde la consola.
-    void handleInput();
+  public:
+    explicit Server(const char *servname);
 
-    // Verifica si el servidor está en ejecución.
-    bool esta_corriendo() const { return _keep_running; }
+    // Inicia la logica del server. Inicializa el aceptador, procesador y las queues.
+    void start();
 
-    // Devuelve los Senders de los usuarios.
-    std::map<uint8_t, std::shared_ptr<Client>>& getClients();
-
-    // Destruye el servidor, liberando todos los recursos reservados.
     ~Server();
 };
 
-#endif  // SERVER_H
+#endif

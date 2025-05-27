@@ -1,5 +1,6 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
+#include "personaje_popup.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -92,10 +93,20 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
 
 void LobbyWindow::onCrearClicked() {
     protocolo.enviar_crear_partida();
-    MensajePopup popup("Partida", "Partida creada con éxito.", this);
-    popup.exec();
-    emit partidaSeleccionada();
-    accept();  // Cierra el diálogo con QDialog::Accepted
+
+    PersonajePopup equipoDialog(this);
+    connect(&equipoDialog, &PersonajePopup::teamSeleccionado, this, [this](int team) {
+        // Aquí podés guardar el equipo seleccionado o enviarlo por protocolo si hace falta
+        qDebug() << "Equipo seleccionado (crear):" << team;
+        // protocolo.enviar_seleccion_equipo(team); // si necesitás enviar info
+    });
+
+    if (equipoDialog.exec() == QDialog::Accepted) {
+        MensajePopup popup("Partida", "Partida creada con éxito.", this);
+        popup.exec();
+        emit partidaSeleccionada();
+        accept();
+    }
 }
 
 void LobbyWindow::onListarClicked() {
@@ -132,9 +143,16 @@ void LobbyWindow::onUnirseClicked() {
 
     protocolo.enviar_unirse_partida(id);
 
-    MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
-    popup.exec();
-    emit partidaSeleccionada();
-    accept();
-}
+    PersonajePopup equipoDialog(this);
+    connect(&equipoDialog, &PersonajePopup::teamSeleccionado, this, [this](int team) {
+        qDebug() << "Equipo seleccionado (unirse):" << team;
+        // protocolo.enviar_seleccion_equipo(team);
+    });
 
+    if (equipoDialog.exec() == QDialog::Accepted) {
+        MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
+        popup.exec();
+        emit partidaSeleccionada();
+        accept();
+    }
+}

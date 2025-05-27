@@ -1,5 +1,6 @@
 #include "client_protocol.h"
 #include "../common_src/prefijos_protocolo.h"
+#include "../common_src/municion.h"
 #include <netinet/in.h>
 
 #define RW_CLOSE 2
@@ -44,6 +45,27 @@ void ProtocoloCliente::enviarComando(ComandoDTO comando) {
 }
 
 Snapshot ProtocoloCliente::recibirSnapshot() {
+   /*uint16_t largo;
+   socket.recvall(&largo, sizeof(largo));
+   largo = ntohs(largo);
+   size_t num_jugadores = largo / 12;
+   std::vector<Jugador> jugadores;
+   while (num_jugadores > 0) {
+      uint8_t buffer[12];
+      socket.recvall(buffer, 12);
+      uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
+      uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
+      uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
+      uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
+      Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
+      jugadores.push_back(jugador);
+      num_jugadores--;
+   }
+   return Snapshot(jugadores);*/
+
+   /*ARRIBA VIEJO, ABAJO CODIGO CON BALAS DISPARADAS*/
+   uint8_t hay_balas_disparadas;
+   socket.recvall(&hay_balas_disparadas, sizeof(hay_balas_disparadas));
    uint16_t largo;
    socket.recvall(&largo, sizeof(largo));
    largo = ntohs(largo);
@@ -60,7 +82,29 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       jugadores.push_back(jugador);
       num_jugadores--;
    }
+   if (hay_balas_disparadas == 0x01){
+      //std::cout << "Hay balas disparadas" << std::endl;
+      uint16_t largo_balas;
+      socket.recvall(&largo_balas, sizeof(largo_balas));
+      largo_balas = ntohs(largo_balas);
+      size_t num_balas = largo_balas / 12; // Cada bala ocupa 12 bytes
+      std::vector<Municion> balas_disparadas;
+      while (num_balas > 0) {
+         uint8_t buffer[12];
+         socket.recvall(buffer, 12);
+         uint16_t id_quien_disparo = ntohs(*(uint16_t*)&buffer[0]);
+         uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
+         uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
+         uint16_t angulo_disparo = ntohs(*(uint16_t*)&buffer[10]);
+         Municion bala(id_quien_disparo, static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo_disparo)/100);
+         balas_disparadas.push_back(bala);
+         num_balas--;
+      }
+      return Snapshot(jugadores, balas_disparadas);
+   }
+
    return Snapshot(jugadores);
+
 }
 
 int ProtocoloCliente::recibirID() {

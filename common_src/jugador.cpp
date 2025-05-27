@@ -1,47 +1,59 @@
-/*
-
 #include "jugador.h"
 
+bool Jugador::disparar() {
+    /* HARCODEADO PAEA PROBAR DISPARO */
+    if (arma_secundaria->accion(0.0f) > 0)
+        return true;
+    return false;
+}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+#include "jugador.h"
 int Jugador::getId() const {
     return id;
 }
-
 float Jugador::getX() const {
     return x;
 }
 float Jugador::getY() const {
     return y;
 }
-
 void Jugador::setX(float posX) {
     this->x = posX;
 }
 void Jugador::setY(float posY) {
     this->y = posY;
 }
-
 void Jugador::setAngulo(float angulo){
     this->angulo = angulo;
 }
-
 float Jugador::getAngulo() const {
     return angulo;
 }
-
 bool Jugador::estaMoviendo() const {
     return movimiento_actual != DETENER;
 }
-
 enum Movimiento Jugador::getMovimiento() const {
     return movimiento_actual;
 }
-
 void Jugador::setMovimiento(enum Movimiento m){
     this->movimiento_actual = m;
 }
-
 int Jugador::getVida() const {
     return vida;
 }
@@ -51,7 +63,6 @@ void Jugador::setArmaPrimaria(ArmaDeFuego* nuevaArma) {
     }
     arma_primaria = nuevaArma;
 }
-
 void Jugador::cambiarASecundaria() {
     arma_actual = arma_secundaria;
 }
@@ -67,7 +78,6 @@ ArmaDeFuego* Jugador::getArmaPrimaria() const {
 ArmaDeFuego* Jugador::getArmaSecundaria() const {
     return arma_secundaria;
 }
-
 int Jugador::getDinero() const {
     return dinero;
 }
@@ -86,7 +96,6 @@ int Jugador::getMunicionPrimaria() const {
 void Jugador::recibirMunicionPrimaria(int cantidad) {
     this->arma_primaria->setMunicion(cantidad);
 }
-
 void Jugador::recibirDanio(int danio) {
     if (danio < 0) return; // No se puede recibir daño negativo
     vida -= danio;
@@ -108,11 +117,9 @@ void Jugador::setEquipo(enum Equipo equipo) {
 enum Equipo Jugador::getEquipo() const {
     return equipo_actual;
 }
-
 int Jugador::disparar(float distancia) {
     return arma_actual->accion(distancia);
 }
-
 Jugador::~Jugador() {
     delete arma_primaria;
     delete arma_secundaria;

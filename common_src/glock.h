@@ -6,7 +6,7 @@ public:
     // Valores Hardcodeados hasta tener YAML
     Glock() : ArmaDeFuego("Glock", 0.8f, 20.0f, 10, 40, false,50) {}
     int accion(float distancia) override {
-        if (municion_actual <= 0) return 0;
+        /*if (municion_actual <= 0) return 0;
         municion_actual--;
         float factor_precision = precision - (distancia / alcance) * 0.5f;
         if (factor_precision < 0.1f) factor_precision = 0.1f;
@@ -19,7 +19,12 @@ public:
             danio -= static_cast<int>(danio * (distancia / alcance) * 0.5f);
             return danio > 0 ? danio : 1;
         }
-        return 0;
+        return 0;*/
+        if (getMunicion() == 0) 
+            return 0;
+        municion_actual--;
+        distancia += 0.5f; // Aumentamos la distancia para que el daño disminuya con la distancia
+        return 10;
     }
 
    

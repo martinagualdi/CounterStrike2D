@@ -7,7 +7,7 @@
 ServerProtocol::ServerProtocol(Socket& skt) : skt(skt) {}
 
 bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) { 
-    if (snapshot.info_jugadores.size() <= 0) {
+    /*if (snapshot.info_jugadores.size() <= 0) {
         return false;
     }
     std::vector<uint8_t> buffer;
@@ -32,6 +32,64 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[1]);
     }
+    skt.sendall(buffer.data(), buffer.size());
+    return true;*/
+    
+    
+    /*ARRIBA CODIGO VIEJO, ABAJO AGREGANDO LAS BALAS DISPARADAS*/
+    
+    
+    if (snapshot.info_jugadores.size() <= 0) {
+        return false;
+    }
+    std::vector<uint8_t> buffer;
+    snapshot.balas_disparadas.size() > 0 ? buffer.push_back(0x01) : buffer.push_back(0x00); /* AGREGO UNA FORMA DE DEFINIR SI HAY QUE LEER BALAS*/
+    uint16_t largo = htons(static_cast<uint16_t>(12 * snapshot.info_jugadores.size()));
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
+    for (const Jugador& j : snapshot.info_jugadores) {
+        uint16_t id = htons(static_cast<uint16_t>(j.getId()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&id)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&id)[1]);
+        uint32_t pos_X = htonl(static_cast<uint32_t>(j.getX() * 100));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[1]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[2]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[3]);
+        uint32_t pos_Y = htonl(static_cast<uint32_t>(j.getY() * 100));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[1]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[2]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[3]);
+        uint16_t angulo = htons(static_cast<uint16_t>(j.getAngulo() * 100));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[1]);
+    }
+    if (snapshot.balas_disparadas.size() > 0) {
+        //std::cout << "Enviando balas disparadas..." << std::endl;
+        uint16_t largo_balas = htons(static_cast<uint16_t>(12 * snapshot.balas_disparadas.size()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[1]);
+        for (const Municion& bala : snapshot.balas_disparadas) {
+            uint16_t id_quien_disparo = htons(static_cast<uint16_t>(bala.quien_disparo()));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&id_quien_disparo)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&id_quien_disparo)[1]);
+            uint32_t pos_X = htonl(static_cast<uint32_t>(bala.getPosX() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[1]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[2]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[3]);
+            uint32_t pos_Y = htonl(static_cast<uint32_t>(bala.getPosY() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[1]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[2]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[3]);
+            uint16_t angulo_disparo = htons(static_cast<uint16_t>(bala.getAnguloDisparo() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&angulo_disparo)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&angulo_disparo)[1]);
+        }
+    }
+    
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }

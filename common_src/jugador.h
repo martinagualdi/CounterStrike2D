@@ -21,17 +21,27 @@ class Jugador {
     int dinero;
     enum Equipo equipo_actual;
     bool vivo = true;
+    std::shared_ptr<Glock> arma_secundaria;
+
+
+
+
     //std::unique_ptr<Cuchillo> cuchillo;
     //Arma* arma_actual;
     //std::unique_ptr<ArmaDeFuego> arma_secundaria;
     //std::unique_ptr<ArmaDeFuego> arma_primaria;
 
   public:
-    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)/*
-    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr)*/ {};
+    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
 
-    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)/*
-    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr)*/{};
+    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
+
+    /*explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)
+    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr){};
+
+    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)
+    ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr){};*/
+
 
     int getId() const {
         return id;
@@ -73,6 +83,16 @@ class Jugador {
 
     int getVida() const {
         return vida;
+    }
+
+    bool disparar();
+
+    void recibir_danio(int danio) { 
+        vida -= danio; 
+        if (vida <= 0) {
+            vida = 0;
+            vivo = false;
+        }
     }
     /*
     void setArmaPrimaria(std::unique_ptr<ArmaDeFuego> nuevaArma) {

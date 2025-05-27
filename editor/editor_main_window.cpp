@@ -13,60 +13,72 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QDebug>
+#include <QTabWidget>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
-    // Fondo blanco inicial
-    setStyleSheet("background-color: white;");
-
-    // Layout principal vertical
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // Espacio superior (puede ser para mapa o vacío)
-    QWidget* topWidget = new QWidget;
+    // Parte superior (topWidget)
+    topWidget = new TopWidget;
     topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout->addWidget(topWidget);
 
-    // Scroll area para los thumbnails (parte inferior)
-    QScrollArea* scrollArea = new QScrollArea;
-    scrollArea->setFixedHeight(120);  // Altura para thumbnails
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setWidgetResizable(true);
+    // QTabWidget para las pestañas
+    QTabWidget* tabWidget = new QTabWidget;
+    tabWidget->setFixedHeight(140);  // para incluir scroll + espacio
 
-    QWidget* container = new QWidget;
-    QHBoxLayout* hLayout = new QHBoxLayout(container);
-    hLayout->setSpacing(5);
-    hLayout->setContentsMargins(5, 5, 5, 5);
+    // Crear las 4 pestañas
+    struct TabInfo {
+        QString name;
+        QString dirPath;
+    };
 
-    // Cargar imágenes desde el directorio
-    QDir dir("editor/gfx/backgrounds/");
-    QStringList images = dir.entryList(QStringList() << "*.png" << "*.jpg" << "*.bmp", QDir::Files);
+    TabInfo tabs[] = {
+        { "Fondos", "editor/gfx/backgrounds/" },
+        { "Objetos", "editor/gfx/tiles/" },
+        { "Armas",  "editor/gfx/weapons/" },
+        { "Jugadores", "editor/gfx/player/" }
+    };
 
-    for (const QString& imgName : images) {
-        QString fullPath = dir.absoluteFilePath(imgName);
-        QPixmap pix(fullPath);
-        DraggableLabel* label = new DraggableLabel(fullPath);
-        label->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        label->setFixedSize(100, 100);
-        hLayout->addWidget(label);
+    for (const auto& tab : tabs) {
+        QScrollArea* scrollArea = new QScrollArea;
+        scrollArea->setFixedHeight(120);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollArea->setWidgetResizable(true);
 
-        // opcional: todavía podés permitir hacer clic si querés
-        connect(label, &DraggableLabel::clicked, this, [this](const QString& path) {
-            QPixmap bg(path);
-            QPalette pal = this->palette();
-            pal.setBrush(QPalette::Window, QBrush(bg.scaled(this->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)));
-            this->setAutoFillBackground(true);
-            this->setPalette(pal);
-            this->update();
-        });
+        QWidget* container = new QWidget;
+        QHBoxLayout* hLayout = new QHBoxLayout(container);
+        hLayout->setSpacing(5);
+        hLayout->setContentsMargins(5, 5, 5, 5);
+
+        QDir dir(tab.dirPath);
+        QStringList images = dir.entryList(QStringList() << "*.png" << "*.jpg" << "*.bmp", QDir::Files);
+
+        for (const QString& imgName : images) {
+            QString fullPath = dir.absoluteFilePath(imgName);
+            QPixmap pix(fullPath);
+            DraggableLabel* label = new DraggableLabel(fullPath);
+            label->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            label->setFixedSize(100, 100);
+            hLayout->addWidget(label);
+
+            connect(label, &DraggableLabel::clicked, this, [this](const QString& path) {
+                topWidget->setBackgroundPath(path);
+            });
+        }
+
+        scrollArea->setWidget(container);
+        tabWidget->addTab(scrollArea, tab.name);
     }
 
-    scrollArea->setWidget(container);
-    mainLayout->addWidget(scrollArea);
+    mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
+    topWidget->setAcceptDrops(true);
 }
+
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasImage() || event->mimeData()->hasUrls()) {
@@ -74,19 +86,4 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     }
 }
 
-void MainWindow::dropEvent(QDropEvent* event) {
-    const QMimeData* mimeData = event->mimeData();
 
-    // Leer la ruta como texto (porque DraggableLabel usa setText)
-    if (mimeData->hasText()) {
-        QString filePath = mimeData->text();
-        QPixmap bg(filePath);
-        if (!bg.isNull()) {
-            QPalette pal = this->palette();
-            pal.setBrush(QPalette::Window, QBrush(bg.scaled(this->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)));
-            this->setAutoFillBackground(true);
-            this->setPalette(pal);
-            this->update();
-        }
-    }
-}

@@ -22,10 +22,15 @@ void DraggableLabel::mouseMoveEvent(QMouseEvent* event) {
         return;
 
     QMimeData* mimeData = new QMimeData;
-    mimeData->setText(path);  // Puedes usar otro formato según lo que necesites
+
+    // Aquí cambio setText por setUrls
+    QList<QUrl> urls;
+    urls.append(QUrl::fromLocalFile(path));
+    mimeData->setUrls(urls);
 
     QDrag* drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap());
     drag->exec(Qt::CopyAction);
 }
+

@@ -183,6 +183,16 @@ if(TALLER_EDITOR)
 
     # Link the taller_common lib target
     target_link_libraries(taller_editor taller_common SDL2pp::SDL2pp)
+
+    target_link_libraries(taller_editor Qt6::Widgets)
+    target_link_libraries(taller_editor Qt6::Multimedia)
+
+    # Habilitar MOC, UIC, etc. (útil para Qt)
+    set_target_properties(taller_editor PROPERTIES
+        AUTOMOC ON
+        AUTORCC ON
+        AUTOUIC ON
+    )
 endif()
 
 

@@ -1,7 +1,11 @@
 target_sources(taller_editor
     PRIVATE
-    # .cpp files
-    main.cpp
+    main.cpp    
+    clickable_label.cpp
+    editor_main_window.cpp
+    draggable_label.cpp
     PUBLIC
-    # .h files
+    editor_main_window.h
+    clickable_label.h
+    draggable_label.h
     )

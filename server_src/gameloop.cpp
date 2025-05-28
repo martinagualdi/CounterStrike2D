@@ -114,7 +114,8 @@ void GameLoop::run() {
                         jugador->recibir_danio(10);
                         balas_disparadas.erase(balas_disparadas.begin() + i);
                         std::cout << "Jugador de ID: " << jugador->getId() << " ha sido impactado por la bala del jugador de ID: " 
-                                  << bala.quien_disparo() << std::endl;
+                                  << bala.quien_disparo() << " || ";
+                        std::cout << "Vida restante del jugador: " << jugador->get_vida() << std::endl;
                         bala_impacto = true;
                         break; 
                     }

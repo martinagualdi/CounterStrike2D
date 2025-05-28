@@ -45,45 +45,30 @@ void ProtocoloCliente::enviarComando(ComandoDTO comando) {
 }
 
 Snapshot ProtocoloCliente::recibirSnapshot() {
-   /*uint16_t largo;
-   socket.recvall(&largo, sizeof(largo));
-   largo = ntohs(largo);
-   size_t num_jugadores = largo / 12;
-   std::vector<Jugador> jugadores;
-   while (num_jugadores > 0) {
-      uint8_t buffer[12];
-      socket.recvall(buffer, 12);
-      uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
-      uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
-      uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
-      uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
-      Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
-      jugadores.push_back(jugador);
-      num_jugadores--;
-   }
-   return Snapshot(jugadores);*/
-
-   /*ARRIBA VIEJO, ABAJO CODIGO CON BALAS DISPARADAS*/
+   /*Recibe: Jugadores (id, pos_x, pos_y, angulo, vida, dinero y codigo del arma)*/
    uint8_t hay_balas_disparadas;
    socket.recvall(&hay_balas_disparadas, sizeof(hay_balas_disparadas));
    uint16_t largo;
    socket.recvall(&largo, sizeof(largo));
    largo = ntohs(largo);
-   size_t num_jugadores = largo / 12;
+   size_t num_jugadores = largo / 17;
    std::vector<Jugador> jugadores;
    while (num_jugadores > 0) {
-      uint8_t buffer[12];
-      socket.recvall(buffer, 12);
+      uint8_t buffer[17];
+      socket.recvall(buffer, 17);
       uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
       uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
       uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
       uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
-      Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
+      uint16_t vida = ntohs(*(uint16_t*)&buffer[12]);
+      uint16_t dinero = ntohs(*(uint16_t*)&buffer[14]);
+      uint8_t arma_secundaria_id = buffer[16]; // No se usa en el cliente, pero se recibe
+      //Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
+      Jugador jugador(id, static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100, vida, dinero, arma_secundaria_id);
       jugadores.push_back(jugador);
       num_jugadores--;
    }
    if (hay_balas_disparadas == 0x01){
-      //std::cout << "Hay balas disparadas" << std::endl;
       uint16_t largo_balas;
       socket.recvall(&largo_balas, sizeof(largo_balas));
       largo_balas = ntohs(largo_balas);

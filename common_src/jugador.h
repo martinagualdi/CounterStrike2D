@@ -36,6 +36,10 @@ class Jugador {
 
     Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
 
+    Jugador(int id, float x, float y, float angulo, int vida, int dinero, uint8_t arma_secundaria_id)
+        : id(id), x(x), y(y), angulo(angulo), movimiento_actual(DETENER), vida(vida), dinero(dinero), vivo(true), 
+        arma_secundaria(arma_secundaria_id == 0x01 ? new Glock() : nullptr) {};
+
     /*explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)
     ,cuchillo(std::make_unique<Cuchillo>()), arma_actual(cuchillo.get()), arma_secundaria(std::make_unique<Glock>()), arma_primaria(nullptr){};
 
@@ -81,11 +85,20 @@ class Jugador {
         this->movimiento_actual = m;
     }
 
-    int getVida() const {
+    int get_vida() const {
         return vida;
     }
 
-    bool disparar();
+    int get_dinero() const {
+        return dinero;
+    }
+
+    bool disparar() {
+    /* HARCODEADO PAEA PROBAR DISPARO */
+    if (arma_secundaria->accion(0.0f) > 0)
+        return true;
+    return false;
+}
 
     void recibir_danio(int danio) { 
         vida -= danio; 
@@ -93,6 +106,10 @@ class Jugador {
             vida = 0;
             vivo = false;
         }
+    }
+
+    std::string get_nombre_arma_secundaria() const {
+        return arma_secundaria->getNombre();
     }
     /*
     void setArmaPrimaria(std::unique_ptr<ArmaDeFuego> nuevaArma) {

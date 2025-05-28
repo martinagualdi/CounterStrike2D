@@ -44,7 +44,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
     }
     std::vector<uint8_t> buffer;
     snapshot.balas_disparadas.size() > 0 ? buffer.push_back(0x01) : buffer.push_back(0x00); /* AGREGO UNA FORMA DE DEFINIR SI HAY QUE LEER BALAS*/
-    uint16_t largo = htons(static_cast<uint16_t>(12 * snapshot.info_jugadores.size()));
+    uint16_t largo = htons(static_cast<uint16_t>(17 * snapshot.info_jugadores.size()));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
     for (const Jugador& j : snapshot.info_jugadores) {
@@ -64,9 +64,25 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         uint16_t angulo = htons(static_cast<uint16_t>(j.getAngulo() * 100));
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[1]);
+        uint16_t vida = htons(static_cast<uint16_t>(j.get_vida()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&vida)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&vida)[1]);
+        uint16_t dinero = htons(static_cast<uint16_t>(j.get_dinero()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&dinero)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&dinero)[1]);
+        uint8_t arma_secundaria;
+        if (j.get_nombre_arma_secundaria() == "Glock") {
+            arma_secundaria = 0x01; // Glock
+        } else if (j.get_nombre_arma_secundaria() == "AK-47") {
+            arma_secundaria = 0x02; // AK-47                                    /*Logica de como creo va a ser mejor enviar el arma actual, usaria mejor id's para usar enums"*/
+        } else if (j.get_nombre_arma_secundaria() == "Desert Eagle") {
+            arma_secundaria = 0x03; // Desert Eagle
+        } else {
+            arma_secundaria = 0x00; // No tiene arma secundaria
+        }
+        buffer.push_back(arma_secundaria);
     }
     if (snapshot.balas_disparadas.size() > 0) {
-        //std::cout << "Enviando balas disparadas..." << std::endl;
         uint16_t largo_balas = htons(static_cast<uint16_t>(12 * snapshot.balas_disparadas.size()));
         buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[1]);

@@ -1,11 +1,6 @@
 #include "jugador.h"
 
-bool Jugador::disparar() {
-    /* HARCODEADO PAEA PROBAR DISPARO */
-    if (arma_secundaria->accion(0.0f) > 0)
-        return true;
-    return false;
-}
+
 
 
 

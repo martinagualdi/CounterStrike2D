@@ -10,9 +10,6 @@
 #define ANCHO_MIN 960
 #define ALTO_MIN 720
 
-enum ct_types {SEAL_FORCE, GERMAN_GSG_9, UK_SAS, FRENCH_GIGN};
-enum tt_types {PHEONIX, L337_KREW, ARTIC_AVENGER, GUERRILLA};
-
 using namespace SDL2pp; 
 
 class Dibujador{

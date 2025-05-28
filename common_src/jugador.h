@@ -10,6 +10,18 @@ enum Equipo {
     TT
 };
 
+enum SkinTipos {
+    /*Del 0 al 3 son CT, los otros TT*/
+    SEAL_FORCE,
+    GERMAN_GSG_9,
+    UK_SAS,
+    FRENCH_GIGN,
+    PHEONIX, 
+    L337_KREW, 
+    ARTIC_AVENGER, 
+    GUERRILLA
+};
+
 class Jugador {
   private:
     int id;
@@ -20,6 +32,7 @@ class Jugador {
     int vida;
     int dinero;
     enum Equipo equipo_actual;
+    enum SkinTipos skin_tipo;
     bool vivo = true;
     std::shared_ptr<Glock> arma_secundaria;
 
@@ -31,13 +44,13 @@ class Jugador {
     //std::unique_ptr<ArmaDeFuego> arma_secundaria;
     //std::unique_ptr<ArmaDeFuego> arma_primaria;
 
-  public:
-    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
+  public:   /* AGREGAR LOGICA DE SEPARAR EN EQUIPOS */
+    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500), equipo_actual(CT), skin_tipo(SEAL_FORCE), vivo(true), arma_secundaria(new Glock()) {};
 
-    Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
+    //Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
 
-    Jugador(int id, float x, float y, float angulo, int vida, int dinero, uint8_t arma_secundaria_id)
-        : id(id), x(x), y(y), angulo(angulo), movimiento_actual(DETENER), vida(vida), dinero(dinero), vivo(true), 
+    Jugador(int id, float x, float y, float angulo, enum Equipo equipo, enum SkinTipos skin, int vida, int dinero, uint8_t arma_secundaria_id)
+        : id(id), x(x), y(y), angulo(angulo), movimiento_actual(DETENER), vida(vida), dinero(dinero), equipo_actual(equipo), skin_tipo(skin), vivo(true), 
         arma_secundaria(arma_secundaria_id == 0x01 ? new Glock() : nullptr) {};
 
     /*explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)
@@ -94,11 +107,11 @@ class Jugador {
     }
 
     bool disparar() {
-    /* HARCODEADO PAEA PROBAR DISPARO */
-    if (arma_secundaria->accion(0.0f) > 0)
-        return true;
-    return false;
-}
+        /* HARCODEADO PAEA PROBAR DISPARO */
+        if (arma_secundaria->accion(0.0f) > 0)
+            return true;
+        return false;
+    }
 
     void recibir_danio(int danio) { 
         vida -= danio; 
@@ -111,6 +124,23 @@ class Jugador {
     std::string get_nombre_arma_secundaria() const {
         return arma_secundaria->getNombre();
     }
+
+    enum Equipo get_equipo() const {
+        return equipo_actual;
+    }
+
+    void set_equipo(enum Equipo equipo) {
+        this->equipo_actual = equipo;
+    }
+
+    enum SkinTipos get_skin_tipo() const {
+        return skin_tipo;
+    }
+
+    void set_skin_tipo(enum SkinTipos skin) {
+        this->skin_tipo = skin;
+    }
+
     /*
     void setArmaPrimaria(std::unique_ptr<ArmaDeFuego> nuevaArma) {
         arma_primaria = std::move(nuevaArma);

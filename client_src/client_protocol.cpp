@@ -51,20 +51,23 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo;
    socket.recvall(&largo, sizeof(largo));
    largo = ntohs(largo);
-   size_t num_jugadores = largo / 17;
+   size_t num_jugadores = largo / 19;
    std::vector<Jugador> jugadores;
    while (num_jugadores > 0) {
-      uint8_t buffer[17];
-      socket.recvall(buffer, 17);
+      uint8_t buffer[19];
+      socket.recvall(buffer, 19);
       uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
       uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
       uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
       uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
       uint16_t vida = ntohs(*(uint16_t*)&buffer[12]);
       uint16_t dinero = ntohs(*(uint16_t*)&buffer[14]);
-      uint8_t arma_secundaria_id = buffer[16]; // No se usa en el cliente, pero se recibe
+      uint8_t arma_secundaria_id = buffer[16]; 
+      uint8_t equipo = buffer[17]; 
+      uint8_t skin = buffer[18];
       //Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
-      Jugador jugador(id, static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100, vida, dinero, arma_secundaria_id);
+      Jugador jugador(id, static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100, 
+         static_cast<enum Equipo>(equipo), static_cast<enum SkinTipos>(skin), vida, dinero, arma_secundaria_id);
       jugadores.push_back(jugador);
       num_jugadores--;
    }

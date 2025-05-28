@@ -12,6 +12,7 @@
 #define ALTO_MIN 720
 #define CANT_PLAYERS 4
 
+
 using namespace SDL2pp; 
 
 class Dibujador{

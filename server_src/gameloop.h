@@ -7,6 +7,7 @@
 #include "../common_src/jugador.h"
 #include "../common_src/snapshot.h"
 #include "lista_queues.h"
+#include "../common_src/municion.h"
 
 class GameLoop : public Thread {
   private:
@@ -16,6 +17,7 @@ class GameLoop : public Thread {
     std::atomic<bool> activo;
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
+    std::vector<Municion> balas_disparadas;
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores);

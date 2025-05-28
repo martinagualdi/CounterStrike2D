@@ -4,9 +4,11 @@
 #include <vector>
 #include <cstddef>
 #include "jugador.h"
+#include "municion.h"
 
 struct Snapshot {
     std::vector<Jugador> info_jugadores;
+    std::vector<Municion> balas_disparadas;
 
     Snapshot() : info_jugadores() {}
 
@@ -26,6 +28,8 @@ struct Snapshot {
     }
 
     Snapshot(std::vector<Jugador> &jugadores) : info_jugadores(jugadores) {}
+
+    Snapshot(std::vector<Jugador> &jugadores, std::vector<Municion> &balas_disparadas) : info_jugadores(jugadores), balas_disparadas(balas_disparadas) {}
 
     void actualizar_snapshot(const Snapshot &otro) {
         info_jugadores.clear();

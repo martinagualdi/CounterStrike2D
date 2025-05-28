@@ -6,12 +6,13 @@
 
 ServerProtocol::ServerProtocol(Socket& skt) : skt(skt) {}
 
-bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) { 
+bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {     
     if (snapshot.info_jugadores.size() <= 0) {
         return false;
     }
     std::vector<uint8_t> buffer;
-    uint16_t largo = htons(static_cast<uint16_t>(12 * snapshot.info_jugadores.size()));
+    snapshot.balas_disparadas.size() > 0 ? buffer.push_back(0x01) : buffer.push_back(0x00); /* AGREGO UNA FORMA DE DEFINIR SI HAY QUE LEER BALAS*/
+    uint16_t largo = htons(static_cast<uint16_t>(19 * snapshot.info_jugadores.size()));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
     for (const Jugador& j : snapshot.info_jugadores) {
@@ -31,7 +32,52 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         uint16_t angulo = htons(static_cast<uint16_t>(j.getAngulo() * 100));
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[0]);
         buffer.push_back(reinterpret_cast<uint8_t*>(&angulo)[1]);
+        uint16_t vida = htons(static_cast<uint16_t>(j.get_vida()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&vida)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&vida)[1]);
+        uint16_t dinero = htons(static_cast<uint16_t>(j.get_dinero()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&dinero)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&dinero)[1]);
+        uint8_t arma_secundaria;
+        if (j.get_nombre_arma_secundaria() == "Glock") {
+            arma_secundaria = 0x01; // Glock
+        } else if (j.get_nombre_arma_secundaria() == "AK-47") {
+            arma_secundaria = 0x02; // AK-47                                    /*Logica de como creo va a ser mejor enviar el arma actual, usaria mejor id's para usar enums"*/
+        } else if (j.get_nombre_arma_secundaria() == "Desert Eagle") {
+            arma_secundaria = 0x03; // Desert Eagle
+        } else {
+            arma_secundaria = 0x00; // No tiene arma secundaria
+        }
+        buffer.push_back(arma_secundaria);
+        uint8_t equipo = static_cast<uint8_t>(j.get_equipo());
+        buffer.push_back(equipo); // Enviar el equipo del jugador
+        uint8_t skin = static_cast<uint8_t>(j.get_skin_tipo());
+        buffer.push_back(skin); // Enviar el skin del jugador
     }
+    if (snapshot.balas_disparadas.size() > 0) {
+        uint16_t largo_balas = htons(static_cast<uint16_t>(12 * snapshot.balas_disparadas.size()));
+        buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
+        buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[1]);
+        for (const Municion& bala : snapshot.balas_disparadas) {
+            uint16_t id_quien_disparo = htons(static_cast<uint16_t>(bala.quien_disparo()));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&id_quien_disparo)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&id_quien_disparo)[1]);
+            uint32_t pos_X = htonl(static_cast<uint32_t>(bala.getPosX() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[1]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[2]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_X)[3]);
+            uint32_t pos_Y = htonl(static_cast<uint32_t>(bala.getPosY() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[1]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[2]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&pos_Y)[3]);
+            uint16_t angulo_disparo = htons(static_cast<uint16_t>(bala.getAnguloDisparo() * 100));
+            buffer.push_back(reinterpret_cast<uint8_t*>(&angulo_disparo)[0]);
+            buffer.push_back(reinterpret_cast<uint8_t*>(&angulo_disparo)[1]);
+        }
+    }
+    
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }

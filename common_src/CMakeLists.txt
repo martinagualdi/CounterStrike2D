@@ -4,6 +4,8 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
+    municion.cpp
+    jugador.cpp
     PUBLIC
     comando_dto.h
     jugador.h
@@ -23,4 +25,5 @@ target_sources(taller_common
     glock.h
     cuchillo.h
     bomba.h
+    municion.h
     )

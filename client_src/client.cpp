@@ -8,7 +8,7 @@
 #define CS2D_TITLE "Counter Strike 2D"
 #define ANCHO_MIN 960
 #define ALTO_MIN 720
-#define FPS 20
+#define FPS 30
 
 using namespace SDL2pp;
 

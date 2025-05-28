@@ -66,7 +66,7 @@ void Dibujador::dibujar_jugadores() {
         SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
         SDL_Rect sprite = sprites_player[3];
         SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-        SDL_RenderCopyExF(renderer.Get(), tt_players[GUERRILLA].Get(), &sprite, &dst, angulo_sdl, &center, SDL_FLIP_NONE);
+        SDL_RenderCopyExF(renderer.Get(), tt_players[SEAL_FORCE].Get(), &sprite, &dst, angulo_sdl, &center, SDL_FLIP_NONE);
         
     }
 }
@@ -116,7 +116,7 @@ void Dibujador::dibujar_salud() {
     Rect salud_dst(0, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprite_salud, salud_dst);
 
-    std::vector<int> digitos_salud = separar_digitos(100);
+    std::vector<int> digitos_salud = separar_digitos(snapshot->getJugadorPorId(client_id)->get_vida());
     int cant_digitos_salud = static_cast<int>(digitos_salud.size());
 
     for(int i = 0; i < cant_digitos_salud; i++){
@@ -140,7 +140,7 @@ void Dibujador::dibujar_tiempo() {
 
 void Dibujador::dibujar_saldo() {
 
-    std::vector<int> digitos_dinero = separar_digitos(16000);
+    std::vector<int> digitos_dinero = separar_digitos(snapshot->getJugadorPorId(client_id)->get_dinero());
     int cant_digitos_dinero = static_cast<int>(digitos_dinero.size());
     int x;
     for(int i = 0; i < cant_digitos_dinero; i++){

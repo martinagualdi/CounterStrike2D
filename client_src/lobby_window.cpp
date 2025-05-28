@@ -6,6 +6,8 @@
 #include <QStackedLayout>
 #include <QGraphicsOpacityEffect>
 #include <QMessageBox>
+#include <QTimer>
+
 
 LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& username)
     : QDialog(nullptr), protocolo(protocolo) {
@@ -88,6 +90,21 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
+void LobbyWindow::fadeOutAudioAndClose() {
+    QTimer *fadeTimer = new QTimer(this);
+    fadeTimer->setInterval(50);  // cada 50ms
+    connect(fadeTimer, &QTimer::timeout, this, [this, fadeTimer]() {
+        float vol = audioOutput->volume();
+        if (vol > 0.01f) {
+            audioOutput->setVolume(vol - 0.05f);  // bajamos el volumen
+        } else {
+            fadeTimer->stop();
+            mediaPlayer->stop();
+            accept();  // cerramos el diálogo
+        }
+    });
+    fadeTimer->start();
+}
 
 
 void LobbyWindow::onCrearClicked() {
@@ -95,7 +112,7 @@ void LobbyWindow::onCrearClicked() {
     MensajePopup popup("Partida", "Partida creada con éxito.", this);
     popup.exec();
     emit partidaSeleccionada();
-    accept();  // Cierra el diálogo con QDialog::Accepted
+    fadeOutAudioAndClose();  // Cierra el diálogo con QDialog::Accepted
 }
 
 void LobbyWindow::onListarClicked() {
@@ -135,6 +152,6 @@ void LobbyWindow::onUnirseClicked() {
     MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
     popup.exec();
     emit partidaSeleccionada();
-    accept();
+    fadeOutAudioAndClose();
 }
 

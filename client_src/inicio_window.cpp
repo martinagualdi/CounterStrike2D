@@ -125,12 +125,6 @@ Inicio::Inicio(QWidget *parent) : QWidget(parent), ui(nullptr) {
     
     )");
 
-    mediaPlayer = new QMediaPlayer(this);
-    audioOutput = new QAudioOutput(this);
-    mediaPlayer->setAudioOutput(audioOutput);
-    mediaPlayer->setSource(QUrl::fromLocalFile("client_src/sfx/gamestart.mp3"));
-    audioOutput->setVolume(100);
-    mediaPlayer->play();
 }
 
 Inicio::~Inicio() = default;

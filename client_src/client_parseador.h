@@ -6,16 +6,22 @@
 #include <SDL2pp/SDL2pp.hh>
 
 
+enum NUMEROS_HUD{CERO, UNO, DOS, TRES, CUATRO, CINCO, SEIS, SIETE, OCHO, NUEVE, DOS_PUNTOS, PIPE};
+enum SIMBOLOS_HUD{SALUD, ESCUDO, TIEMPO, DEFUSE, COMPRAS, SIGHT, BOMBA, SALDO, EXCLAMACION, CONO, PENSAR, INFINITO, CALABERA};
+
+
 using namespace SDL2pp;
 
 class ParseadorSpriteSheets{
 private:
-    void ParseadorSpriteSheets::iterar_sobre_spritesheet(std::vector<Rect>& sprites, const int cant_sprites, 
-                                                    const int x, const int y, const int tamanio_sprite);
-
+    void iterar(std::vector<SDL_Rect>& sprites, const int x, const int y, 
+                const int cant_sprites, const int ancho, const int alto);
 public:
     ParseadorSpriteSheets();
-    std::vector<Rect> obtener_sprites_pies_jugador();
+    std::vector<SDL_Rect> obtener_sprites_jugador();
+    std::vector<SDL_Rect> obtener_sprites_pies_jugador();
+    std::vector<SDL_Rect> obtener_sprites_simbolos_hud();
+    std::vector<SDL_Rect> obtener_sprites_numeros_hud();
     ParseadorSpriteSheets(const ParseadorSpriteSheets&) = delete;
     ParseadorSpriteSheets& operator=(const ParseadorSpriteSheets&) = delete;
     ParseadorSpriteSheets(ParseadorSpriteSheets&&) = default;

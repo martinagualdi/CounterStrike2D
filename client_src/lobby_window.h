@@ -23,6 +23,7 @@ private slots:
     void onCrearClicked();
     void onListarClicked();
     void onUnirseClicked();
+    void fadeOutAudioAndClose();
 
 private:
     ProtocoloCliente& protocolo;

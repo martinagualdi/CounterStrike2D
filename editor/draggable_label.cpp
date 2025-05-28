@@ -9,8 +9,10 @@ DraggableLabel::DraggableLabel(const QString& imagePath, QWidget* parent)
     : QLabel(parent), path(imagePath) {}
 
 void DraggableLabel::mousePressEvent(QMouseEvent* event) {
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton) {
         dragStartPosition = event->pos();
+        emit clicked(path);  // <--- emitir señal al hacer clic
+    }
     QLabel::mousePressEvent(event);
 }
 

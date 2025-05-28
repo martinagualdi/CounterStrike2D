@@ -12,7 +12,7 @@ public:
         : QLabel(parent), imagePath(path) {}
 
 signals:
-    void clicked(const QString& path);
+    void clicked(const QString& path); 
 
 protected:
     void mousePressEvent(QMouseEvent* event) override {

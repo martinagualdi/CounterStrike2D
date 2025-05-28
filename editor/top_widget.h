@@ -1,7 +1,10 @@
 #pragma once
-#include <QWidget>
 
-class TopWidget : public QWidget {
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsRectItem>
+
+class TopWidget : public QGraphicsView {
     Q_OBJECT
 
 public:
@@ -9,10 +12,12 @@ public:
     void setBackgroundPath(const QString& path);
 
 protected:
+    void drawBackground(QPainter* painter, const QRectF& rect) override;
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
 
 private:
-    QString backgroundPath;
+    QGraphicsScene* scene;
+    QPixmap backgroundPixmap;
+    int gridSize = 32;
 };

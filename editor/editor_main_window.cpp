@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     // Parte superior (topWidget)
     topWidget = new TopWidget;
-    topWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainLayout->addWidget(topWidget);
 
     // QTabWidget para las pestañas

@@ -48,8 +48,6 @@ void TopWidget::setBackgroundPath(const QString& path) {
             item->setPos(x, y);
             item->setZValue(-1);
             scene->addItem(item);
-            qDebug() << "Tile colocado en:" << x << "," << y;
-
         }
     }
 

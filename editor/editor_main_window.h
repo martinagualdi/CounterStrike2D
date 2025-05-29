@@ -12,6 +12,7 @@ public:
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
 private:
+    void guardarMapa();
     TopWidget* topWidget;
     QString backgroundPath;
 };

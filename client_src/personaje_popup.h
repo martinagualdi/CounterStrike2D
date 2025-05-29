@@ -14,20 +14,16 @@ public:
     explicit PersonajePopup(QWidget* parent = nullptr);
 
 signals:
-    void teamSeleccionado(int team, int skinIndex = 0);  // 0 = Terrorist, 1 = Counter Terrorist
+    void skinSeleccionado(int skin);
 
 private slots:
-    void seleccionarTerrorist();
-    void seleccionarCounterTerrorist();
     void paintEvent(QPaintEvent* event) override;
     void seleccionarSkin(int skinIndex);
+    void mostrarSkins(const QString& basePath, const QStringList& skinFiles);
 
 private:
     void mostrarOpcionesT();
     void mostrarOpcionesCT();
-
-    QPushButton* btnTerrorist;
-    QPushButton* btnCounterTerrorist;
 
     QWidget* skinsWidget;
     QHBoxLayout* skinsLayout;

@@ -74,7 +74,6 @@ void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
         }
     }
 
-    // fallback: URLs tradicionales
     if (mime->hasUrls()) {
         QString path = mime->urls().first().toLocalFile();
         QPixmap pix(path);

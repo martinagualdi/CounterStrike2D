@@ -89,16 +89,13 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
-
-
 void LobbyWindow::onCrearClicked() {
     protocolo.enviar_crear_partida();
 
     PersonajePopup equipoDialog(this);
-    connect(&equipoDialog, &PersonajePopup::teamSeleccionado, this, [this](int team) {
-        // Aquí podés guardar el equipo seleccionado o enviarlo por protocolo si hace falta
-        qDebug() << "Equipo seleccionado (crear):" << team;
-        // protocolo.enviar_seleccion_equipo(team); // si necesitás enviar info
+    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
+        qDebug() << "Skin seleccionada (crear):" << skinIndex;
+        // protocolo.enviar_skin(skinIndex);
     });
 
     if (equipoDialog.exec() == QDialog::Accepted) {
@@ -144,9 +141,9 @@ void LobbyWindow::onUnirseClicked() {
     protocolo.enviar_unirse_partida(id);
 
     PersonajePopup equipoDialog(this);
-    connect(&equipoDialog, &PersonajePopup::teamSeleccionado, this, [this](int team) {
-        qDebug() << "Equipo seleccionado (unirse):" << team;
-        // protocolo.enviar_seleccion_equipo(team);
+    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
+        qDebug() << "Skin seleccionada (crear):" << skinIndex;
+        // protocolo.enviar_skin(skinIndex);
     });
 
     if (equipoDialog.exec() == QDialog::Accepted) {

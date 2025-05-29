@@ -21,6 +21,17 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
+    QHBoxLayout* topBarLayout = new QHBoxLayout;
+    topBarLayout->setContentsMargins(5, 5, 5, 0);
+    topBarLayout->addStretch(); 
+
+    QPushButton* saveButton = new QPushButton("Guardar");
+    saveButton->setFixedSize(100, 30);
+    topBarLayout->addWidget(saveButton);
+    connect(saveButton, &QPushButton::clicked, this, &MainWindow::guardarMapa);
+
+    mainLayout->addLayout(topBarLayout);
+
     // Parte superior (topWidget)
     topWidget = new TopWidget;
     mainLayout->addWidget(topWidget);
@@ -83,7 +94,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                         QPixmap tile = fullPixmap.copy(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                         auto* draggable = new DraggableLabel(tile);
                         draggable->setFixedSize(32, 32);
-                        //draggable->setPixmap(tile.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                         connect(draggable, &DraggableLabel::dragStarted, this, [this]() {
                             topWidget->setDropMode(DropMode::OBJETO);
                         });
@@ -114,4 +124,9 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasImage() || event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
+}
+
+void MainWindow::guardarMapa() {
+    qDebug() << "Guardar mapa aún no implementado.";
+    // Aquí podrías guardar el contenido del QGraphicsScene, etc.
 }

@@ -1,5 +1,6 @@
 #include "editor_main_window.h"
 #include "draggable_label.h" 
+#include "clickable_label.h" 
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -59,19 +60,27 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         for (const QString& imgName : images) {
             QString fullPath = dir.absoluteFilePath(imgName);
             QPixmap pix(fullPath);
-            DraggableLabel* label = new DraggableLabel(fullPath);
+
+            QLabel* label = nullptr;
+
+            if (tab.name == "Fondos") {
+                auto* clickable = new ClickableLabel(fullPath);
+                connect(clickable, &ClickableLabel::clicked, this, [this](const QString& path) {
+                    topWidget->setDropMode(DropMode::FONDO);
+                    topWidget->setBackgroundPath(path);
+                });
+                label = clickable;
+            } else {
+                auto* draggable = new DraggableLabel(fullPath);
+                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
+                    topWidget->setDropMode(DropMode::OBJETO);
+                });
+                label = draggable;
+            }
+
             label->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
             label->setFixedSize(100, 100);
             hLayout->addWidget(label);
-
-            connect(label, &DraggableLabel::clicked, this, [this, tab](const QString& path) {
-                if (tab.name == "Fondos") {
-                    topWidget->setDropMode(DropMode::FONDO);
-                    topWidget->setBackgroundPath(path);
-                } else {
-                    topWidget->setDropMode(DropMode::OBJETO);
-                }
-            });
         }
 
         scrollArea->setWidget(container);

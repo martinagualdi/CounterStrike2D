@@ -15,7 +15,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
 
 signals:
-    void clicked(const QString& path);
+    void dragStarted(const QString& path);
 
 private:
     QString path;

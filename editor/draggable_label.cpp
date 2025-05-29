@@ -11,7 +11,7 @@ DraggableLabel::DraggableLabel(const QString& imagePath, QWidget* parent)
 void DraggableLabel::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         dragStartPosition = event->pos();
-        emit clicked(path);
+        emit dragStarted(path);
     }
     QLabel::mousePressEvent(event);
 }

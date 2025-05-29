@@ -10,9 +10,13 @@
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphicsScene(this)) {
     setScene(scene);
     setAcceptDrops(true);
-    setSceneRect(0, 0, 2000, 2000);  // Tamaño virtual del canvas
+    setSceneRect(0, 0, 2000, 2000);
     setRenderHint(QPainter::Antialiasing);
     setBackgroundBrush(Qt::white);
+}
+
+void TopWidget::setDropMode(DropMode mode) {
+    currentMode = mode;
 }
 
 void TopWidget::drawBackground(QPainter* painter, const QRectF& rect) {
@@ -54,31 +58,77 @@ void TopWidget::setBackgroundPath(const QString& path) {
     viewport()->update();
 }
 
-
 void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
-    if (event->mimeData()->hasUrls())
+    if (event->mimeData()->hasUrls()) {
+        QString path = event->mimeData()->urls().first().toLocalFile();
+        QPixmap pix(path);
+        if (!pix.isNull()) {
+            currentDraggedPixmap = pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
         event->acceptProposedAction();
+    }
 }
 
+void TopWidget::dragMoveEvent(QDragMoveEvent* event) {
+    if (!currentDraggedPixmap.isNull()) {
+        QPointF scenePos = mapToScene(event->position().toPoint());
+        int x = int(scenePos.x()) / gridSize * gridSize;
+        int y = int(scenePos.y()) / gridSize * gridSize;
+
+        if (!previewItem) {
+            previewItem = new QGraphicsPixmapItem(currentDraggedPixmap);
+            previewItem->setOpacity(0.5);
+            previewItem->setZValue(10);
+            scene->addItem(previewItem);
+        }
+
+        previewItem->setPos(x, y);
+        event->acceptProposedAction();
+    }
+}
+
+void TopWidget::dragLeaveEvent(QDragLeaveEvent* event) {
+    Q_UNUSED(event);
+    if (previewItem) {
+        scene->removeItem(previewItem);
+        delete previewItem;
+        previewItem = nullptr;
+    }
+    currentDraggedPixmap = QPixmap();
+}
+
+
 void TopWidget::dropEvent(QDropEvent* event) {
+    if (previewItem) {
+        scene->removeItem(previewItem);
+        delete previewItem;
+        previewItem = nullptr;
+    }
+
+    currentDraggedPixmap = QPixmap();
+
     const QMimeData* mime = event->mimeData();
     if (!mime->hasUrls()) return;
 
     for (const QUrl& url : mime->urls()) {
         QString path = url.toLocalFile();
         QPixmap pix(path);
-        qDebug() << "Intentando cargar imagen desde:" << path << "¿Es nulo?:" << pix.isNull();
-        if (!pix.isNull()) {
+        if (pix.isNull()) continue;
 
-            setBackgroundPath(path); 
+        QPointF scenePos = mapToScene(event->position().toPoint());
+        int x = int(scenePos.x()) / gridSize * gridSize;
+        int y = int(scenePos.y()) / gridSize * gridSize;
 
-            QPointF pos = mapToScene(event->position().toPoint());
-            int x = int(pos.x()) / gridSize * gridSize;
-            int y = int(pos.y()) / gridSize * gridSize;
+        if (currentMode == DropMode::OBJETO) {
             auto* item = new QGraphicsPixmapItem(pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
             item->setPos(x, y);
+            item->setZValue(1);
             scene->addItem(item);
+        } else if (currentMode == DropMode::FONDO) {
+            setBackgroundPath(path);
         }
     }
+
+    event->acceptProposedAction();
 }
 

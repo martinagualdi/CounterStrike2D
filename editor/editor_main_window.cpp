@@ -64,8 +64,13 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
             label->setFixedSize(100, 100);
             hLayout->addWidget(label);
 
-            connect(label, &DraggableLabel::clicked, this, [this](const QString& path) {
-                topWidget->setBackgroundPath(path);
+            connect(label, &DraggableLabel::clicked, this, [this, tab](const QString& path) {
+                if (tab.name == "Fondos") {
+                    topWidget->setDropMode(DropMode::FONDO);
+                    topWidget->setBackgroundPath(path);
+                } else {
+                    topWidget->setDropMode(DropMode::OBJETO);
+                }
             });
         }
 

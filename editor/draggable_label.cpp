@@ -11,7 +11,7 @@ DraggableLabel::DraggableLabel(const QString& imagePath, QWidget* parent)
 void DraggableLabel::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         dragStartPosition = event->pos();
-        emit clicked(path);  // <--- emitir señal al hacer clic
+        emit clicked(path);
     }
     QLabel::mousePressEvent(event);
 }
@@ -25,7 +25,6 @@ void DraggableLabel::mouseMoveEvent(QMouseEvent* event) {
 
     QMimeData* mimeData = new QMimeData;
 
-    // Aquí cambio setText por setUrls
     QList<QUrl> urls;
     urls.append(QUrl::fromLocalFile(path));
     mimeData->setUrls(urls);

@@ -1,28 +1,20 @@
-#ifndef CLICKABLE_LABEL_H_
-#define CLICKABLE_LABEL_H_
+#pragma once
 
 #include <QLabel>
 #include <QString>
-#include <QMouseEvent>
 
 class ClickableLabel : public QLabel {
     Q_OBJECT
+
 public:
-    explicit ClickableLabel(const QString& path, QWidget* parent = nullptr) 
-        : QLabel(parent), imagePath(path) {}
+    explicit ClickableLabel(const QString& imagePath, QWidget* parent = nullptr);
 
 signals:
-    void clicked(const QString& path); 
+    void clicked(const QString& path);
 
 protected:
-    void mousePressEvent(QMouseEvent* event) override {
-        if(event->button() == Qt::LeftButton)
-            emit clicked(imagePath);
-        QLabel::mousePressEvent(event);
-    }
+    void mousePressEvent(QMouseEvent* event) override;
 
 private:
-    QString imagePath;
+    QString path;
 };
-
-#endif  // CLICKABLE_LABEL_H_

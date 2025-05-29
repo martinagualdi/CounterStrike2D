@@ -60,13 +60,28 @@ void TopWidget::setBackgroundPath(const QString& path) {
 }
 
 void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
-    if (event->mimeData()->hasUrls()) {
-        QString path = event->mimeData()->urls().first().toLocalFile();
+    const QMimeData* mime = event->mimeData();
+
+    if (mime->hasFormat("application/x-pixmap")) {
+        QByteArray data = mime->data("application/x-pixmap");
+        QPixmap pix;
+        pix.loadFromData(data, "PNG");
+
+        if (!pix.isNull()) {
+            currentDraggedPixmap = pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            event->acceptProposedAction();
+            return;
+        }
+    }
+
+    // fallback: URLs tradicionales
+    if (mime->hasUrls()) {
+        QString path = mime->urls().first().toLocalFile();
         QPixmap pix(path);
         if (!pix.isNull()) {
             currentDraggedPixmap = pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            event->acceptProposedAction();
         }
-        event->acceptProposedAction();
     }
 }
 
@@ -121,7 +136,24 @@ void TopWidget::dropEvent(QDropEvent* event) {
     currentDraggedPixmap = QPixmap();
 
     const QMimeData* mime = event->mimeData();
-    if (!mime->hasUrls()) return;
+
+    if (mime->hasFormat("application/x-pixmap")) {
+    QByteArray data = mime->data("application/x-pixmap");
+    QPixmap pix;
+    pix.loadFromData(data, "PNG");
+
+    QPointF scenePos = mapToScene(event->position().toPoint());
+    int x = int(scenePos.x()) / gridSize * gridSize;
+    int y = int(scenePos.y()) / gridSize * gridSize;
+
+    auto* item = new QGraphicsPixmapItem(pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
+    item->setPos(x, y);
+    item->setFlag(QGraphicsItem::ItemIsMovable);
+    item->setFlag(QGraphicsItem::ItemIsSelectable);
+    item->setZValue(1);
+    scene->addItem(item);
+    event->acceptProposedAction();
+    }
 
     for (const QUrl& url : mime->urls()) {
         QString path = url.toLocalFile();

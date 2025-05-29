@@ -55,13 +55,11 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         hLayout->setContentsMargins(5, 5, 5, 5);
 
         QDir dir(tab.dirPath);
-        QStringList images = dir.entryList(QStringList() << "*.png" << "*.jpg" << "*.bmp", QDir::Files);
+        QStringList images = dir.entryList(QStringList() << "*.png", QDir::Files);
 
         for (const QString& imgName : images) {
             QString fullPath = dir.absoluteFilePath(imgName);
-            QPixmap pix(fullPath);
-
-            QLabel* label = nullptr;
+            QPixmap fullPixmap(fullPath);
 
             if (tab.name == "Fondos") {
                 auto* clickable = new ClickableLabel(fullPath);
@@ -69,18 +67,38 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                     topWidget->setDropMode(DropMode::FONDO);
                     topWidget->setBackgroundPath(path);
                 });
-                label = clickable;
+
+                clickable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                clickable->setFixedSize(100, 100);
+                hLayout->addWidget(clickable);
+            } else if (tab.name == "Objetos") {
+                // Dividir la imagen en tiles de 32x32
+                const int tileWidth = 32;
+                const int tileHeight = 32;
+                int cols = fullPixmap.width() / tileWidth;
+                int rows = fullPixmap.height() / tileHeight;
+
+                for (int y = 0; y < rows; ++y) {
+                    for (int x = 0; x < cols; ++x) {
+                        QPixmap tile = fullPixmap.copy(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
+                        auto* draggable = new DraggableLabel(tile);
+                        draggable->setFixedSize(32, 32);
+                        //draggable->setPixmap(tile.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                        connect(draggable, &DraggableLabel::dragStarted, this, [this]() {
+                            topWidget->setDropMode(DropMode::OBJETO);
+                        });
+                        hLayout->addWidget(draggable);
+                    }
+                }
             } else {
                 auto* draggable = new DraggableLabel(fullPath);
-                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
+                connect(draggable, &DraggableLabel::dragStarted, this, [this]() {
                     topWidget->setDropMode(DropMode::OBJETO);
                 });
-                label = draggable;
+                draggable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                draggable->setFixedSize(100, 100);
+                hLayout->addWidget(draggable);
             }
-
-            label->setPixmap(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            label->setFixedSize(100, 100);
-            hLayout->addWidget(label);
         }
 
         scrollArea->setWidget(container);
@@ -92,11 +110,8 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     topWidget->setAcceptDrops(true);
 }
 
-
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasImage() || event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
 }
-
-

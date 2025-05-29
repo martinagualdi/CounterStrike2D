@@ -126,7 +126,7 @@ void GameLoop::run() {
                 }
                 i++;
             }
-            Snapshot snapshot(jugadores);
+            Snapshot snapshot(jugadores, balas_disparadas);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             

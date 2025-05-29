@@ -3,12 +3,14 @@
 #include <iostream> 
 
 #define TAM_SIGHT 46
+#define TAM_BALA 8
 #define TAM_PLAYER 60
 #define TAM_SIMBOLOS_HUD 50
 #define DESFASE_ANGULO 90
 #define ANCHO_NUMEROS_HUD 48
 #define OFFSET_TIEMPO 130
 #define OFFSET_SALDO 2.1
+#define CANT_SPRITESHEETS_PLAYER 4
 
 Dibujador::Dibujador(const int id, Renderer& renderer) : 
     client_id(id),
@@ -16,6 +18,14 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     parseador(),
     snapshot(nullptr),
     fondo(Texture(renderer, Surface(IMG_Load("client_src/gfx/backgrounds/dust.png")))),
+    balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),
+    ak47(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/ak47.bmp")))),
+    awp(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/awp.bmp")))),
+    bomba(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb.bmp")))),
+    cuchillo(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/knife.bmp")))),
+    dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),
+    glock(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/glock.bmp")))),
+    m3(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/m3.bmp")))),
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
     simbolos_hud([&renderer]() {
         Surface s(IMG_Load("client_src/gfx/hud_symbols.bmp"));
@@ -34,7 +44,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     }()),
     ct_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
-        for (int i = 1; i <= 4; ++i) {
+        for (int i = 1; i <= CANT_SPRITESHEETS_PLAYER; ++i) {
             std::string path = "client_src/gfx/player/ct" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
@@ -42,38 +52,69 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     }()),
     tt_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
-        for (int i = 1; i <= 4; ++i) {
+        for (int i = 1; i <= CANT_SPRITESHEETS_PLAYER; ++i) {
             std::string path = "client_src/gfx/player/t" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
         return textures;
     }()),
+    sprite_arma(parseador.obtener_sprite_arma()),
+    sprite_bala(parseador.obtener_sprite_bala()),
     sprites_player(parseador.obtener_sprites_jugador()),
     sprites_player_legs(parseador.obtener_sprites_pies_jugador()),
     sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
     sprites_numeros_hud(parseador.obtener_sprites_numeros_hud())
     {}
 
+void Dibujador::convertir_coordenadas(float &x, float &y) {
+    x = x;
+    y = ALTO_MIN - y;
+}
+
+float Dibujador::convertir_angulo(float angulo){
+    return 360.0f - angulo + DESFASE_ANGULO;
+}
 
 void Dibujador::dibujar_jugadores() {
     for(const Jugador& jugador : snapshot->info_jugadores){
         
         float x_pixel = jugador.getX();
-        float y_pixel = ALTO_MIN -jugador.getY();
-        float angulo_sdl = 360.0f - jugador.getAngulo() + DESFASE_ANGULO;
+        float y_pixel = jugador.getY();
+        convertir_coordenadas(x_pixel, y_pixel);
+        float angulo_sdl = convertir_angulo(jugador.getAngulo());
 
-        //dibujar_pies(x_pixel, y_pixel, angulo_sdl);
-        SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
-        SDL_Rect sprite = sprites_player[3];
-        SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-        SDL_RenderCopyExF(renderer.Get(), tt_players[SEAL_FORCE].Get(), &sprite, &dst, angulo_sdl, &center, SDL_FLIP_NONE);
-        
+      //dibujar_pies(x_pixel, y_pixel, angulo_sdl);
+        enum SkinTipos skin = jugador.get_skin_tipo();
+        dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin);
+        dibujar_arma(x_pixel, y_pixel, angulo_sdl);
     }
 }
 
 void Dibujador::dibujar_fondo() {
     Rect dst(Rect(0, 0, ANCHO_MIN, ALTO_MIN));
     renderer.Copy(fondo, NullOpt, dst);
+}
+
+void Dibujador::dibujar_balas() {
+    for (const Municion& bala : snapshot->balas_disparadas){
+        float x_pixel = bala.getPosX();
+        float y_pixel = bala.getPosY();
+        std::cout << x_pixel << ":" << y_pixel << ":" << bala.getAnguloDisparo() << std::endl; 
+        convertir_coordenadas(x_pixel, y_pixel);
+        float angulo_bala = convertir_angulo(bala.getAnguloDisparo());
+        SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
+        SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
+        SDL_RenderCopyExF(renderer.Get(), balas.Get(), &sprite_bala, &dst, angulo_bala, &center, SDL_FLIP_NONE);
+    }
+}
+
+void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin) {
+
+
+    SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
+    SDL_Rect sprite = sprites_player[ARMADO];
+    SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
+    SDL_RenderCopyExF(renderer.Get(), tt_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
 void Dibujador::dibujar_pies(float x, float y, float angulo) {
@@ -83,6 +124,13 @@ void Dibujador::dibujar_pies(float x, float y, float angulo) {
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
     SDL_FPoint center = {TAM_PLAYER, TAM_PLAYER};
     SDL_RenderCopyExF(renderer.Get(), player_legs.Get(), &sprite_actual, &dst, angulo, &center, SDL_FLIP_NONE);
+}
+
+void Dibujador::dibujar_arma(float x, float y, float angulo) {
+
+    SDL_FRect dst {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 5) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    SDL_FPoint center = {x - dst.x, y - dst.y};
+    SDL_RenderCopyExF(renderer.Get(), ak47.Get(), &sprite_arma, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
 void Dibujador::dibujar_sight() {
@@ -103,24 +151,23 @@ std::vector<int> Dibujador::separar_digitos(int n) {
 
     while (n > 0) {
         int digito = n % 10;
-        digitos.insert(digitos.begin(), digito);  // Insertar al comienzo
+        digitos.insert(digitos.begin(), digito);
         n /= 10;
     }
 
     return digitos;
 }
 
-void Dibujador::dibujar_salud() {
+void Dibujador::dibujar_salud(int salud) {
+
+    std::vector<int> digitos_salud = separar_digitos(salud);
+    int cant_digitos_salud = static_cast<int>(digitos_salud.size());
 
     Rect sprite_salud(sprites_simbolos_hud[SALUD]);
     Rect salud_dst(0, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprite_salud, salud_dst);
 
-    std::vector<int> digitos_salud = separar_digitos(snapshot->getJugadorPorId(client_id)->get_vida());
-    int cant_digitos_salud = static_cast<int>(digitos_salud.size());
-
     for(int i = 0; i < cant_digitos_salud; i++){
-
         Rect sprite_digito(sprites_numeros_hud[digitos_salud[i]]);
         int x = TAM_SIMBOLOS_HUD + i * (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD));
         Rect dst(x, ALTO_MIN - TAM_SIMBOLOS_HUD, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
@@ -138,9 +185,9 @@ void Dibujador::dibujar_tiempo() {
     //Falta el tiempo
 }
 
-void Dibujador::dibujar_saldo() {
+void Dibujador::dibujar_saldo(int saldo) {
 
-    std::vector<int> digitos_dinero = separar_digitos(snapshot->getJugadorPorId(client_id)->get_dinero());
+    std::vector<int> digitos_dinero = separar_digitos(saldo);
     int cant_digitos_dinero = static_cast<int>(digitos_dinero.size());
     int x;
     for(int i = 0; i < cant_digitos_dinero; i++){
@@ -157,9 +204,9 @@ void Dibujador::dibujar_saldo() {
 
 }
 
-void Dibujador::dibujar_balas_hud() {
+void Dibujador::dibujar_balas_hud(int balas) {
 
-    std::vector<int> digitos_balas = separar_digitos(30);
+    std::vector<int> digitos_balas = separar_digitos(balas);
     int cant_digitos_balas = static_cast<int>(digitos_balas.size());
 
     for (int i = 0; i < cant_digitos_balas; i++){
@@ -173,15 +220,15 @@ void Dibujador::dibujar_balas_hud() {
 
 void Dibujador::dibujar_hud() {
 
-    simbolos_hud.SetColorMod(255, 165, 0);
+    simbolos_hud.SetColorMod(29, 140, 31);
     simbolos_hud.SetAlphaMod(128);
-    numeros_hud.SetColorMod(255, 165, 0);
+    numeros_hud.SetColorMod(29, 140, 31);
     numeros_hud.SetAlphaMod(128);
     
-    dibujar_salud();
+    dibujar_salud(snapshot->getJugadorPorId(client_id)->get_vida());
     dibujar_tiempo();
-    dibujar_balas_hud();
-    dibujar_saldo();
+    dibujar_balas_hud(30);
+    dibujar_saldo(snapshot->getJugadorPorId(client_id)->get_dinero());
 }
 
 void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
@@ -189,6 +236,7 @@ void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
     this->snapshot = snapshot;
     renderer.Clear();
     dibujar_fondo();
+    dibujar_balas();
     dibujar_jugadores();
     dibujar_sight();
     dibujar_hud();

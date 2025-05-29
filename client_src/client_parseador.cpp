@@ -1,6 +1,7 @@
 #include "client_parseador.h"
 
 #define TAM_PLAYER 32
+#define TAM_BALA 8
 #define TAM_PLAYER_LEGS 32
 #define CANT_PLAYER_LEGS 6
 #define CANT_PLAYERS 6
@@ -12,6 +13,13 @@
 
 ParseadorSpriteSheets::ParseadorSpriteSheets() {}
 
+SDL_Rect ParseadorSpriteSheets::obtener_sprite_arma() {
+    return {0, 0, TAM_PLAYER, TAM_PLAYER};
+}
+
+SDL_Rect ParseadorSpriteSheets::obtener_sprite_bala() {
+    return {0, 0, TAM_BALA, TAM_BALA};
+}
 
 void ParseadorSpriteSheets::iterar(std::vector<SDL_Rect>& sprites, const int x, const int y, 
                             const int cant_sprites, const int ancho, const int alto){

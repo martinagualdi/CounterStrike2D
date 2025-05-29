@@ -23,6 +23,7 @@ protected:
     void dragMoveEvent(QDragMoveEvent* event) override;
     void dropEvent(QDropEvent* event) override;
     void dragLeaveEvent(QDragLeaveEvent* event) override;
+    void keyPressEvent(QKeyEvent* event)  override;
 
 private:
     QGraphicsScene* scene;

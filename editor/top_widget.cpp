@@ -13,6 +13,7 @@ TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphi
     setSceneRect(0, 0, 2000, 2000);
     setRenderHint(QPainter::Antialiasing);
     setBackgroundBrush(Qt::white);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void TopWidget::setDropMode(DropMode mode) {
@@ -97,6 +98,18 @@ void TopWidget::dragLeaveEvent(QDragLeaveEvent* event) {
     currentDraggedPixmap = QPixmap();
 }
 
+void TopWidget::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
+        for (QGraphicsItem* item : scene->selectedItems()) {
+            if (item->zValue() > 0) {
+                scene->removeItem(item);
+                delete item;
+            }
+        }
+    } else {
+        QGraphicsView::keyPressEvent(event);
+    }
+}
 
 void TopWidget::dropEvent(QDropEvent* event) {
     if (previewItem) {
@@ -123,6 +136,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             auto* item = new QGraphicsPixmapItem(pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
             item->setPos(x, y);
             item->setZValue(1);
+            item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
             scene->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
             setBackgroundPath(path);

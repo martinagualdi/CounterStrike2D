@@ -18,6 +18,7 @@ project(taller_tp
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Multimedia MultimediaWidgets)
+find_package(yaml-cpp REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
 option(TALLER_TESTS "Enable / disable tests." OFF)
@@ -186,6 +187,7 @@ if(TALLER_EDITOR)
 
     target_link_libraries(taller_editor Qt6::Widgets)
     target_link_libraries(taller_editor Qt6::Multimedia)
+    target_link_libraries(taller_editor yaml-cpp)
 
     # Habilitar MOC, UIC, etc. (útil para Qt)
     set_target_properties(taller_editor PROPERTIES

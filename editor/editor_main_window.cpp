@@ -2,6 +2,7 @@
 #include "draggable_label.h" 
 #include "clickable_label.h" 
 
+#include <yaml-cpp/yaml.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QScrollArea>
@@ -19,6 +20,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QApplication>
+#include <QGraphicsPixmapItem>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -147,3 +149,20 @@ void MainWindow::guardarMapa() {
     file.close();
     QApplication::quit();
 }
+
+void MainWindow::cargarDesdeYAML(const QString& ruta) {
+    YAML::Node root = YAML::LoadFile(ruta.toStdString());
+
+    QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
+    topWidget->setDropMode(DropMode::FONDO);
+    topWidget->setBackgroundPath(fondo);
+
+    const auto& elementos = root["elementos"];
+    for (const auto& elemento : elementos) {
+        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+        int x = elemento["x"].as<int>();
+        int y = elemento["y"].as<int>();
+        topWidget->agregarElemento(imagen, x, y);
+    }
+}
+

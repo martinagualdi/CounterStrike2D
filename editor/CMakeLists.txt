@@ -5,9 +5,13 @@ target_sources(taller_editor
     editor_main_window.cpp
     draggable_label.cpp
     top_widget.cpp
+    editor_lobby.cpp
+    editor_seleccion_mapa.cpp
     PUBLIC
     editor_main_window.h
     clickable_label.h
     draggable_label.h
     top_widget.h
+    editor_lobby.h
+    editor_seleccion_mapa.h
     )

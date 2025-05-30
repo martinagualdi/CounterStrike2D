@@ -10,6 +10,7 @@ class MainWindow : public QWidget {
 public:
     explicit MainWindow(QWidget* parent = nullptr);
     void guardarMapa();
+    void cargarDesdeYAML(const QString& ruta);
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
 private:

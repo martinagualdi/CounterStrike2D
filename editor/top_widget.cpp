@@ -170,3 +170,14 @@ void TopWidget::dropEvent(QDropEvent* event) {
     event->acceptProposedAction();
 }
 
+void TopWidget::agregarElemento(const QString& path, int x, int y) {
+    QPixmap pixmap(path);
+    if (!pixmap.isNull()) {
+        auto* item = new QGraphicsPixmapItem(pixmap.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
+        item->setPos(x, y);
+        item->setZValue(1);
+        item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+        scene->addItem(item);
+    }
+}
+

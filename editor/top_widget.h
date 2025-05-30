@@ -18,7 +18,7 @@ public:
     void setDropMode(DropMode mode);
     QString getFondoPath() const;
     QList<QPair<QString, QPointF>> getElementos() const;
-
+    void agregarElemento(const QString& path, int x, int y);
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;

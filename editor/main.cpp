@@ -1,13 +1,34 @@
+#include "editor_lobby.h"
 #include "editor_main_window.h"
+#include "editor_seleccion_mapa.h"
 #include <QApplication>
-#include <QMainWindow>
 
 int main(int argc, char *argv[]) {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
-    MainWindow w;
-    w.resize(1200, 800);
-    w.show();
+    EditorLobby* lobby = new EditorLobby;
+    lobby->show();
 
-    return a.exec();
+    QObject::connect(lobby, &EditorLobby::crearMapaSolicitado, [=]() {
+        auto* ventana = new MainWindow;
+        ventana->show();
+        lobby->close();
+    });
+
+    QObject::connect(lobby, &EditorLobby::editarMapaSolicitado, [=]() {
+        auto* seleccion = new EditorSeleccionMapa;
+        
+        QObject::connect(seleccion, &EditorSeleccionMapa::mapaSeleccionado, [=](const QString& rutaYaml) {
+            auto* ventana = new MainWindow;
+            ventana->cargarDesdeYAML(rutaYaml);
+            ventana->show();
+            seleccion->close();
+        });
+
+        seleccion->show();
+        seleccion->seleccionarArchivo();
+        lobby->close();
+    });
+
+    return app.exec();
 }

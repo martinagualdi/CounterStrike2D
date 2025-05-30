@@ -56,7 +56,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Fondos", "editor/gfx/backgrounds/" },
         { "Azteca", "editor/gfx/aztec/" },
         { "Dust",  "editor/gfx/dust/" },
-        { "Infierno", "editor/gfx/inferno/" }
+        { "Inferno", "editor/gfx/inferno/" },
+        { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
+        { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" }
     };
 
     for (const auto& tab : tabs) {

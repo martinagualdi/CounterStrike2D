@@ -8,17 +8,17 @@ class DraggableLabel : public QLabel {
     Q_OBJECT
 
 public:
-    explicit DraggableLabel(const QPixmap& pixmap, QWidget* parent = nullptr);
+    explicit DraggableLabel(const QString& imagePath, QWidget* parent = nullptr);
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
 
 signals:
-    void dragStarted();
+    void dragStarted(const QString& path);
 
 private:
-    QPixmap pixmapData; 
+    QString path;
     QPoint dragStartPosition;
 };
 

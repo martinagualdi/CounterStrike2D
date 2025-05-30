@@ -48,9 +48,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     TabInfo tabs[] = {
         { "Fondos", "editor/gfx/backgrounds/" },
-        { "Objetos", "editor/gfx/tiles/" },
-        { "Armas",  "editor/gfx/weapons/" },
-        { "Jugadores", "editor/gfx/player/" }
+        { "Azteca", "editor/gfx/aztec/" },
+        { "Dust",  "editor/gfx/dust/" },
+        { "Infierno", "editor/gfx/inferno/" }
     };
 
     for (const auto& tab : tabs) {
@@ -82,27 +82,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 clickable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 clickable->setFixedSize(100, 100);
                 hLayout->addWidget(clickable);
-            } else if (tab.name == "Objetos") {
-                // Dividir la imagen en tiles de 32x32
-                const int tileWidth = 32;
-                const int tileHeight = 32;
-                int cols = fullPixmap.width() / tileWidth;
-                int rows = fullPixmap.height() / tileHeight;
-
-                for (int y = 0; y < rows; ++y) {
-                    for (int x = 0; x < cols; ++x) {
-                        QPixmap tile = fullPixmap.copy(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
-                        auto* draggable = new DraggableLabel(tile);
-                        draggable->setFixedSize(32, 32);
-                        connect(draggable, &DraggableLabel::dragStarted, this, [this]() {
-                            topWidget->setDropMode(DropMode::OBJETO);
-                        });
-                        hLayout->addWidget(draggable);
-                    }
-                }
             } else {
                 auto* draggable = new DraggableLabel(fullPath);
-                connect(draggable, &DraggableLabel::dragStarted, this, [this]() {
+                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
                     topWidget->setDropMode(DropMode::OBJETO);
                 });
                 draggable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));

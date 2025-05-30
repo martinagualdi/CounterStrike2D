@@ -6,15 +6,15 @@
 #include <QApplication>
 #include <QBuffer>
 
-DraggableLabel::DraggableLabel(const QPixmap& pixmap, QWidget* parent)
-    : QLabel(parent),pixmapData(pixmap) {
-        setPixmap(pixmap);
-    }
+DraggableLabel::DraggableLabel(const QString& imagePath, QWidget* parent)
+    : QLabel(parent), path(imagePath) {
+    setPixmap(QPixmap(imagePath));
+}
 
 void DraggableLabel::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         dragStartPosition = event->pos();
-        emit dragStarted();
+        emit dragStarted(path);
     }
     QLabel::mousePressEvent(event);
 }
@@ -28,14 +28,12 @@ void DraggableLabel::mouseMoveEvent(QMouseEvent* event) {
 
     QMimeData* mimeData = new QMimeData;
 
-    QByteArray data;
-    QBuffer buffer(&data);
-    buffer.open(QIODevice::WriteOnly);
-    pixmapData.save(&buffer, "PNG");
-    mimeData->setData("application/x-pixmap", data);
+    QList<QUrl> urls;
+    urls.append(QUrl::fromLocalFile(path));
+    mimeData->setUrls(urls);
 
     QDrag* drag = new QDrag(this);
     drag->setMimeData(mimeData);
-    drag->setPixmap(pixmapData);
+    drag->setPixmap(pixmap());
     drag->exec(Qt::CopyAction);
 }

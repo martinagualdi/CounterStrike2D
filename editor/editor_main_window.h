@@ -9,10 +9,10 @@ class MainWindow : public QWidget {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+    void guardarMapa();
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
 private:
-    void guardarMapa();
     TopWidget* topWidget;
     QString backgroundPath;
 };

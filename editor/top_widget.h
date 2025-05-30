@@ -16,6 +16,9 @@ public:
     explicit TopWidget(QWidget* parent = nullptr);
     void setBackgroundPath(const QString& path);
     void setDropMode(DropMode mode);
+    QString getFondoPath() const;
+    QList<QPair<QString, QPointF>> getElementos() const;
+
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -32,4 +35,5 @@ private:
     QGraphicsPixmapItem* previewItem = nullptr; 
     QPixmap currentDraggedPixmap; 
     DropMode currentMode = DropMode::OBJETO;
+    QString fondoPath;
 };

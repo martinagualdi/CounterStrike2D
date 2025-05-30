@@ -15,6 +15,10 @@
 #include <QDropEvent>
 #include <QDebug>
 #include <QTabWidget>
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -109,6 +113,37 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
 }
 
 void MainWindow::guardarMapa() {
-    qDebug() << "Guardar mapa aún no implementado.";
-    // Aquí podrías guardar el contenido del QGraphicsScene, etc.
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        "Guardar mapa",
+        "",
+        "Archivos YAML (*.yaml);;Todos los archivos (*)"
+    );
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".yaml", Qt::CaseInsensitive)) {
+        fileName += ".yaml";
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "No se pudo abrir el archivo para escribir.";
+        return;
+    }
+
+    QTextStream out(&file);
+    out << "fondo: " << topWidget->getFondoPath() << "\n";
+    out << "elementos:\n";
+
+    auto elementos = topWidget->getElementos();
+    for (const auto& e : elementos) {
+        out << "  - imagen: " << e.first << "\n";
+        out << "    x: " << int(e.second.x()) << "\n";
+        out << "    y: " << int(e.second.y()) << "\n";
+    }
+
+    file.close();
+    QApplication::quit();
 }

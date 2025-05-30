@@ -16,6 +16,26 @@ TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphi
     setFocusPolicy(Qt::StrongFocus);
 }
 
+QString TopWidget::getFondoPath() const {
+    return fondoPath;
+}
+
+QList<QPair<QString, QPointF>> TopWidget::getElementos() const {
+    QList<QPair<QString, QPointF>> elementos;
+    for (QGraphicsItem* item : scene->items()) {
+        if (item->zValue() > 0) {
+            auto* pixmapItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+            if (pixmapItem) {
+                QString imgPath = pixmapItem->data(0).toString();
+                if (!imgPath.isEmpty()) {
+                    elementos.append(qMakePair(imgPath, pixmapItem->pos()));
+                }
+            }
+        }
+    }
+    return elementos;
+}
+
 void TopWidget::setDropMode(DropMode mode) {
     currentMode = mode;
 }
@@ -37,6 +57,8 @@ void TopWidget::setBackgroundPath(const QString& path) {
     QPixmap tile(path);
     if (tile.isNull())
         return;
+
+    fondoPath = path;
 
     scene->clear();
 
@@ -61,18 +83,6 @@ void TopWidget::setBackgroundPath(const QString& path) {
 
 void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
     const QMimeData* mime = event->mimeData();
-
-    if (mime->hasFormat("application/x-pixmap")) {
-        QByteArray data = mime->data("application/x-pixmap");
-        QPixmap pix;
-        pix.loadFromData(data, "PNG");
-
-        if (!pix.isNull()) {
-            currentDraggedPixmap = pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            event->acceptProposedAction();
-            return;
-        }
-    }
 
     if (mime->hasUrls()) {
         QString path = mime->urls().first().toLocalFile();
@@ -136,24 +146,6 @@ void TopWidget::dropEvent(QDropEvent* event) {
 
     const QMimeData* mime = event->mimeData();
 
-    if (mime->hasFormat("application/x-pixmap")) {
-    QByteArray data = mime->data("application/x-pixmap");
-    QPixmap pix;
-    pix.loadFromData(data, "PNG");
-
-    QPointF scenePos = mapToScene(event->position().toPoint());
-    int x = int(scenePos.x()) / gridSize * gridSize;
-    int y = int(scenePos.y()) / gridSize * gridSize;
-
-    auto* item = new QGraphicsPixmapItem(pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
-    item->setPos(x, y);
-    item->setFlag(QGraphicsItem::ItemIsMovable);
-    item->setFlag(QGraphicsItem::ItemIsSelectable);
-    item->setZValue(1);
-    scene->addItem(item);
-    event->acceptProposedAction();
-    }
-
     for (const QUrl& url : mime->urls()) {
         QString path = url.toLocalFile();
         QPixmap pix(path);
@@ -168,6 +160,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setPos(x, y);
             item->setZValue(1);
             item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+            item->setData(0, path);
             scene->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
             setBackgroundPath(path);

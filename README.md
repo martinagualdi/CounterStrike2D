@@ -26,12 +26,12 @@ El archivo de configuración contiene el puerto al cual conectarse, predefinido 
 ```sh
 ./client
 ```
+Una vez ejecutado deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 
 ###### **Para ejecutar el editor:**
 ```sh
 ./taller_editor
 ```
-Una vez ejecutado deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 
 #### Movimientos del jugador
 Para mover al jugador podes usar:

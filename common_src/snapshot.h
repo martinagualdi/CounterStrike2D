@@ -6,17 +6,6 @@
 #include "jugador.h"
 #include "municion.h"
 
-/*Identificador de arma para el dibujo de la misma, asi no enviamos todas*/
-
-enum ArmaEnMano {
-    CUCHILLO,
-    GLOCK,
-    AK_47,
-    M3,
-    AWP,
-    BOMBA_TT
-};
-
 /*Structs para enviar la informacion necesaria para dibujar el juevo en "client"*/
 
 struct InfoJugador {
@@ -57,7 +46,7 @@ struct Snapshot {
             info_jugador.dinero = jugador_ptr->get_dinero();
             info_jugador.equipo = jugador_ptr->get_equipo();
             info_jugador.skin_tipo = jugador_ptr->get_skin_tipo();
-            info_jugador.arma_en_mano = GLOCK; // HARDCODEADO
+            info_jugador.arma_en_mano = jugador_ptr->get_codigo_arma_en_mano();
             info_jugador.esta_vivo = jugador_ptr->esta_vivo();
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
 

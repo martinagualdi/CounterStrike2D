@@ -8,6 +8,14 @@
 #include "ak47.h"
 #include "armaDeFuego.h"
 
+enum ArmaEnMano {
+    CUCHILLO,
+    GLOCK,
+    AK_47,
+    M3,
+    AWP,
+    BOMBA_TT
+};
 
 enum Equipo {
     CT,
@@ -144,6 +152,23 @@ class Jugador {
             arma_en_mano = cuchillo.get();
         } else {
             arma_en_mano = arma_principal.get();
+        }
+    }
+
+    enum ArmaEnMano get_codigo_arma_en_mano() const {
+        std::string nombre_arma = arma_en_mano->getNombre();
+        if (nombre_arma == "Cuchillo") {
+            return CUCHILLO;
+        } else if (nombre_arma == "Glock") {
+            return GLOCK;
+        } else if (nombre_arma == "AK-47") {
+            return AK_47;
+        } else if (nombre_arma == "M3") {
+            return M3;
+        } else if (nombre_arma == "AWP") {
+            return AWP;
+        } else {
+            return BOMBA_TT;
         }
     }
     

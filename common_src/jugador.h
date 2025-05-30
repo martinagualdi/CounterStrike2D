@@ -28,12 +28,13 @@ class Jugador {
     float x;
     float y;
     float angulo;
-    enum Movimiento movimiento_actual;
     int vida;
     int dinero;
     enum Equipo equipo_actual;
     enum SkinTipos skin_tipo;
     bool vivo = true;
+    bool moviendose = false;
+    enum Movimiento movimiento_actual = DETENER;
     std::shared_ptr<Glock> arma_secundaria;
 
 
@@ -45,12 +46,12 @@ class Jugador {
     //std::unique_ptr<ArmaDeFuego> arma_primaria;
 
   public:   /* AGREGAR LOGICA DE SEPARAR EN EQUIPOS */
-    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500), equipo_actual(CT), skin_tipo(SEAL_FORCE), vivo(true), arma_secundaria(new Glock()) {};
+    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), vida(100), dinero(500), equipo_actual(CT), skin_tipo(SEAL_FORCE), vivo(true), arma_secundaria(new Glock()) {};
 
     //Jugador(int id, float x, float y, float angulo) : id(id), x(x), y(y), angulo(angulo),movimiento_actual(DETENER), vida(100), dinero(500),vivo(true), arma_secundaria(new Glock()) {};
 
     Jugador(int id, float x, float y, float angulo, enum Equipo equipo, enum SkinTipos skin, int vida, int dinero, uint8_t arma_secundaria_id)
-        : id(id), x(x), y(y), angulo(angulo), movimiento_actual(DETENER), vida(vida), dinero(dinero), equipo_actual(equipo), skin_tipo(skin), vivo(true), 
+        : id(id), x(x), y(y), angulo(angulo), vida(vida), dinero(dinero), equipo_actual(equipo), skin_tipo(skin), vivo(true), 
         arma_secundaria(arma_secundaria_id == 0x01 ? new Glock() : nullptr) {};
 
     /*explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), movimiento_actual(DETENER), vida(100), dinero(500),vivo(true)
@@ -85,15 +86,11 @@ class Jugador {
     float getAngulo() const {
         return angulo;
     }
-
-    bool estaMoviendo() const {
-        return movimiento_actual != DETENER;
-    }
-
+    
     enum Movimiento getMovimiento() const {
         return movimiento_actual;
     }
-
+    
     void setMovimiento(enum Movimiento m){
         this->movimiento_actual = m;
     }
@@ -140,6 +137,14 @@ class Jugador {
     void set_skin_tipo(enum SkinTipos skin) {
         this->skin_tipo = skin;
     }
+
+    bool esta_vivo() const {
+        return vivo;
+    }
+
+    bool esta_moviendose() const { return moviendose == true; }
+
+    void cambiar_estado_moviendose() { moviendose = !moviendose; }
 
     /*
     void setArmaPrimaria(std::unique_ptr<ArmaDeFuego> nuevaArma) {

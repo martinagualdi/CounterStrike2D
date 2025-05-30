@@ -82,9 +82,9 @@ void EventHandler::convertir_coordenadas(float &x, float &y) {
 }
 
 float EventHandler::procesarPuntero(Snapshot& snapshot) {
-    Jugador* jugador = snapshot.getJugadorPorId(client_id);
-    float jugador_x = jugador->getX();
-    float jugador_y = jugador->getY();
+    InfoJugador* jugador = snapshot.getJugadorPorId(client_id);
+    float jugador_x = jugador->pos_x;
+    float jugador_y = jugador->pos_y;
     convertir_coordenadas(jugador_x, jugador_y);    
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);

@@ -54,6 +54,15 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         case DETENER:
             break;
     }
+
+    if ((!jugador->esta_moviendose() && jugador->getMovimiento() != DETENER)
+        || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)) {
+        jugador->cambiar_estado_moviendose(); 
+    }
+    if (jugador->esta_moviendose())
+        std::cout << "ESTA MOVIENDOSE " << std::endl;
+    else
+        std::cout << "NO ESTA MOVIENDOSE " << std::endl;
 }
 
 Jugador *GameLoop::findJugador(int id_jugador_buscado) {
@@ -75,6 +84,7 @@ void GameLoop::run() {
                 switch (comando.tipo) {
                     case MOVIMIENTO:
                         jugador->setMovimiento(comando.movimiento);
+                        //ejecutar_movimiento(jugador, comando.movimiento);
                         break;
                     case ROTACION:
                         jugador->setAngulo(comando.angulo);
@@ -93,9 +103,7 @@ void GameLoop::run() {
             }
 
             for (Jugador *jugador : jugadores) {
-                if(jugador->estaMoviendo()){
-                    ejecutar_movimiento(jugador);
-                }
+                ejecutar_movimiento(jugador);
             }
             size_t i = 0;
             while ( i < balas_disparadas.size()) {
@@ -121,8 +129,8 @@ void GameLoop::run() {
                     }
                 }
                 if (!bala_impacto) {
-                    bala.setPosX(bala.getPosX() + std::cos(bala.getAnguloDisparo() * M_PI / 180.0f) * 2);
-                    bala.setPosY(bala.getPosY() + std::sin(bala.getAnguloDisparo() * M_PI / 180.0f) * 2);
+                    bala.setPosX(bala.getPosX() + std::cos(bala.getAnguloDisparo() * M_PI / 180.0f) * 8);
+                    bala.setPosY(bala.getPosY() + std::sin(bala.getAnguloDisparo() * M_PI / 180.0f) * 8);
                 }
                 i++;
             }

@@ -59,10 +59,10 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)) {
         jugador->cambiar_estado_moviendose(); 
     }
-    if (jugador->esta_moviendose())
+    /*if (jugador->esta_moviendose())
         std::cout << "ESTA MOVIENDOSE " << std::endl;
     else
-        std::cout << "NO ESTA MOVIENDOSE " << std::endl;
+        std::cout << "NO ESTA MOVIENDOSE " << std::endl;*/
 }
 
 Jugador *GameLoop::findJugador(int id_jugador_buscado) {
@@ -84,18 +84,21 @@ void GameLoop::run() {
                 switch (comando.tipo) {
                     case MOVIMIENTO:
                         jugador->setMovimiento(comando.movimiento);
-                        //ejecutar_movimiento(jugador, comando.movimiento);
                         break;
                     case ROTACION:
                         jugador->setAngulo(comando.angulo);
                         break;
                     case DISPARO:
-                        // logica disparo
                         std::cout << "Angulo recibido: " << comando.angulo << std::endl;
                         if (jugador->disparar() ){
                             Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
                             balas_disparadas.push_back(bala_disparada);
                         }
+                        break;
+                    case CAMBIAR_ARMA:
+                        jugador->cambiar_arma_en_mano();
+                        std::cout << "Jugador de ID: " << jugador->getId() << " ha cambiado su arma a: " 
+                                  << jugador->get_nombre_arma_en_mano() << std::endl;
                         break;
                     default:
                         break;

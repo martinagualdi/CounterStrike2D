@@ -106,10 +106,10 @@ void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
         comando.angulo = procesarPuntero(snapshot);
         cola_enviador.try_push(comando);
     }  else if (event.type == SDL_MOUSEWHEEL) {
-        if (event.wheel.y > 0) {
-           // cola_enviador.try_push(CMD_SCROLL_ARRIBA);
-        } else if (event.wheel.y < 0) {
-           // cola_enviador.try_push(CMD_SCROLL_ABAJO);
+        if (event.wheel.y < 0) {
+            ComandoDTO comando;
+            comando.tipo = CAMBIAR_ARMA;
+            cola_enviador.try_push(comando);
         }
     }
     

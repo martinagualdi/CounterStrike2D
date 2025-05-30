@@ -94,6 +94,9 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             skt.recvall(&angulo, 2);
             comando.angulo = static_cast<float>(ntohs(angulo))/100;
             break;
+        case PREFIJO_CAMBIO_ARMA:
+            comando.tipo = CAMBIAR_ARMA;
+            break;
         default:
             break;
     }

@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         hLayout->setContentsMargins(5, 5, 5, 5);
 
         QDir dir(tab.dirPath);
-        QStringList images = dir.entryList(QStringList() << "*.png", QDir::Files);
+        QStringList images = dir.entryList(QStringList() << "*.png" << "*.jpg", QDir::Files);
 
         for (const QString& imgName : images) {
             QString fullPath = dir.absoluteFilePath(imgName);

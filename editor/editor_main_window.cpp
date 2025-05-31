@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     topBarLayout->setContentsMargins(5, 5, 5, 0);
     topBarLayout->addStretch(); 
 
-    QPushButton* botonZonaInicio = new QPushButton("Marcar Zona de Inicio");
+    QPushButton* botonZonaInicio = new QPushButton("Marcar Zona");
     botonZonaInicio->setFixedSize(180, 30);
     topBarLayout->addWidget(botonZonaInicio);
     connect(botonZonaInicio, &QPushButton::clicked, [this]() {

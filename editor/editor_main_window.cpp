@@ -142,7 +142,31 @@ bool MainWindow::zonasValidadas(){
         if (!tieneTT) mensaje += "- Zona de inicio TT\n";
         if (!tieneBomba) mensaje += "- Zona de bombas\n";
 
-        QMessageBox::warning(this, "Guardado inválido", mensaje);
+        QMessageBox box(this);
+        box.setWindowTitle("Guardado inválido");
+        box.setText(mensaje);
+        box.setIcon(QMessageBox::Warning);
+        box.setStandardButtons(QMessageBox::Ok);
+
+        box.setStyleSheet(R"(
+            QMessageBox {
+                background-color: #2e2e2e;
+                color: #f0f0f0;
+                font-size: 14px;
+            }
+            QPushButton {
+                background-color: #444;
+                color: #fff;
+                padding: 6px 12px;
+                border: 1px solid #666;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #555;
+            }
+        )");
+
+        box.exec();
         return false;
     }
 

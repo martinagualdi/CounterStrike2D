@@ -54,7 +54,6 @@ void ZonaRectItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     QPointF pos = event->pos();
     QRectF r = rect();
 
-    // Verificamos si está dentro de la zona de redimensionado (esquina inferior derecha)
     QRectF resizeZone(r.right() - resizeMargin, r.bottom() - resizeMargin, resizeMargin, resizeMargin);
     if (resizeZone.contains(pos)) {
         resizing = true;
@@ -73,7 +72,7 @@ void ZonaRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         newRect.setWidth(std::max(10.0, newRect.width() + delta.x()));
         newRect.setHeight(std::max(10.0, newRect.height() + delta.y()));
         setRect(newRect);
-        setTexto(label->toPlainText()); // re-centra el texto
+        setTexto(label->toPlainText());
     } else {
         QGraphicsRectItem::mouseMoveEvent(event);
     }

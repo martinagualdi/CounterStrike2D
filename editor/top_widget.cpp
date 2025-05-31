@@ -249,7 +249,6 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         if (ok) {
             QRectF rect = zonaPreview->rect();
 
-            // Crear la zona visual editable
             auto* zonaItem = new ZonaRectItem(rect, tipo);
             QColor color;
             QString texto;
@@ -269,7 +268,6 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
             zonaItem->setTexto(texto);
             scene->addItem(zonaItem);
 
-            // Guardar zona lógica
             ZonaMapa zona;
             zona.rect = rect;
             zona.tipo = tipo;
@@ -305,7 +303,6 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
         texto = "BOMBAS";
     }
 
-    // Usar ZonaRectItem en lugar de recta común
     auto* zonaItem = new ZonaRectItem(rect, tipo);
     zonaItem->setColor(color);
     zonaItem->setTexto(texto);

@@ -229,10 +229,25 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-        int x = elemento["x"].as<int>();
-        int y = elemento["y"].as<int>();
-        topWidget->agregarElemento(imagen, x, y);
+        if (elemento["imagen"]) {
+
+            QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+            int x = elemento["x"].as<int>();
+            int y = elemento["y"].as<int>();
+
+            QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
+            topWidget->agregarElemento(imagen, x, y);
+        } else if (elemento["tipo"] && elemento["ancho"] && elemento["alto"]) {
+
+            QString tipoZona = QString::fromStdString(elemento["tipo"].as<std::string>());
+            int x = elemento["x"].as<int>();
+            int y = elemento["y"].as<int>();
+            int ancho = elemento["ancho"].as<int>();
+            int alto = elemento["alto"].as<int>();
+            QRectF rect(x, y, ancho, alto);
+            topWidget->agregarZona(rect, tipoZona);
+        }
     }
 }
+
 

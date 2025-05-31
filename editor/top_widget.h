@@ -32,6 +32,7 @@ public:
     QList<ElementoMapa> getElementos() const;
     void agregarElemento(const QString& path, int x, int y);
     QList<ZonaMapa> getZonas() const { return zonasInicio; }
+    void agregarZona(const QRectF& rect, const QString& tipo);
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -55,7 +56,7 @@ private:
     QList<ZonaMapa> zonasInicio;
     QPointF zonaStartPoint;
     QGraphicsRectItem* zonaPreview = nullptr;
-    
+
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);
 };

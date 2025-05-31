@@ -95,9 +95,9 @@ void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
 
     if (mime->hasUrls()) {
         QString path = mime->urls().first().toLocalFile();
-        QPixmap pix(path);
+        QPixmap pix = filtrarFondo(path, gridSize);
         if (!pix.isNull()) {
-            currentDraggedPixmap = pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            currentDraggedPixmap = pix;
             event->acceptProposedAction();
         }
     }
@@ -110,7 +110,8 @@ void TopWidget::dragMoveEvent(QDragMoveEvent* event) {
         int y = int(scenePos.y()) / gridSize * gridSize;
 
         if (!previewItem) {
-            previewItem = new QGraphicsPixmapItem(currentDraggedPixmap);
+            QPixmap filteredPixmap = currentDraggedPixmap;
+            previewItem = new QGraphicsPixmapItem(filteredPixmap);
             previewItem->setOpacity(0.5);
             previewItem->setZValue(10);
             scene->addItem(previewItem);
@@ -157,7 +158,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
 
     for (const QUrl& url : mime->urls()) {
         QString path = url.toLocalFile();
-        QPixmap pix(path);
+        QPixmap pix = filtrarFondo(path, gridSize);
         if (pix.isNull()) continue;
 
         QPointF scenePos = mapToScene(event->position().toPoint());
@@ -165,10 +166,11 @@ void TopWidget::dropEvent(QDropEvent* event) {
         int y = int(scenePos.y()) / gridSize * gridSize;
 
         if (currentMode == DropMode::OBJETO) {
-            auto* item = new QGraphicsPixmapItem(pix.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
+            auto* item = new QGraphicsPixmapItem(pix);
             item->setPos(x, y);
             item->setZValue(1);
             item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+
             QString tipo = "otros";
             if (path.contains("plantacion_bombas"))
                 tipo = "bombsite";
@@ -189,9 +191,9 @@ void TopWidget::dropEvent(QDropEvent* event) {
 }
 
 void TopWidget::agregarElemento(const QString& path, int x, int y) {
-    QPixmap pixmap(path);
+    QPixmap pixmap = filtrarFondo(path, gridSize);
     if (!pixmap.isNull()) {
-        auto* item = new QGraphicsPixmapItem(pixmap.scaled(gridSize, gridSize, Qt::KeepAspectRatio));
+        auto* item = new QGraphicsPixmapItem(pixmap);
         item->setPos(x, y);
         item->setZValue(1);
         item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
@@ -314,5 +316,24 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
     zonasInicio.append(zona);
 }
 
+QPixmap TopWidget::filtrarFondo(const QString& path, int gridSize) {
+    QImage img(path);
+    if (img.isNull())
+        return QPixmap();
+
+    img = img.convertToFormat(QImage::Format_ARGB32);
+    QRgb magenta = qRgb(255, 0, 255);
+
+    for (int y = 0; y < img.height(); ++y) {
+        for (int x = 0; x < img.width(); ++x) {
+            QRgb pixel = img.pixel(x, y);
+            if (pixel == magenta) {
+                img.setPixelColor(x, y, QColor(0, 0, 0, 0));
+            }
+        }
+    }
+
+    return QPixmap::fromImage(img).scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
 
 

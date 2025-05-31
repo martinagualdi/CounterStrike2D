@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Azteca", "editor/gfx/aztec/" },
         { "Dust",  "editor/gfx/dust/" },
         { "Inferno", "editor/gfx/inferno/" },
+        { "Armas", "editor/gfx/weapons/" },
         { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
         { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
     };
@@ -81,11 +82,33 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         hLayout->setContentsMargins(5, 5, 5, 5);
 
         QDir dir(tab.dirPath);
-        QStringList images = dir.entryList(QStringList() << "*.png" << "*.jpg", QDir::Files);
+        QStringList filters = (tab.name == "Armas")
+                            ? QStringList() << "*.bmp"
+                            : QStringList() << "*.png" << "*.jpg";
+        QStringList images = dir.entryList(filters, QDir::Files);
 
         for (const QString& imgName : images) {
             QString fullPath = dir.absoluteFilePath(imgName);
-            QPixmap fullPixmap(fullPath);
+
+            QPixmap pixmap;
+            if (tab.name == "Armas") {
+                QImage img(fullPath);
+                img = img.convertToFormat(QImage::Format_ARGB32);
+                QRgb magenta = qRgb(255, 0, 255);
+
+                for (int y = 0; y < img.height(); ++y) {
+                    for (int x = 0; x < img.width(); ++x) {
+                        QRgb pixel = img.pixel(x, y);
+                        if ((pixel == magenta)) {
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el negro y el magenta
+                        }
+                    }
+                }
+
+                pixmap = QPixmap::fromImage(img);
+            } else {
+                pixmap = QPixmap(fullPath);
+            }
 
             if (tab.name == "Fondos") {
                 auto* clickable = new ClickableLabel(fullPath);
@@ -93,8 +116,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                     topWidget->setDropMode(DropMode::FONDO);
                     topWidget->setBackgroundPath(path);
                 });
-
-                clickable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                clickable->setPixmap(pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 clickable->setFixedSize(100, 100);
                 hLayout->addWidget(clickable);
             } else {
@@ -102,7 +124,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
                     topWidget->setDropMode(DropMode::OBJETO);
                 });
-                draggable->setPixmap(fullPixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                draggable->setPixmap(pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 draggable->setFixedSize(100, 100);
                 hLayout->addWidget(draggable);
             }
@@ -111,7 +133,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         scrollArea->setWidget(container);
         tabWidget->addTab(scrollArea, tab.name);
     }
-
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);

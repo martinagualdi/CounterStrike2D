@@ -44,6 +44,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
+    QPixmap filtrarFondo(const QString& path, int gridSize);
 
 private:
     QGraphicsScene* scene;

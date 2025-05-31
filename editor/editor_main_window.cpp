@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QApplication>
 #include <QGraphicsPixmapItem>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -45,15 +46,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     mainLayout->addLayout(topBarLayout);
 
-    // Parte superior (topWidget)
+    // Parte superior
     topWidget = new TopWidget;
     mainLayout->addWidget(topWidget);
 
-    // QTabWidget para las pestañas
+    //Pestañas
     QTabWidget* tabWidget = new QTabWidget;
-    tabWidget->setFixedHeight(140);  // para incluir scroll + espacio
+    tabWidget->setFixedHeight(140);
 
-    // Crear las 4 pestañas
     struct TabInfo {
         QString name;
         QString dirPath;
@@ -123,7 +123,34 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     }
 }
 
+bool MainWindow::zonasValidadas(){
+    const auto zonas = topWidget->getZonas();
+
+    bool tieneCT = false;
+    bool tieneTT = false;
+    bool tieneBomba = false;
+
+    for (const auto& zona : zonas) {
+        if (zona.tipo == "inicio_ct") tieneCT = true;
+        else if (zona.tipo == "inicio_tt") tieneTT = true;
+        else if (zona.tipo == "zona_bombas") tieneBomba = true;
+    }
+
+    if (!tieneCT || !tieneTT || !tieneBomba) {
+        QString mensaje = "Faltan zonas obligatorias:\n";
+        if (!tieneCT) mensaje += "- Zona de inicio CT\n";
+        if (!tieneTT) mensaje += "- Zona de inicio TT\n";
+        if (!tieneBomba) mensaje += "- Zona de bombas\n";
+
+        QMessageBox::warning(this, "Guardado inválido", mensaje);
+        return false;
+    }
+
+    return true;
+}
+
 void MainWindow::guardarMapa() {
+    if (!zonasValidadas()) return;
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",

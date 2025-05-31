@@ -13,6 +13,7 @@ public:
     void cargarDesdeYAML(const QString& ruta);
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
+    bool zonasValidadas();
 private:
     TopWidget* topWidget;
     QString backgroundPath;

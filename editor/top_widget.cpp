@@ -242,7 +242,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         bool ok = false;
         QString tipo = QInputDialog::getItem(
             this, "Tipo de zona", "¿Qué zona estás marcando?",
-            { "inicio_ct", "inicio_tt" }, 0, false, &ok
+            { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok
         );
         if (ok) {
             ZonaMapa zona;
@@ -251,7 +251,29 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
             zonasInicio.append(zona);
             emit zonaCreada(tipo, zona.rect);
 
-            zonaPreview->setBrush(QColor(0, 0, 255, 50));
+            QColor azul(0, 0, 255, 50);
+            zonaPreview->setBrush(azul);
+            zonaPreview->setPen(QPen(Qt::blue, 2, Qt::DashLine));
+
+            QString texto = "";
+            if(tipo =="inicio_ct")
+                texto = "CT";
+            else if (tipo == "inicio_tt")
+                texto = "TT";
+            
+            QGraphicsTextItem* label = scene->addText(texto);
+            QFont font = label->font();
+            font.setBold(true);
+            font.setPointSize(14);
+            label->setFont(font);
+
+            QRectF rect = zonaPreview->rect();
+            QPointF center = rect.center();
+            QRectF textRect = label->boundingRect();
+            label->setDefaultTextColor(Qt::black);
+            label->setPos(center.x() - textRect.width() / 2, center.y() - textRect.height() / 2);
+            label->setZValue(2);
+
             zonaPreview = nullptr;
         } else {
             scene->removeItem(zonaPreview);
@@ -261,7 +283,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
     } else {
         QGraphicsView::mouseReleaseEvent(event);
     }
-    
 }
+
 
 

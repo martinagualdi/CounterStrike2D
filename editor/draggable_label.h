@@ -9,6 +9,8 @@ class DraggableLabel : public QLabel {
 
 public:
     explicit DraggableLabel(const QString& imagePath, QWidget* parent = nullptr);
+    void setTipo(const QString& tipo_) { tipo = tipo_; }
+    QString getTipo() const { return tipo; }
 
 protected:
     void mousePressEvent(QMouseEvent* event) override;
@@ -20,6 +22,7 @@ signals:
 private:
     QString path;
     QPoint dragStartPosition;
+    QString tipo = "otros";
 };
 
 #endif // DRAGGABLE_LABEL_H

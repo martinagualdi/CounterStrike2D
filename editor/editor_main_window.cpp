@@ -31,6 +31,13 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     topBarLayout->setContentsMargins(5, 5, 5, 0);
     topBarLayout->addStretch(); 
 
+    QPushButton* botonZonaInicio = new QPushButton("Marcar Zona de Inicio");
+    botonZonaInicio->setFixedSize(180, 30);
+    topBarLayout->addWidget(botonZonaInicio);
+    connect(botonZonaInicio, &QPushButton::clicked, [this]() {
+        topWidget->setDropMode(DropMode::ZONA_INICIO);
+    });
+
     QPushButton* saveButton = new QPushButton("Guardar");
     saveButton->setFixedSize(100, 30);
     topBarLayout->addWidget(saveButton);
@@ -58,7 +65,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Dust",  "editor/gfx/dust/" },
         { "Inferno", "editor/gfx/inferno/" },
         { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
-        { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" }
+        { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
     };
 
     for (const auto& tab : tabs) {
@@ -143,10 +150,20 @@ void MainWindow::guardarMapa() {
 
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
-        out << "  - imagen: " << e.first << "\n";
-        out << "    x: " << int(e.second.x()) << "\n";
-        out << "    y: " << int(e.second.y()) << "\n";
+        out << "  - imagen: " << e.path << "\n";
+        out << "    x: " << int(e.posicion.x()) << "\n";
+        out << "    y: " << int(e.posicion.y()) << "\n";
+        out << "    tipo: " << e.tipo << "\n";
     }
+
+    for (const auto& zona : topWidget->getZonas()) {
+    out << "  - tipo: " << zona.tipo << "\n";
+    out << "    x: " << int(zona.rect.x()) << "\n";
+    out << "    y: " << int(zona.rect.y()) << "\n";
+    out << "    ancho: " << int(zona.rect.width()) << "\n";
+    out << "    alto: " << int(zona.rect.height()) << "\n";
+    }
+
 
     file.close();
     QApplication::quit();

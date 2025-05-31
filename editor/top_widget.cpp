@@ -6,6 +6,7 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QUrl>
+#include <QInputDialog>
 
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphicsScene(this)) {
     setScene(scene);
@@ -20,15 +21,22 @@ QString TopWidget::getFondoPath() const {
     return fondoPath;
 }
 
-QList<QPair<QString, QPointF>> TopWidget::getElementos() const {
-    QList<QPair<QString, QPointF>> elementos;
+QList<ElementoMapa> TopWidget::getElementos() const {
+    QList<ElementoMapa> elementos;
     for (QGraphicsItem* item : scene->items()) {
         if (item->zValue() > 0) {
             auto* pixmapItem = dynamic_cast<QGraphicsPixmapItem*>(item);
             if (pixmapItem) {
                 QString imgPath = pixmapItem->data(0).toString();
+                QString tipo = pixmapItem->data(1).toString();
+
                 if (!imgPath.isEmpty()) {
-                    elementos.append(qMakePair(imgPath, pixmapItem->pos()));
+                    ElementoMapa elem;
+                    elem.path = imgPath;
+                    elem.posicion = pixmapItem->pos();
+                    elem.tipo = tipo;
+
+                    elementos.append(elem);
                 }
             }
         }
@@ -160,7 +168,16 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setPos(x, y);
             item->setZValue(1);
             item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+            QString tipo = "otros";
+            if (path.contains("plantacion_bombas"))
+                tipo = "bombsite";
+            else if (path.contains("proteccion_disparos"))
+                tipo = "solidos";
+            else if (path.contains("spawns"))
+                tipo = "spawn";
+
             item->setData(0, path);
+            item->setData(1, tipo);
             scene->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
             setBackgroundPath(path);
@@ -177,7 +194,74 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setPos(x, y);
         item->setZValue(1);
         item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+
+        QString tipo = "otros";
+        if (path.contains("plantacion_bombas"))
+            tipo = "bombsite";
+        else if (path.contains("proteccion_disparos"))
+            tipo = "solidos";
+        else if (path.contains("spawns"))
+            tipo = "spawn";
+
+        item->setData(0, path);
+        item->setData(1, tipo);
+
         scene->addItem(item);
     }
 }
+
+void TopWidget::mousePressEvent(QMouseEvent* event) {
+    if (currentMode == DropMode::ZONA_INICIO) {
+        zonaStartPoint = mapToScene(event->pos());
+        if (zonaPreview) {
+            scene->removeItem(zonaPreview);
+            delete zonaPreview;
+            zonaPreview = nullptr;
+        }
+    } else {
+        QGraphicsView::mousePressEvent(event);
+    }
+}
+
+void TopWidget::mouseMoveEvent(QMouseEvent* event) {
+    if (currentMode == DropMode::ZONA_INICIO && event->buttons() & Qt::LeftButton) {
+        QPointF currentPos = mapToScene(event->pos());
+        QRectF rect(zonaStartPoint, currentPos);
+        if (!zonaPreview) {
+            zonaPreview = scene->addRect(rect.normalized(), QPen(Qt::blue, 2, Qt::DashLine));
+        } else {
+            zonaPreview->setRect(rect.normalized());
+        }
+    } else {
+        QGraphicsView::mouseMoveEvent(event);
+    }
+}
+
+void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
+    if (currentMode == DropMode::ZONA_INICIO && zonaPreview) {
+        bool ok = false;
+        QString tipo = QInputDialog::getItem(
+            this, "Tipo de zona", "¿Qué zona estás marcando?",
+            { "inicio_ct", "inicio_tt" }, 0, false, &ok
+        );
+        if (ok) {
+            ZonaMapa zona;
+            zona.rect = zonaPreview->rect();
+            zona.tipo = tipo;
+            zonasInicio.append(zona);
+            emit zonaCreada(tipo, zona.rect);
+
+            zonaPreview->setBrush(QColor(0, 0, 255, 50));
+            zonaPreview = nullptr;
+        } else {
+            scene->removeItem(zonaPreview);
+            delete zonaPreview;
+            zonaPreview = nullptr;
+        }
+    } else {
+        QGraphicsView::mouseReleaseEvent(event);
+    }
+    
+}
+
 

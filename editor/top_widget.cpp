@@ -1,4 +1,5 @@
 #include "top_widget.h"
+#include "zona_rect_item.h"
 #include <QMimeData>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
@@ -244,38 +245,40 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
             this, "Tipo de zona", "¿Qué zona estás marcando?",
             { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok
         );
+
         if (ok) {
+            QRectF rect = zonaPreview->rect();
+
+            // Crear la zona visual editable
+            auto* zonaItem = new ZonaRectItem(rect, tipo);
+            QColor color;
+            QString texto;
+
+            if (tipo == "inicio_ct") {
+                color = QColor(0, 0, 255, 50);
+                texto = "CT";
+            } else if (tipo == "inicio_tt") {
+                color = QColor(0, 255, 0, 50);
+                texto = "TT";
+            } else if (tipo == "zona_bombas") {
+                color = QColor(255, 0, 0, 50);
+                texto = "BOMBAS";
+            }
+
+            zonaItem->setColor(color);
+            zonaItem->setTexto(texto);
+            scene->addItem(zonaItem);
+
+            // Guardar zona lógica
             ZonaMapa zona;
-            zona.rect = zonaPreview->rect();
+            zona.rect = rect;
             zona.tipo = tipo;
             zonasInicio.append(zona);
-            emit zonaCreada(tipo, zona.rect);
+            emit zonaCreada(tipo, rect);
 
-            QColor azul(0, 0, 255, 50);
-            zonaPreview->setBrush(azul);
-            zonaPreview->setPen(QPen(Qt::blue, 2, Qt::DashLine));
-
-            QString texto = "";
-            if(tipo =="inicio_ct")
-                texto = "CT";
-            else if (tipo == "inicio_tt")
-                texto = "TT";
-            else if (tipo == "zona_bombas")
-                texto = "BOMBAS";
-            
-            QGraphicsTextItem* label = scene->addText(texto);
-            QFont font = label->font();
-            font.setBold(true);
-            font.setPointSize(14);
-            label->setFont(font);
-
-            QRectF rect = zonaPreview->rect();
-            QPointF center = rect.center();
-            QRectF textRect = label->boundingRect();
-            label->setDefaultTextColor(Qt::black);
-            label->setPos(center.x() - textRect.width() / 2, center.y() - textRect.height() / 2);
-            label->setZValue(2);
-
+            currentMode = DropMode::OBJETO;
+            scene->removeItem(zonaPreview);
+            delete zonaPreview;
             zonaPreview = nullptr;
         } else {
             scene->removeItem(zonaPreview);
@@ -288,31 +291,25 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
-    QColor color = QColor(0, 0, 255, 50);
+    QColor color;
     QString texto;
 
     if (tipo == "inicio_ct") {
+        color = QColor(0, 0, 255, 50);
         texto = "CT";
     } else if (tipo == "inicio_tt") {
+        color = QColor(0, 255, 0, 50);
         texto = "TT";
     } else if (tipo == "zona_bombas") {
+        color = QColor(255, 0, 0, 50);
         texto = "BOMBAS";
     }
 
-    auto* zonaItem = scene->addRect(rect, QPen(color.darker(), 2, Qt::DashLine), color);
-    zonaItem->setZValue(1);
-
-    if (!texto.isEmpty()) {
-        QGraphicsTextItem* label = scene->addText(texto);
-        QFont font = label->font();
-        font.setBold(true);
-        font.setPointSize(14);
-        label->setFont(font);
-        label->setDefaultTextColor(Qt::black);
-        QRectF textRect = label->boundingRect();
-        label->setPos(rect.center().x() - textRect.width() / 2, rect.center().y() - textRect.height() / 2);
-        label->setZValue(2);
-    }
+    // Usar ZonaRectItem en lugar de recta común
+    auto* zonaItem = new ZonaRectItem(rect, tipo);
+    zonaItem->setColor(color);
+    zonaItem->setTexto(texto);
+    scene->addItem(zonaItem);
 
     ZonaMapa zona;
     zona.rect = rect;

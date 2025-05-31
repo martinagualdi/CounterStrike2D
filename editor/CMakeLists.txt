@@ -7,6 +7,7 @@ target_sources(taller_editor
     top_widget.cpp
     editor_lobby.cpp
     editor_seleccion_mapa.cpp
+    zona_rect_item.cpp
     PUBLIC
     editor_main_window.h
     clickable_label.h
@@ -14,4 +15,5 @@ target_sources(taller_editor
     top_widget.h
     editor_lobby.h
     editor_seleccion_mapa.h
+    zona_rect_item.h
     )

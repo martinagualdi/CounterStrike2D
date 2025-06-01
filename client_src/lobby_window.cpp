@@ -1,5 +1,6 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
+#include "personaje_popup.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -88,14 +89,21 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
-
-
 void LobbyWindow::onCrearClicked() {
     protocolo.enviar_crear_partida();
-    MensajePopup popup("Partida", "Partida creada con éxito.", this);
-    popup.exec();
-    emit partidaSeleccionada();
-    accept();  // Cierra el diálogo con QDialog::Accepted
+
+    PersonajePopup equipoDialog(this);
+    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
+        qDebug() << "Skin seleccionada (crear):" << skinIndex;
+        // protocolo.enviar_skin(skinIndex);
+    });
+
+    if (equipoDialog.exec() == QDialog::Accepted) {
+        MensajePopup popup("Partida", "Partida creada con éxito.", this);
+        popup.exec();
+        emit partidaSeleccionada();
+        accept();
+    }
 }
 
 void LobbyWindow::onListarClicked() {
@@ -132,9 +140,16 @@ void LobbyWindow::onUnirseClicked() {
 
     protocolo.enviar_unirse_partida(id);
 
-    MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
-    popup.exec();
-    emit partidaSeleccionada();
-    accept();
-}
+    PersonajePopup equipoDialog(this);
+    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
+        qDebug() << "Skin seleccionada (crear):" << skinIndex;
+        // protocolo.enviar_skin(skinIndex);
+    });
 
+    if (equipoDialog.exec() == QDialog::Accepted) {
+        MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
+        popup.exec();
+        emit partidaSeleccionada();
+        accept();
+    }
+}

@@ -5,10 +5,18 @@
 
 GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
-      activo(true), balas_disparadas() {}
+      activo(true), balas_disparadas(), ultimo_unido_ct(false) {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
+    if (ultimo_unido_ct){ 
+        jugador->establecer_equipo(TT);
+        jugador->establecer_skin(PHEONIX); // Asignar skin por defecto a los Terroristas
+    } else {
+        jugador->establecer_equipo(CT);
+        jugador->establecer_skin(SEAL_FORCE); // Asignar skin por defecto a los Contra Terroristas
+    }
+    ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);
 }
 

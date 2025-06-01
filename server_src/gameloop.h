@@ -16,6 +16,7 @@ class GameLoop : public Thread {
     std::vector<Jugador *> jugadores;
     std::atomic<bool> activo;
     std::vector<Municion> balas_disparadas;
+    std::atomic<bool> ultimo_unido_ct;
 
 
 

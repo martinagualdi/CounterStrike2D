@@ -114,7 +114,10 @@ void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos sk
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
     SDL_Rect sprite = sprites_player[ARMADO];
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-    SDL_RenderCopyExF(renderer.Get(), tt_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    if (skin < 4) // CT players
+        SDL_RenderCopyExF(renderer.Get(), ct_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    else // TT players
+        SDL_RenderCopyExF(renderer.Get(), tt_players[skin-3].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
 void Dibujador::dibujar_pies(float x, float y, float angulo) {

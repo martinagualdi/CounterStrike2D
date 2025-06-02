@@ -1,8 +1,10 @@
 #pragma once
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QObject>
 
-class ZonaRectItem : public QGraphicsRectItem {
+class ZonaRectItem : public QObject, public QGraphicsRectItem {
+    Q_OBJECT 
 public:
     ZonaRectItem(const QRectF& rect, const QString& tipo, QGraphicsItem* parent = nullptr);
     void setTexto(const QString& texto);
@@ -22,4 +24,7 @@ private:
     QPointF resizeStartPos;
     QRectF originalRect;
     const qreal resizeMargin = 10.0;
+signals:
+    void tipoZonaCambiado(ZonaRectItem* zona, const QString& nuevoTipo);
+
 };

@@ -47,6 +47,7 @@ void ZonaRectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
                        (tipo == "inicio_tt") ? QColor(0, 255, 0, 50) :
                        QColor(255, 0, 0, 50);
         setColor(color);
+        emit tipoZonaCambiado(this, tipo);
     }
 }
 

@@ -256,6 +256,15 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
             QRectF rect = zonaPreview->rect();
 
             auto* zonaItem = new ZonaRectItem(rect, tipo);
+            connect(zonaItem, &ZonaRectItem::tipoZonaCambiado, this, [this](ZonaRectItem* item, const QString& nuevoTipo) {
+                for (ZonaMapa& zona : zonasInicio) {
+                    if (zona.rect == item->rect()) {
+                        zona.tipo = nuevoTipo;
+                        break;
+                    }
+                }
+            });
+            
             QColor color;
             QString texto;
 

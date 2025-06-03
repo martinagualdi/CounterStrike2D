@@ -14,11 +14,13 @@ struct ElementoMapa {
     QString path;
     QPointF posicion;
     QString tipo;
+    int ancho;
+    int alto;
 };
 
 struct ZonaMapa {
-    QRectF rect;     // La zona rectangular
-    QString tipo;    // "inicio_ct" o "inicio_tt"
+    QRectF rect;
+    QString tipo;
 };
 
 class TopWidget : public QGraphicsView {

@@ -227,6 +227,8 @@ void MainWindow::guardarMapa() {
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
+        out << "    ancho: " << e.ancho << "\n";
+        out << "    alto: " << e.alto << "\n";
     }
 
     for (const auto& zona : topWidget->getZonas()) {

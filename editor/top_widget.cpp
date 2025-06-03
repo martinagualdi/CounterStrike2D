@@ -40,6 +40,9 @@ QList<ElementoMapa> TopWidget::getElementos() const {
                     elem.path = imgPath;
                     elem.posicion = pixmapItem->pos();
                     elem.tipo = tipo;
+                    QPixmap pix = pixmapItem->pixmap();
+                    elem.ancho = pix.width();
+                    elem.alto = pix.height();
 
                     elementos.append(elem);
                 }
@@ -191,6 +194,9 @@ void TopWidget::dropEvent(QDropEvent* event) {
 
             item->setData(0, path);
             item->setData(1, tipo);
+            item->setData(2, pix.width());
+            item->setData(3, pix.height());
+
             scene->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
             QString rutaRelativa = path.mid(path.indexOf("/editor"));
@@ -224,6 +230,8 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
             tipo = "piso";
         item->setData(0, path);
         item->setData(1, tipo);
+        item->setData(2, pixmap.width());
+        item->setData(3, pixmap.height());
 
         scene->addItem(item);
     }

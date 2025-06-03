@@ -1,45 +1,72 @@
-# Ejemplo de CMAKE para el TP Final
+# Manual de usuario
 
-**Importante:** el primer commit de este repositorio tiene el setup
-básico para el TP Final que incluye la instalación de la lib de Google
-Tests, `SDL2` y `SDL2pp` (el wrapper de C++).
-
-El resto de los commits son a modo de ejemplo de como se pueden
-agregar mas código fuente al proyecto.
-
-Este ejemplo **no** incluye instalarse otras libs que son dependencias
-tanto de `SDL2` como de `SDL2pp` (pero si estan documentadas en el
-`CMakeFile` para Xubuntu 24.04).
-
-Este repo **no** incluye tampoco un instalador.
-
-**Se deben agregar las librerias necesarias y el instalador.**
-
-También el ejemplo usa una estructura de carpetas muy simple:
-
-```
-client/
-server/
-editor/
-common/
+**Importante:** el usuario previo a la compilacion debe instalar:
+```sh
+sudo apt install qt6-base-dev qt6-multimedia-dev
+sudo apt-get install libyaml-cpp-dev
 ```
 
-Bien se puede mejorar (cambiando el cmakefile) agregando mas
-sub-carpetas.
+###### **Para compilar:**
+```sh
+make
+```
 
-Asi tambien **deben** ser cambiados los *targets* del cmake (`taller_client`,
-`taller_server`, ...) por nombres mas acordes al TP que se este
-haciendo.
+###### **Para borrar los ejecutables:**
+```sh
+make clean
+```
 
-Tambien, por default solo se compila una version *debug* sin
-optimizar. Si se quiere compilar binarios optimizados
-(lo que cmake llama *release*) se puede, solo hay modificar
-cmake.
+###### **Para ejecutar el servidor:**
+```sh
+./server configuracion.yaml
+```
+El archivo de configuración contiene el puerto al cual conectarse, predefinido 8080
 
-Aprender del ejemplo para saber como extenderlo!
+###### **Para ejecutar el cliente:**
+```sh
+./client
+```
+Una vez ejecutado deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 
-**Importante:** este repositorio **no** incluye pre-commits hooks,
-ni scripts adicionales (como correr valgrind).
+###### **Para ejecutar el editor:**
+```sh
+./taller_editor
+```
 
-**Eso esta a cargo de los estudiantes,** tal como fue mostrado
-en los tps individuales, recaps y hands-on.
+#### Movimientos del jugador
+Para mover al jugador podes usar:
+
+- Teclado: W(arriba), S(abajo), A(derecha), D(izquierda). 
+
+- Mouse: para rotar el frente del jugador. 
+
+
+#### Uso del editor de niveles/mapas
+
+El editor cuenta con un lobby el cual tiene dos opciones **editar** o **crear** un mapa.
+
+En ambos casos tener las siguientes consideraciones:
+
+- Para setear el fondo basta con hacer **click** sobre el fondo elegido. 
+
+- Para posicionar un elemento se utiliza **drag and drop**, arrastrar la imagen a la posición deseada. 
+
+Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
+
+Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **client_src/gfx/mapas**. 
+
+Al momento de editar un mapa ya existe se abre automaticamente esa carpeta para que se seleccione el mapa deseado, luego de finalizar la edición se debe guardar con el mismo nombre para reemplazar el archivo existente por el nuevo que contiene los cambios realizados. 
+
+Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion de bombas el editor cuenta con un boton **Marcar zona** una vez presionado se habilita para marcar una zona cualquiera con el cursor. Al finalizar la seleccion se consultara a que zona hace referencia lo marcado (inicio_ct, inicio_tt o zona_bombas). 
+
+**IMPORTANTE:** al finalizar de marcar una zona, el modo del mismo se desactiva, por lo que para crear otra zona se deberá volver a presionar el botón. De esta maner se permite:
+
+- Hacer **click** sobre la zona y moverla al lugar que desees. 
+
+- Presionar **tecla supr** para eliminar la zona si asi quisieras.
+
+- Hacer **click en la esquina inferior derecha** para redimencionar la zona. 
+
+- Hacer **doble click** en el centro de la zona para cambiarle el tipo a la misma.
+
+

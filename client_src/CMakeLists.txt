@@ -11,6 +11,7 @@ target_sources(client
     client_dibujador.cpp
     lobby_window.cpp
     inicio_window.cpp
+    personaje_popup.cpp
     PUBLIC
     client_event_handler.h
     client_protocol.h
@@ -22,4 +23,5 @@ target_sources(client
     lobby_window.h
     inicio_window.h
     mensaje_popup.h
+    personaje_popup.h
     )

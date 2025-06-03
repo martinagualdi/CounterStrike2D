@@ -35,6 +35,7 @@ public:
     void agregarElemento(const QString& path, int x, int y);
     QList<ZonaMapa> getZonas() const { return zonasInicio; }
     void agregarZona(const QRectF& rect, const QString& tipo);
+    QGraphicsScene* scene;
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -49,7 +50,6 @@ protected:
     QPixmap filtrarFondo(const QString& path, int gridSize);
 
 private:
-    QGraphicsScene* scene;
     QPixmap backgroundPixmap;
     int gridSize = 64;
     QGraphicsPixmapItem* previewItem = nullptr; 

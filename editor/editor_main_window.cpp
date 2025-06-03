@@ -218,6 +218,11 @@ void MainWindow::guardarMapa() {
 
     QTextStream out(&file);
     out << "fondo: " << topWidget->getFondoPath() << "\n";
+
+    QRectF sceneBounds = topWidget->scene->sceneRect();
+    out << "ancho_max_mapa: " << int(sceneBounds.width()) << "\n";
+    out << "alto_max_mapa: " << int(sceneBounds.height()) << "\n";
+
     out << "elementos:\n";
 
     auto elementos = topWidget->getElementos();

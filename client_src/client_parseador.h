@@ -19,6 +19,7 @@ public:
     ParseadorSpriteSheets();
     SDL_Rect obtener_sprite_arma();
     SDL_Rect obtener_sprite_bala();
+    SDL_Rect obtener_sprite_sight();
     std::vector<SDL_Rect> obtener_sprites_jugador();
     std::vector<SDL_Rect> obtener_sprites_pies_jugador();
     std::vector<SDL_Rect> obtener_sprites_simbolos_hud();

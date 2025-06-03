@@ -107,6 +107,7 @@ void LobbyWindow::onCrearClicked() {
         emit partidaSeleccionada();
         fadeOutAudioAndClose();
     }
+}    
 
 void LobbyWindow::fadeOutAudioAndClose() {
     QTimer *fadeTimer = new QTimer(this);

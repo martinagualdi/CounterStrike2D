@@ -95,7 +95,7 @@ int ProtocoloCliente::recibirID() {
 }
 
 void ProtocoloCliente::enviar_crear_partida() {
-   uint8_t comando = 0x0A;
+   uint8_t comando = PREFIJO_CREAR_PARTIDA;
    if (!socket.sendall(&comando, sizeof(comando))) {
       throw std::runtime_error("Error al enviar el comando de crear partida");
    }
@@ -103,7 +103,7 @@ void ProtocoloCliente::enviar_crear_partida() {
 
 void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
    std::vector<uint8_t> buffer; 
-   uint8_t comando = 0x0B;
+   uint8_t comando = PREFIJO_UNIRSE_PARTIDA;
    buffer.push_back(comando);
    push_back_uint16(buffer, (uint16_t)id_partida);
    if (!socket.sendall(buffer.data(), buffer.size())) {
@@ -112,7 +112,7 @@ void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
 }
 
 void ProtocoloCliente::enviar_listar_partida() {
-   uint8_t comando = 0x0C;
+   uint8_t comando = PREFIJO_LISTAR;
    if (!socket.sendall(&comando, sizeof(comando))) {
       throw std::runtime_error("Error al enviar el comando de listar partidas");
    }

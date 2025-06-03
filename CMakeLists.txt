@@ -18,7 +18,6 @@ project(taller_tp
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Multimedia MultimediaWidgets)
-find_package(yaml-cpp REQUIRED)
 set(CMAKE_AUTOMOC ON)
 
 option(TALLER_TESTS "Enable / disable tests." OFF)
@@ -110,11 +109,12 @@ if(TALLER_CLIENT OR TALLER_EDITOR)
     # YAML-CPP
     include(FetchContent)
     FetchContent_Declare(
-    yaml-cpp
-    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-    GIT_TAG yaml-cpp-0.7.0
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG master  # o usa yaml-cpp-0.8.0 si existe
     )
     FetchContent_MakeAvailable(yaml-cpp)
+    
 
 endif()
 

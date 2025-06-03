@@ -2,8 +2,8 @@
 #include <thread>
 #include <iostream> 
 
-#define TAM_SIGHT 46
 #define TAM_BALA 8
+#define TAM_SIGHT 46
 #define TAM_PLAYER 60
 #define TAM_SIMBOLOS_HUD 50
 #define DESFASE_ANGULO 90
@@ -18,14 +18,8 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     parseador(),
     snapshot(nullptr),
     fondo(Texture(renderer, Surface(IMG_Load("client_src/gfx/backgrounds/dust.png")))),
-    balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),
-    ak47(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/ak47.bmp")))),
-    awp(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/awp.bmp")))),
-    bomba(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb.bmp")))),
-    cuchillo(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/knife.bmp")))),
-    dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),
-    glock(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/glock.bmp")))),
-    m3(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/m3.bmp")))),
+    balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),  
+    dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),  
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
     simbolos_hud([&renderer]() {
         Surface s(IMG_Load("client_src/gfx/hud_symbols.bmp"));
@@ -41,6 +35,16 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
         Surface s(IMG_Load("client_src/gfx/pointer.bmp"));
         s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 255, 0, 255));
         return Texture(renderer, s);
+    }()),
+    armas([&renderer]() {
+        std::vector<SDL2pp::Texture> textures;
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/knife.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/glock.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/ak47.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/m3.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/awp.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb.bmp")));
+        return textures;
     }()),
     ct_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
@@ -60,6 +64,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     }()),
     sprite_arma(parseador.obtener_sprite_arma()),
     sprite_bala(parseador.obtener_sprite_bala()),
+    sprite_sight(parseador.obtener_sprite_sight()),
     sprites_player(parseador.obtener_sprites_jugador()),
     sprites_player_legs(parseador.obtener_sprites_pies_jugador()),
     sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
@@ -82,11 +87,14 @@ void Dibujador::dibujar_jugadores() {
         float y_pixel = jugador.pos_y;
         convertir_coordenadas(x_pixel, y_pixel);
         float angulo_sdl = convertir_angulo(jugador.angulo);
-
-      //dibujar_pies(x_pixel, y_pixel, angulo_sdl);
+        
+        if(jugador.esta_moviendose){
+            dibujar_pies(x_pixel, y_pixel, angulo_sdl);
+        }
         enum SkinTipos skin = jugador.skin_tipo;
-        dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin);
-        dibujar_arma(x_pixel, y_pixel, angulo_sdl);
+        enum ArmaEnMano arma = jugador.arma_en_mano;
+        dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin, arma);
+        dibujar_arma(x_pixel, y_pixel, angulo_sdl, arma);
     }
 }
 
@@ -99,7 +107,6 @@ void Dibujador::dibujar_balas() {
     for (const InfoMunicion& bala : snapshot->balas_disparadas){
         float x_pixel = bala.pos_x;
         float y_pixel = bala.pos_y;
-        std::cout << x_pixel << ":" << y_pixel << ":" << bala.angulo_disparo<< std::endl; 
         convertir_coordenadas(x_pixel, y_pixel);
         float angulo_bala = convertir_angulo(bala.angulo_disparo);
         SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
@@ -108,11 +115,17 @@ void Dibujador::dibujar_balas() {
     }
 }
 
-void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin) {
+void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin, enum ArmaEnMano arma) {
 
 
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
-    SDL_Rect sprite = sprites_player[ARMADO];
+    SDL_Rect sprite;
+    if(arma == CUCHILLO){
+        sprite = sprites_player[MANO_IZQ_CUCHILLO];
+    } else{
+        sprite = sprites_player[ARMADO];
+    }
+
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
     if (skin < 4) // CT players
         SDL_RenderCopyExF(renderer.Get(), ct_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
@@ -122,26 +135,32 @@ void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos sk
 
 void Dibujador::dibujar_pies(float x, float y, float angulo) {
     Uint32 current_ticks = SDL_GetTicks();
-    int i = (current_ticks / 10) % sprites_player_legs.size();
+    int i = (current_ticks / 100) % sprites_player_legs.size();
     SDL_Rect sprite_actual = sprites_player_legs[i];   
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
-    SDL_FPoint center = {TAM_PLAYER, TAM_PLAYER};
+    SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
     SDL_RenderCopyExF(renderer.Get(), player_legs.Get(), &sprite_actual, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
-void Dibujador::dibujar_arma(float x, float y, float angulo) {
+void Dibujador::dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual) {
 
-    SDL_FRect dst {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 5) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    SDL_FRect dst;
+    if(arma_actual == CUCHILLO){
+        dst = {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 14) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    }
+    else{
+        dst = {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 6) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    }
+
     SDL_FPoint center = {x - dst.x, y - dst.y};
-    SDL_RenderCopyExF(renderer.Get(), ak47.Get(), &sprite_arma, &dst, angulo, &center, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(renderer.Get(), armas[arma_actual].Get(), &sprite_arma, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
 void Dibujador::dibujar_sight() {
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    Rect sprite(0, 0, TAM_SIGHT, TAM_SIGHT);
     Rect dst(mouseX - TAM_SIGHT / 2, mouseY - TAM_SIGHT / 2, TAM_SIGHT, TAM_SIGHT);
-    renderer.Copy(sight, sprite, dst);
+    renderer.Copy(sight, sprite_sight, dst);
 }
 
 std::vector<int> Dibujador::separar_digitos(int n) {

@@ -7,32 +7,8 @@
 #include "glock.h"
 #include "ak47.h"
 #include "armaDeFuego.h"
+#include "enums_jugador.h"
 
-enum ArmaEnMano {
-    CUCHILLO,
-    GLOCK,
-    AK_47,
-    M3,
-    AWP,
-    BOMBA_TT
-};
-
-enum Equipo {
-    CT,
-    TT
-};
-
-enum SkinTipos {
-    /*Del 0 al 3 son CT, los otros TT*/
-    SEAL_FORCE,
-    GERMAN_GSG_9,
-    UK_SAS,
-    FRENCH_GIGN,
-    PHEONIX, 
-    L337_KREW, 
-    ARTIC_AVENGER, 
-    GUERRILLA
-};
 
 class Jugador {
   private:

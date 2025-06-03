@@ -1,9 +1,10 @@
 #include "client_parseador.h"
 
 #define TAM_PLAYER 32
+#define TAM_SIGHT 46
 #define TAM_BALA 8
 #define TAM_PLAYER_LEGS 32
-#define CANT_PLAYER_LEGS 6
+#define CANT_PLAYER_LEGS 8
 #define CANT_PLAYERS 6
 #define CANT_NUMEROS_HUD 12
 #define ALTO_NUMEROS_HUD 66
@@ -19,6 +20,10 @@ SDL_Rect ParseadorSpriteSheets::obtener_sprite_arma() {
 
 SDL_Rect ParseadorSpriteSheets::obtener_sprite_bala() {
     return {0, 0, TAM_BALA, TAM_BALA};
+}
+
+SDL_Rect ParseadorSpriteSheets::obtener_sprite_sight() {
+    return {0, 0, TAM_SIGHT, TAM_SIGHT};
 }
 
 void ParseadorSpriteSheets::iterar(std::vector<SDL_Rect>& sprites, const int x, const int y, 
@@ -38,14 +43,14 @@ std::vector<SDL_Rect> ParseadorSpriteSheets::obtener_sprites_pies_jugador()
 {
 	std::vector<SDL_Rect> sprites;
     int y = 0;
-    int x = 1;
+    int x = 0;
     for (int i = 0; i < CANT_PLAYER_LEGS; i++) {
         if (x == 4 * TAM_PLAYER_LEGS){
-            x = 1;
+            x = 0;
             y = TAM_PLAYER_LEGS;
         }
         SDL_Rect rect;
-        rect.x =  i * TAM_PLAYER_LEGS;
+        rect.x = x;
         rect.y = y;
         rect.w = TAM_PLAYER_LEGS;
         rect.h = TAM_PLAYER_LEGS;

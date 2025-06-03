@@ -115,17 +115,17 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
     std::cout << "Esperando comando..." << std::endl;
     skt.recvall(&codigo, sizeof(codigo));
     std::vector<std::string> comando;
-    if (codigo == 0x0A) {
+    if (codigo == PREFIJO_CREAR_PARTIDA) {
         /* Caso: Crear partida */
         comando.push_back("crear");
         std::cout << "Creando partida..." << std::endl;
-    }else if (codigo == 0x0B) {
+    }else if (codigo == PREFIJO_UNIRSE_PARTIDA) {
         /* Caso: Unirse a partida */
         comando.push_back("unirse");
         uint16_t id_partida;
         skt.recvall(&id_partida, sizeof(id_partida));
         comando.push_back(std::to_string(ntohs(id_partida)));
-    } else {
+    } else if(codigo == PREFIJO_LISTAR) {
         /* Caso: Listar partidas */
         comando.push_back("listar");
     }

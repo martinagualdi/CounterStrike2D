@@ -82,9 +82,9 @@ void EventHandler::convertir_coordenadas(float &x, float &y) {
 }
 
 float EventHandler::procesarPuntero(Snapshot& snapshot) {
-    Jugador* jugador = snapshot.getJugadorPorId(client_id);
-    float jugador_x = jugador->getX();
-    float jugador_y = jugador->getY();
+    InfoJugador* jugador = snapshot.getJugadorPorId(client_id);
+    float jugador_x = jugador->pos_x;
+    float jugador_y = jugador->pos_y;
     convertir_coordenadas(jugador_x, jugador_y);    
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
@@ -106,10 +106,10 @@ void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
         comando.angulo = procesarPuntero(snapshot);
         cola_enviador.try_push(comando);
     }  else if (event.type == SDL_MOUSEWHEEL) {
-        if (event.wheel.y > 0) {
-           // cola_enviador.try_push(CMD_SCROLL_ARRIBA);
-        } else if (event.wheel.y < 0) {
-           // cola_enviador.try_push(CMD_SCROLL_ABAJO);
+        if (event.wheel.y < 0) {
+            ComandoDTO comando;
+            comando.tipo = CAMBIAR_ARMA;
+            cola_enviador.try_push(comando);
         }
     }
     

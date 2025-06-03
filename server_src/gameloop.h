@@ -15,9 +15,13 @@ class GameLoop : public Thread {
     ListaQueues &queues_jugadores;
     std::vector<Jugador *> jugadores;
     std::atomic<bool> activo;
+    std::vector<Municion> balas_disparadas;
+    std::atomic<bool> ultimo_unido_ct;
+
+
+
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
-    std::vector<Municion> balas_disparadas;
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores);

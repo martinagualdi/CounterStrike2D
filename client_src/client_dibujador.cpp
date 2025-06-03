@@ -76,15 +76,15 @@ float Dibujador::convertir_angulo(float angulo){
 }
 
 void Dibujador::dibujar_jugadores() {
-    for(const Jugador& jugador : snapshot->info_jugadores){
+    for(const InfoJugador& jugador : snapshot->info_jugadores){
         
-        float x_pixel = jugador.getX();
-        float y_pixel = jugador.getY();
+        float x_pixel = jugador.pos_x;
+        float y_pixel = jugador.pos_y;
         convertir_coordenadas(x_pixel, y_pixel);
-        float angulo_sdl = convertir_angulo(jugador.getAngulo());
+        float angulo_sdl = convertir_angulo(jugador.angulo);
 
       //dibujar_pies(x_pixel, y_pixel, angulo_sdl);
-        enum SkinTipos skin = jugador.get_skin_tipo();
+        enum SkinTipos skin = jugador.skin_tipo;
         dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin);
         dibujar_arma(x_pixel, y_pixel, angulo_sdl);
     }
@@ -96,12 +96,12 @@ void Dibujador::dibujar_fondo() {
 }
 
 void Dibujador::dibujar_balas() {
-    for (const Municion& bala : snapshot->balas_disparadas){
-        float x_pixel = bala.getPosX();
-        float y_pixel = bala.getPosY();
-        std::cout << x_pixel << ":" << y_pixel << ":" << bala.getAnguloDisparo() << std::endl; 
+    for (const InfoMunicion& bala : snapshot->balas_disparadas){
+        float x_pixel = bala.pos_x;
+        float y_pixel = bala.pos_y;
+        std::cout << x_pixel << ":" << y_pixel << ":" << bala.angulo_disparo<< std::endl; 
         convertir_coordenadas(x_pixel, y_pixel);
-        float angulo_bala = convertir_angulo(bala.getAnguloDisparo());
+        float angulo_bala = convertir_angulo(bala.angulo_disparo);
         SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
         SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
         SDL_RenderCopyExF(renderer.Get(), balas.Get(), &sprite_bala, &dst, angulo_bala, &center, SDL_FLIP_NONE);
@@ -114,7 +114,10 @@ void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos sk
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
     SDL_Rect sprite = sprites_player[ARMADO];
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-    SDL_RenderCopyExF(renderer.Get(), tt_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    if (skin < 4) // CT players
+        SDL_RenderCopyExF(renderer.Get(), ct_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    else // TT players
+        SDL_RenderCopyExF(renderer.Get(), tt_players[skin-3].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
 }
 
 void Dibujador::dibujar_pies(float x, float y, float angulo) {
@@ -225,10 +228,10 @@ void Dibujador::dibujar_hud() {
     numeros_hud.SetColorMod(29, 140, 31);
     numeros_hud.SetAlphaMod(128);
     
-    dibujar_salud(snapshot->getJugadorPorId(client_id)->get_vida());
+    dibujar_salud(snapshot->getJugadorPorId(client_id)->vida);
     dibujar_tiempo();
     dibujar_balas_hud(30);
-    dibujar_saldo(snapshot->getJugadorPorId(client_id)->get_dinero());
+    dibujar_saldo(snapshot->getJugadorPorId(client_id)->dinero);
 }
 
 void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)

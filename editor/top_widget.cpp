@@ -179,11 +179,15 @@ void TopWidget::dropEvent(QDropEvent* event) {
             if (path.contains("plantacion_bombas"))
                 tipo = "bombsite";
             else if (path.contains("proteccion_disparos"))
-                tipo = "solidos";
+                tipo = "proteccion";
             else if (path.contains("spawns"))
                 tipo = "spawn";
             else if(path.contains("weapons"))
                 tipo = "arma";
+            else if(path.contains("obstaculo"))
+                tipo = "obstaculo";
+            else if(path.contains("piso"))
+                tipo = "piso";
 
             item->setData(0, path);
             item->setData(1, tipo);
@@ -209,12 +213,15 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         if (path.contains("plantacion_bombas"))
             tipo = "bombsite";
         else if (path.contains("proteccion_disparos"))
-            tipo = "solidos";
+            tipo = "proteccion";
         else if (path.contains("spawns"))
             tipo = "spawn";
         else if(path.contains("weapons"))
             tipo = "arma";
-
+        else if(path.contains("obstaculo"))
+            tipo = "obstaculo";
+        else if(path.contains("piso"))
+            tipo = "piso";
         item->setData(0, path);
         item->setData(1, tipo);
 

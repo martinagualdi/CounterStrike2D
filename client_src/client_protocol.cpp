@@ -1,5 +1,6 @@
 #include "client_protocol.h"
 #include "../common_src/prefijos_protocolo.h"
+#include "../common_src/municion.h"
 #include <netinet/in.h>
 
 #define RW_CLOSE 2
@@ -28,8 +29,9 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_ROTACION);
       uint16_t angulo = static_cast<uint16_t>(comando.angulo * 100);      
       push_back_uint16(mensaje, angulo);
+   }else if (comando.tipo == CAMBIAR_ARMA){
+      mensaje.push_back(PREFIJO_CAMBIO_ARMA);
    }
-
 }
 
 void ProtocoloCliente::enviarComando(ComandoDTO comando) {
@@ -44,23 +46,45 @@ void ProtocoloCliente::enviarComando(ComandoDTO comando) {
 }
 
 Snapshot ProtocoloCliente::recibirSnapshot() {
-   uint16_t largo;
-   socket.recvall(&largo, sizeof(largo));
-   largo = ntohs(largo);
-   size_t num_jugadores = largo / 12;
-   std::vector<Jugador> jugadores;
+   uint16_t largo_jugadores;
+   socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
+   largo_jugadores = ntohs(largo_jugadores);
+   size_t num_jugadores = largo_jugadores / 19; // Cada jugador ocupa 17 bytes
+   Snapshot snapshot;
    while (num_jugadores > 0) {
-      uint8_t buffer[12];
-      socket.recvall(buffer, 12);
-      uint16_t id = ntohs(*(uint16_t*)&buffer[0]);
-      uint32_t pos_X = ntohl(*(uint32_t*)&buffer[2]);
-      uint32_t pos_Y = ntohl(*(uint32_t*)&buffer[6]);
-      uint16_t angulo = ntohs(*(uint16_t*)&buffer[10]);
-      Jugador jugador(static_cast<float>(id), static_cast<float>(pos_X)/100, static_cast<float>(pos_Y)/100, static_cast<float>(angulo)/100);
-      jugadores.push_back(jugador);
+      uint8_t buffer[19];
+      socket.recvall(buffer, 19);
+      InfoJugador info_jugador;
+      info_jugador.id = static_cast<int>(buffer[0]);
+      info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
+      info_jugador.pos_y = static_cast<float>(ntohl(*(uint32_t*)&buffer[5])) / 100.0f;
+      info_jugador.angulo = static_cast<float>(ntohs(*(uint16_t*)&buffer[9])) / 100.0f;
+      info_jugador.vida = static_cast<int>(buffer[11]);
+      info_jugador.dinero = static_cast<int>(ntohs(*(uint16_t*)&buffer[12]));
+      info_jugador.arma_en_mano = static_cast<enum ArmaEnMano>(buffer[14]);
+      info_jugador.equipo = static_cast<enum Equipo>(buffer[15]); // Enviar el equipo del jugador
+      info_jugador.skin_tipo = static_cast<enum SkinTipos>(buffer[16]); // Enviar el skin del jugador
+      info_jugador.esta_vivo = (buffer[17] == 0x01);
+      info_jugador.esta_moviendose = (buffer[18] == 0x01);
+      snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
-   return Snapshot(jugadores);
+   uint16_t largo_balas;
+   socket.recvall(&largo_balas, sizeof(largo_balas));
+   largo_balas = ntohs(largo_balas);
+   size_t num_balas = largo_balas / 11; // Cada bala ocupa 11 bytes
+   while (num_balas > 0) {
+      uint8_t buffer[11];
+      socket.recvall(buffer, 11);
+      InfoMunicion info_municion;
+      info_municion.id_quien_disparo = static_cast<int>(buffer[0]);
+      info_municion.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
+      info_municion.pos_y = static_cast<float>(ntohl(*(uint32_t*)&buffer[5])) / 100.0f;
+      info_municion.angulo_disparo = static_cast<float>(ntohs(*(uint16_t*)&buffer[9])) / 100.0f;
+      snapshot.balas_disparadas.push_back(info_municion);
+      num_balas--;
+   }
+   return snapshot;
 }
 
 int ProtocoloCliente::recibirID() {

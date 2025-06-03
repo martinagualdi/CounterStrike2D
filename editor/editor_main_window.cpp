@@ -222,7 +222,8 @@ void MainWindow::guardarMapa() {
 
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
-        out << "  - imagen: " << e.path << "\n";
+        QString rutaRelativa = e.path.mid(e.path.indexOf("/editor"));
+        out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
@@ -245,19 +246,22 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());
 
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
+    QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(fondo);
+    topWidget->setBackgroundPath(basePath + fondo);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
         if (elemento["imagen"]) {
 
             QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+            QString basePath = QCoreApplication::applicationDirPath();
+            QString fullPath = basePath + imagen; 
             int x = elemento["x"].as<int>();
             int y = elemento["y"].as<int>();
 
             QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
-            topWidget->agregarElemento(imagen, x, y);
+            topWidget->agregarElemento(fullPath, x, y);
         } else if (elemento["tipo"] && elemento["ancho"] && elemento["alto"]) {
 
             QString tipoZona = QString::fromStdString(elemento["tipo"].as<std::string>());

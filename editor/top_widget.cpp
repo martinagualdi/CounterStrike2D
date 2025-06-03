@@ -19,6 +19,10 @@ TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphi
 }
 
 QString TopWidget::getFondoPath() const {
+    int idx = fondoPath.indexOf("/editor");
+    if (idx != -1) {
+        return fondoPath.mid(idx);
+    }
     return fondoPath;
 }
 
@@ -185,7 +189,8 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setData(1, tipo);
             scene->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
-            setBackgroundPath(path);
+            QString rutaRelativa = path.mid(path.indexOf("/editor"));
+            setBackgroundPath(rutaRelativa);
         }
     }
 

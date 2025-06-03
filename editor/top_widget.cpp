@@ -12,7 +12,7 @@
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphicsScene(this)) {
     setScene(scene);
     setAcceptDrops(true);
-    setSceneRect(0, 0, 2000, 2000);
+    setSceneRect(0, 0, 2048, 2048);
     setRenderHint(QPainter::Antialiasing);
     setBackgroundBrush(Qt::white);
     setFocusPolicy(Qt::StrongFocus);

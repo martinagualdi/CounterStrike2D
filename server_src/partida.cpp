@@ -1,10 +1,10 @@
 #include "partida.h"
 
-Partida::Partida(const int codigo):
+Partida::Partida(const int codigo, std::string yaml_partida) :
     codigo_partida(codigo),
     queue_comandos(),
     jugadores_queues(),
-    gameloop(queue_comandos, jugadores_queues) {
+    gameloop(queue_comandos, jugadores_queues, yaml_partida) {
         gameloop.start();
 }
 

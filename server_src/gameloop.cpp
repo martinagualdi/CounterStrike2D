@@ -3,9 +3,9 @@
 
 #define VELOCIDAD 0.3
 
-GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores)
+GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
-      activo(true), balas_disparadas(), ultimo_unido_ct(false) {}
+      activo(true), balas_disparadas(), ultimo_unido_ct(false), mapa(yaml_partida) {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);

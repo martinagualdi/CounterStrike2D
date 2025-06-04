@@ -13,7 +13,7 @@ private:
     int id_para_partidas = 0;
 
 public:
-    int crear_partida(int player_id, Queue<Snapshot>& queue_enviadora);
+    int crear_partida(int player_id, Queue<Snapshot>& queue_enviadora, std::string yaml_path);
 
     bool unirse_a_partida(int id_partida_str, int player_id, Queue<Snapshot>& queue_enviadora);
     

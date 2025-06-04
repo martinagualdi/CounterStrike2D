@@ -14,7 +14,11 @@ void Receiver::comunicacion_del_lobby() {
         try {
             std::vector<std::string> comando_inicial = protocol.recibir_inicio_juego();
             if (comando_inicial[0] == "crear") {
-                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora);
+                /*
+                Aca iria la logica de elegir el mapa, que se debe recibir via socket el yaml del mapa
+                y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
+                */
+                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora, "m2.yaml");
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, queue_enviadora)) {
@@ -22,6 +26,9 @@ void Receiver::comunicacion_del_lobby() {
                     continue;
                 }
                 partida_id = std::stoi(comando_inicial[1]);
+                /*
+                Aca iria la logica del mapa ya debe estar dentro del gameloop porque no la estas creando.
+                */
                 break;
             } else {
                 std::vector<std::string> lista_partidas = monitor_partidas.listar_partidas();
@@ -37,10 +44,6 @@ void Receiver::comunicacion_del_lobby() {
 void Receiver::comunicacion_de_partida() {
     while (alive) {
         try {
-            /*
-             *  LOGICA DE RECEPCION POR PROTOCOLO Y PUSH A LA QUEUE
-             */
-            
             ComandoDTO comando;
             comando.id_jugador = player_id;
             protocol.recibir_de_cliente(comando);

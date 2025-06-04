@@ -20,7 +20,7 @@ private:
     std::mutex mtx;
 
 public:
-    Partida(const int codigo);
+    Partida(const int codigo, std::string yaml_partida);
 
     int get_codigo_partida() {return this->codigo_partida;};
 

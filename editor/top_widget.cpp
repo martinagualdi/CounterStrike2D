@@ -9,13 +9,117 @@
 #include <QUrl>
 #include <QInputDialog>
 
-TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent), scene(new QGraphicsScene(this)) {
-    setScene(scene);
+TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
+    setScene(new QGraphicsScene(this));
     setAcceptDrops(true);
-    setSceneRect(0, 0, 2048, 2048);
     setRenderHint(QPainter::Antialiasing);
     setBackgroundBrush(Qt::white);
     setFocusPolicy(Qt::StrongFocus);
+}
+
+void TopWidget::preguntarTamanioMapa() {
+    if (tamanioEstablecidoDesdeYAML) return;
+
+    QInputDialog anchoDialog(this);
+    anchoDialog.setLabelText("Ancho del mapa (px):");
+    anchoDialog.setWindowTitle("Tamaño del mapa");
+    anchoDialog.setInputMode(QInputDialog::IntInput);
+    anchoDialog.setIntMinimum(500);
+    anchoDialog.setIntMaximum(10000);
+    anchoDialog.setIntStep(64);
+    anchoDialog.setIntValue(2048);
+
+    anchoDialog.setStyleSheet(R"(
+        QInputDialog {
+            background-color: #2c2c2c;
+            font-family: Arial;
+            font-size: 14px;
+        }
+        QLabel {
+            color: white;
+        }
+        QLineEdit, QSpinBox {
+            background-color: #444;
+            color: white;
+            border: 1px solid #888;
+            border-radius: 5px;
+            padding: 4px;
+        }
+        QSpinBox::up-button {
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            width: 20px;
+            border-left: 1px solid #888;
+            background-color: #555;
+        }
+        QSpinBox::down-button {
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            width: 20px;
+            border-left: 1px solid #888;
+            background-color: #555;
+        }
+        QSpinBox::up-arrow {
+            image: none;
+            color: white;
+            font-size: 12px;
+            qproperty-text: "▲";
+        }
+        QSpinBox::down-arrow {
+            image: none;
+            color: white;
+            font-size: 12px;
+            qproperty-text: "▼";
+        }
+        QPushButton {
+            background-color: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        QPushButton:hover {
+            background-color: #2980b9;
+        }
+    )");
+
+    if (anchoDialog.exec() != QDialog::Accepted) {
+        maxAncho = 2048;
+        maxAlto = 2048;
+        setSceneRect(0, 0, 2048, 2048);
+        return;
+    }
+
+    int ancho = anchoDialog.intValue();
+
+    QInputDialog altoDialog(this);
+    altoDialog.setLabelText("Alto del mapa (px):");
+    altoDialog.setWindowTitle("Tamaño del mapa");
+    altoDialog.setInputMode(QInputDialog::IntInput);
+    altoDialog.setIntMinimum(500);
+    altoDialog.setIntMaximum(10000);
+    altoDialog.setIntStep(64);
+    altoDialog.setIntValue(2048);
+
+    altoDialog.setStyleSheet(anchoDialog.styleSheet());
+
+    if (altoDialog.exec() != QDialog::Accepted) {
+        maxAncho = 2048;
+        maxAlto = 2048;
+        setSceneRect(0, 0, 2048, 2048);
+        return;
+    }
+
+    int alto = altoDialog.intValue();
+
+    maxAncho = ancho;
+    maxAlto = alto;
+    setSceneRect(0, 0, ancho, alto);
+}
+
+
+void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
+    setSceneRect(0, 0, ancho, alto);
+    tamanioEstablecidoDesdeYAML = true;
 }
 
 QString TopWidget::getFondoPath() const {
@@ -28,7 +132,7 @@ QString TopWidget::getFondoPath() const {
 
 QList<ElementoMapa> TopWidget::getElementos() const {
     QList<ElementoMapa> elementos;
-    for (QGraphicsItem* item : scene->items()) {
+    for (QGraphicsItem* item : scene()->items()) {
         if (item->zValue() > 0) {
             auto* pixmapItem = dynamic_cast<QGraphicsPixmapItem*>(item);
             if (pixmapItem) {
@@ -76,12 +180,12 @@ void TopWidget::setBackgroundPath(const QString& path) {
 
     fondoPath = path;
 
-    scene->clear();
+    scene()->clear();
 
     QPixmap scaledTile = tile.scaled(gridSize, gridSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    scene->setSceneRect(0, 0, 2000, 2000);
-    QRectF rect = scene->sceneRect();
+    scene()->setSceneRect(0, 0, 2000, 2000);
+    QRectF rect = scene()->sceneRect();
     int width = int(rect.width());
     int height = int(rect.height());
 
@@ -90,7 +194,7 @@ void TopWidget::setBackgroundPath(const QString& path) {
             QGraphicsPixmapItem* item = new QGraphicsPixmapItem(scaledTile);
             item->setPos(x, y);
             item->setZValue(-1);
-            scene->addItem(item);
+            scene()->addItem(item);
         }
     }
 
@@ -121,7 +225,7 @@ void TopWidget::dragMoveEvent(QDragMoveEvent* event) {
             previewItem = new QGraphicsPixmapItem(filteredPixmap);
             previewItem->setOpacity(0.5);
             previewItem->setZValue(10);
-            scene->addItem(previewItem);
+            scene()->addItem(previewItem);
         }
 
         previewItem->setPos(x, y);
@@ -132,7 +236,7 @@ void TopWidget::dragMoveEvent(QDragMoveEvent* event) {
 void TopWidget::dragLeaveEvent(QDragLeaveEvent* event) {
     Q_UNUSED(event);
     if (previewItem) {
-        scene->removeItem(previewItem);
+        scene()->removeItem(previewItem);
         delete previewItem;
         previewItem = nullptr;
     }
@@ -141,9 +245,9 @@ void TopWidget::dragLeaveEvent(QDragLeaveEvent* event) {
 
 void TopWidget::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
-        for (QGraphicsItem* item : scene->selectedItems()) {
+        for (QGraphicsItem* item : scene()->selectedItems()) {
             if (item->zValue() > 0) {
-                scene->removeItem(item);
+                scene()->removeItem(item);
                 delete item;
             }
         }
@@ -154,7 +258,7 @@ void TopWidget::keyPressEvent(QKeyEvent* event) {
 
 void TopWidget::dropEvent(QDropEvent* event) {
     if (previewItem) {
-        scene->removeItem(previewItem);
+        scene()->removeItem(previewItem);
         delete previewItem;
         previewItem = nullptr;
     }
@@ -197,7 +301,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setData(2, pix.width());
             item->setData(3, pix.height());
 
-            scene->addItem(item);
+            scene()->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
             QString rutaRelativa = path.mid(path.indexOf("/editor"));
             setBackgroundPath(rutaRelativa);
@@ -233,7 +337,7 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setData(2, pixmap.width());
         item->setData(3, pixmap.height());
 
-        scene->addItem(item);
+        scene()->addItem(item);
     }
 }
 
@@ -241,7 +345,7 @@ void TopWidget::mousePressEvent(QMouseEvent* event) {
     if (currentMode == DropMode::ZONA_INICIO) {
         zonaStartPoint = mapToScene(event->pos());
         if (zonaPreview) {
-            scene->removeItem(zonaPreview);
+            scene()->removeItem(zonaPreview);
             delete zonaPreview;
             zonaPreview = nullptr;
         }
@@ -255,7 +359,7 @@ void TopWidget::mouseMoveEvent(QMouseEvent* event) {
         QPointF currentPos = mapToScene(event->pos());
         QRectF rect(zonaStartPoint, currentPos);
         if (!zonaPreview) {
-            zonaPreview = scene->addRect(rect.normalized(), QPen(Qt::blue, 2, Qt::DashLine));
+            zonaPreview = scene()->addRect(rect.normalized(), QPen(Qt::blue, 2, Qt::DashLine));
         } else {
             zonaPreview->setRect(rect.normalized());
         }
@@ -301,7 +405,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
 
             zonaItem->setColor(color);
             zonaItem->setTexto(texto);
-            scene->addItem(zonaItem);
+            scene()->addItem(zonaItem);
 
             ZonaMapa zona;
             zona.rect = rect;
@@ -310,11 +414,11 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
             emit zonaCreada(tipo, rect);
 
             currentMode = DropMode::OBJETO;
-            scene->removeItem(zonaPreview);
+            scene()->removeItem(zonaPreview);
             delete zonaPreview;
             zonaPreview = nullptr;
         } else {
-            scene->removeItem(zonaPreview);
+            scene()->removeItem(zonaPreview);
             delete zonaPreview;
             zonaPreview = nullptr;
         }
@@ -341,7 +445,7 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
     auto* zonaItem = new ZonaRectItem(rect, tipo);
     zonaItem->setColor(color);
     zonaItem->setTexto(texto);
-    scene->addItem(zonaItem);
+    scene()->addItem(zonaItem);
 
     ZonaMapa zona;
     zona.rect = rect;

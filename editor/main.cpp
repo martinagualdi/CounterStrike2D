@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(lobby, &EditorLobby::crearMapaSolicitado, [=]() {
         auto* ventana = new MainWindow;
+        ventana->gettopWidget()->preguntarTamanioMapa();
         ventana->show();
         lobby->close();
     });

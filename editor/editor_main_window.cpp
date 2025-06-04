@@ -138,6 +138,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     topWidget->setAcceptDrops(true);
 }
 
+TopWidget* MainWindow::gettopWidget() const {
+    return this->topWidget;
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasImage() || event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
@@ -219,9 +223,8 @@ void MainWindow::guardarMapa() {
     QTextStream out(&file);
     out << "fondo: " << topWidget->getFondoPath() << "\n";
 
-    QRectF sceneBounds = topWidget->scene->sceneRect();
-    out << "ancho_max_mapa: " << int(sceneBounds.width()) << "\n";
-    out << "alto_max_mapa: " << int(sceneBounds.height()) << "\n";
+    out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
+    out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
 
     out << "elementos:\n";
 
@@ -251,6 +254,10 @@ void MainWindow::guardarMapa() {
 
 void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());
+
+    int ancho = root["ancho_max_mapa"] ? root["ancho_max_mapa"].as<int>() : 2048;
+    int alto  = root["alto_max_mapa"] ? root["alto_max_mapa"].as<int>() : 2048;
+    topWidget->setTamanioMapaDesdeYAML(ancho, alto);
 
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
     QString basePath = QCoreApplication::applicationDirPath();

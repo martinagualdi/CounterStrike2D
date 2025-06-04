@@ -35,7 +35,10 @@ public:
     void agregarElemento(const QString& path, int x, int y);
     QList<ZonaMapa> getZonas() const { return zonasInicio; }
     void agregarZona(const QRectF& rect, const QString& tipo);
-    QGraphicsScene* scene;
+    void preguntarTamanioMapa();
+    void setTamanioMapaDesdeYAML(int ancho, int alto);
+    int getMaxAncho() const { return maxAncho; }
+    int getMaxAlto() const { return maxAlto; }
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -59,6 +62,9 @@ private:
     QList<ZonaMapa> zonasInicio;
     QPointF zonaStartPoint;
     QGraphicsRectItem* zonaPreview = nullptr;
+    bool tamanioEstablecidoDesdeYAML = false;
+    int maxAncho = 2048;
+    int maxAlto = 2048;
 
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);

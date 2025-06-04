@@ -9,6 +9,7 @@ class MainWindow : public QWidget {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+    TopWidget* gettopWidget() const;
     void guardarMapa();
     void cargarDesdeYAML(const QString& ruta);
 protected:

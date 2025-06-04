@@ -65,7 +65,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Dust",  "editor/gfx/dust/" },
         { "Inferno", "editor/gfx/inferno/" },
         { "Armas", "editor/gfx/weapons/" },
-        { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
         { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
     };
 

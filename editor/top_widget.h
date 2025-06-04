@@ -1,3 +1,6 @@
+#ifndef TOP_WIDGET_H
+#define TOP_WIDGET_H
+
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -64,6 +67,16 @@ private:
     int maxAncho = 2048;
     int maxAlto = 2048;
 
+    QString pedirTipoZona();
+    bool validarCantidadZonas(const QString& tipo);
+    void conectarCambioTipo(class ZonaRectItem* zonaItem);
+    QColor colorParaTipo(const QString& tipo) const;
+    QString textoParaTipo(const QString& tipo) const;
+    void agregarImagenBomba(const QRectF& rect);
+    void limpiarPreviewZona();
+
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);
 };
+
+#endif // TOP_WIDGET_H

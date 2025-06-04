@@ -8,6 +8,8 @@
 #include <QDropEvent>
 #include <QUrl>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QCoreApplication>
 
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
     setScene(new QGraphicsScene(this));
@@ -367,68 +369,134 @@ void TopWidget::mouseMoveEvent(QMouseEvent* event) {
     }
 }
 
+QString TopWidget::pedirTipoZona() {
+    bool ok = false;
+    QString tipo = QInputDialog::getItem(
+        this, "Tipo de zona", "¿Qué zona estás marcando?",
+        { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok
+    );
+    return ok ? tipo : "";
+}
+
+bool TopWidget::validarCantidadZonas(const QString& tipo) {
+    int cantidad = std::count_if(zonasInicio.begin(), zonasInicio.end(), [&](const ZonaMapa& z) {
+        return z.tipo == tipo;
+    });
+
+    if ((tipo == "inicio_ct" || tipo == "inicio_tt") && cantidad >= 1) {
+        QMessageBox::warning(this, "Zona duplicada", "Ya existe una zona de tipo " + tipo + ".");
+        return false;
+    }
+
+    if (tipo == "zona_bombas" && cantidad >= 2) {
+        QMessageBox::warning(this, "Zona duplicada", "Solo se permiten dos zonas de bombas.");
+        return false;
+    }
+
+    return true;
+}
+
+void TopWidget::conectarCambioTipo(ZonaRectItem* zonaItem) {
+    connect(zonaItem, &ZonaRectItem::tipoZonaCambiado, this,
+        [this](ZonaRectItem* item, const QString& nuevoTipo) {
+            for (ZonaMapa& zona : zonasInicio) {
+                if (zona.rect == item->rect()) {
+                    zona.tipo = nuevoTipo;
+                    break;
+                }
+            }
+        });
+}
+
+QColor TopWidget::colorParaTipo(const QString& tipo) const {
+    if (tipo == "inicio_ct") return QColor(0, 0, 255, 50);
+    if (tipo == "inicio_tt") return QColor(0, 255, 0, 50);
+    if (tipo == "zona_bombas") return QColor(255, 0, 0, 50);
+    return QColor(100, 100, 100, 50);  // fallback
+}
+
+QString TopWidget::textoParaTipo(const QString& tipo) const {
+    if (tipo == "inicio_ct") return "CT";
+    if (tipo == "inicio_tt") return "TT";
+    if (tipo == "zona_bombas") return "BOMBAS";
+    return "";
+}
+
+void TopWidget::agregarImagenBomba(const QRectF& rect) {
+    int cantidad = std::count_if(zonasInicio.begin(), zonasInicio.end(), [](const ZonaMapa& z) {
+        return z.tipo == "zona_bombas";
+    });
+
+    QString basePath = QCoreApplication::applicationDirPath();
+    QString imagen = basePath + ((cantidad == 0)
+        ? "/editor/gfx/plantacion_bombas/plantacion1.png"
+        : "/editor/gfx/plantacion_bombas/plantacion2.png");
+
+    QPixmap pix(imagen);
+    if (!pix.isNull()) {
+        QPointF centro = rect.center();
+        QPointF pos = centro - QPointF(pix.width() / 2, pix.height() / 2);
+
+        auto* imagenItem = new QGraphicsPixmapItem(pix);
+        imagenItem->setPos(pos);
+        imagenItem->setZValue(0.5);
+        scene()->addItem(imagenItem);
+    }
+}
+
+void TopWidget::limpiarPreviewZona() {
+    scene()->removeItem(zonaPreview);
+    delete zonaPreview;
+    zonaPreview = nullptr;
+}
+
 void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
     if (currentMode == DropMode::ZONA_INICIO && zonaPreview) {
-        bool ok = false;
-        QString tipo = QInputDialog::getItem(
-            this, "Tipo de zona", "¿Qué zona estás marcando?",
-            { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok
-        );
-
-        if (ok) {
-            QRectF rect = zonaPreview->rect();
-
-            auto* zonaItem = new ZonaRectItem(rect, tipo);
-            connect(zonaItem, &ZonaRectItem::tipoZonaCambiado, this, [this](ZonaRectItem* item, const QString& nuevoTipo) {
-                for (ZonaMapa& zona : zonasInicio) {
-                    if (zona.rect == item->rect()) {
-                        zona.tipo = nuevoTipo;
-                        break;
-                    }
-                }
-            });
-            
-            QColor color;
-            QString texto;
-
-            if (tipo == "inicio_ct") {
-                color = QColor(0, 0, 255, 50);
-                texto = "CT";
-            } else if (tipo == "inicio_tt") {
-                color = QColor(0, 255, 0, 50);
-                texto = "TT";
-            } else if (tipo == "zona_bombas") {
-                color = QColor(255, 0, 0, 50);
-                texto = "BOMBAS";
-            }
-
-            zonaItem->setColor(color);
-            zonaItem->setTexto(texto);
-            scene()->addItem(zonaItem);
-
-            ZonaMapa zona;
-            zona.rect = rect;
-            zona.tipo = tipo;
-            zonasInicio.append(zona);
-            emit zonaCreada(tipo, rect);
-
-            currentMode = DropMode::OBJETO;
-            scene()->removeItem(zonaPreview);
-            delete zonaPreview;
-            zonaPreview = nullptr;
-        } else {
-            scene()->removeItem(zonaPreview);
-            delete zonaPreview;
-            zonaPreview = nullptr;
+        QString tipo = pedirTipoZona();
+        if (tipo.isEmpty()) {
+            limpiarPreviewZona();
+            return;
         }
+
+        if (!validarCantidadZonas(tipo)) {
+            limpiarPreviewZona();
+            return;
+        }
+
+        QRectF rect = zonaPreview->rect();
+
+        auto* zonaItem = new ZonaRectItem(rect, tipo);
+        conectarCambioTipo(zonaItem);
+
+        QColor color = colorParaTipo(tipo);
+        QString texto = textoParaTipo(tipo);
+
+        zonaItem->setColor(color);
+        zonaItem->setTexto(texto);
+        scene()->addItem(zonaItem);
+
+        if (tipo == "zona_bombas")
+            agregarImagenBomba(rect);
+
+        zonasInicio.append({rect, tipo});
+        emit zonaCreada(tipo, rect);
+
+        currentMode = DropMode::OBJETO;
+        limpiarPreviewZona();
     } else {
         QGraphicsView::mouseReleaseEvent(event);
     }
 }
 
+
 void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
     QColor color;
     QString texto;
+    int cantidadExistente = 0;
+    for (const ZonaMapa& zona : zonasInicio) {
+                if (zona.tipo == tipo)
+                    cantidadExistente++;
+    }
 
     if (tipo == "inicio_ct") {
         color = QColor(0, 0, 255, 50);
@@ -438,12 +506,16 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
         texto = "TT";
     } else if (tipo == "zona_bombas") {
         color = QColor(255, 0, 0, 50);
-        texto = "BOMBAS";
     }
 
     auto* zonaItem = new ZonaRectItem(rect, tipo);
     zonaItem->setColor(color);
     zonaItem->setTexto(texto);
+
+    if (tipo == "zona_bombas") {
+        agregarImagenBomba(rect);
+    }
+
     scene()->addItem(zonaItem);
 
     ZonaMapa zona;

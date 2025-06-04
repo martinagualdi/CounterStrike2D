@@ -206,7 +206,7 @@ void TopWidget::dragEnterEvent(QDragEnterEvent* event) {
 
     if (mime->hasUrls()) {
         QString path = mime->urls().first().toLocalFile();
-        QPixmap pix = filtrarFondo(path, gridSize);
+        QPixmap pix = filtrarFondo(path);
         if (!pix.isNull()) {
             currentDraggedPixmap = pix;
             event->acceptProposedAction();
@@ -269,7 +269,9 @@ void TopWidget::dropEvent(QDropEvent* event) {
 
     for (const QUrl& url : mime->urls()) {
         QString path = url.toLocalFile();
-        QPixmap pix = filtrarFondo(path, gridSize);
+
+        QPixmap pix = filtrarFondo(path);
+
         if (pix.isNull()) continue;
 
         QPointF scenePos = mapToScene(event->position().toPoint());
@@ -285,13 +287,12 @@ void TopWidget::dropEvent(QDropEvent* event) {
             QString tipo = "otros";
             if (path.contains("plantacion_bombas"))
                 tipo = "bombsite";
-            else if (path.contains("proteccion_disparos"))
-                tipo = "proteccion";
             else if (path.contains("spawns"))
                 tipo = "spawn";
             else if(path.contains("weapons"))
                 tipo = "arma";
-            else if(path.contains("obstaculo"))
+            else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
+
                 tipo = "obstaculo";
             else if(path.contains("piso"))
                 tipo = "piso";
@@ -312,7 +313,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
 }
 
 void TopWidget::agregarElemento(const QString& path, int x, int y) {
-    QPixmap pixmap = filtrarFondo(path, gridSize);
+    QPixmap pixmap = filtrarFondo(path);
     if (!pixmap.isNull()) {
         auto* item = new QGraphicsPixmapItem(pixmap);
         item->setPos(x, y);
@@ -322,13 +323,11 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         QString tipo = "otros";
         if (path.contains("plantacion_bombas"))
             tipo = "bombsite";
-        else if (path.contains("proteccion_disparos"))
-            tipo = "proteccion";
         else if (path.contains("spawns"))
             tipo = "spawn";
         else if(path.contains("weapons"))
             tipo = "arma";
-        else if(path.contains("obstaculo"))
+        else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
             tipo = "obstaculo";
         else if(path.contains("piso"))
             tipo = "piso";
@@ -453,7 +452,7 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
     zonasInicio.append(zona);
 }
 
-QPixmap TopWidget::filtrarFondo(const QString& path, int gridSize) {
+QPixmap TopWidget::filtrarFondo(const QString& path) {
     QImage img(path);
     if (img.isNull())
         return QPixmap();
@@ -470,7 +469,5 @@ QPixmap TopWidget::filtrarFondo(const QString& path, int gridSize) {
         }
     }
 
-    return QPixmap::fromImage(img).scaled(gridSize, gridSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    return QPixmap::fromImage(img);
 }
-
-

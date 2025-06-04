@@ -1,5 +1,3 @@
-#pragma once
-
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -50,11 +48,11 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
-    QPixmap filtrarFondo(const QString& path, int gridSize);
+    QPixmap filtrarFondo(const QString& path);
 
 private:
     QPixmap backgroundPixmap;
-    int gridSize = 64;
+    int gridSize = 32;
     QGraphicsPixmapItem* previewItem = nullptr; 
     QPixmap currentDraggedPixmap; 
     DropMode currentMode = DropMode::OBJETO;

@@ -12,12 +12,12 @@
 #define OFFSET_SALDO 2.1
 #define CANT_SPRITESHEETS_PLAYER 4
 
-Dibujador::Dibujador(const int id, Renderer& renderer) : 
+Dibujador::Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa> elementos) : 
     client_id(id),
     renderer(renderer),
+    elementos(elementos),
     parseador(),
     snapshot(nullptr),
-    fondo(Texture(renderer, Surface(IMG_Load("client_src/gfx/backgrounds/dust.png")))),
     balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),  
     dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),  
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
@@ -71,26 +71,33 @@ Dibujador::Dibujador(const int id, Renderer& renderer) :
     sprites_numeros_hud(parseador.obtener_sprites_numeros_hud())
     {}
 
-void Dibujador::convertir_coordenadas(float &x, float &y) {
-    x = x;
-    y = ALTO_MIN - y;
-}
-
 float Dibujador::convertir_angulo(float angulo){
     return 360.0f - angulo + DESFASE_ANGULO;
 }
 
+void Dibujador::convertir_a_pantalla(float pos_x, float pos_y, float& x_pixel, float& y_pixel) {
+    const InfoJugador* jugador_principal = snapshot->getJugadorPorId(client_id);
+    if (!jugador_principal) return;
+
+    float centro_x = ANCHO_MIN / 2.0f;
+    float centro_y = ALTO_MIN / 2.0f;
+
+    x_pixel = pos_x - jugador_principal->pos_x + centro_x;
+    y_pixel = - pos_y + jugador_principal->pos_y + centro_y;
+}
+
+
 void Dibujador::dibujar_jugadores() {
+
     for(const InfoJugador& jugador : snapshot->info_jugadores){
+        float x_pixel, y_pixel;
+        convertir_a_pantalla(jugador.pos_x, jugador.pos_y, x_pixel, y_pixel);
         
-        float x_pixel = jugador.pos_x;
-        float y_pixel = jugador.pos_y;
-        convertir_coordenadas(x_pixel, y_pixel);
         float angulo_sdl = convertir_angulo(jugador.angulo);
         
-        if(jugador.esta_moviendose){
+        if(jugador.esta_moviendose)
             dibujar_pies(x_pixel, y_pixel, angulo_sdl);
-        }
+    
         enum SkinTipos skin = jugador.skin_tipo;
         enum ArmaEnMano arma = jugador.arma_en_mano;
         dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin, arma);
@@ -98,16 +105,16 @@ void Dibujador::dibujar_jugadores() {
     }
 }
 
-void Dibujador::dibujar_fondo() {
-    Rect dst(Rect(0, 0, ANCHO_MIN, ALTO_MIN));
-    renderer.Copy(fondo, NullOpt, dst);
+void Dibujador::dibujar_fondo(const ElementoMapa& elemento){
+    renderer.Copy(*elemento.texture, NullOpt, elemento.dst);
 }
 
 void Dibujador::dibujar_balas() {
+    
     for (const InfoMunicion& bala : snapshot->balas_disparadas){
-        float x_pixel = bala.pos_x;
-        float y_pixel = bala.pos_y;
-        convertir_coordenadas(x_pixel, y_pixel);
+        
+        float x_pixel, y_pixel;
+        convertir_a_pantalla(bala.pos_x, bala.pos_y, x_pixel, y_pixel);
         float angulo_bala = convertir_angulo(bala.angulo_disparo);
         SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
         SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
@@ -120,14 +127,13 @@ void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos sk
 
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
     SDL_Rect sprite;
-    if(arma == CUCHILLO){
+    if(arma == CUCHILLO)
         sprite = sprites_player[MANO_IZQ_CUCHILLO];
-    } else{
+    else
         sprite = sprites_player[ARMADO];
-    }
 
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-    if (skin < 4) // CT players
+    if (skin < PHEONIX) // CT players
         SDL_RenderCopyExF(renderer.Get(), ct_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
     else // TT players
         SDL_RenderCopyExF(renderer.Get(), tt_players[skin-3].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
@@ -257,7 +263,27 @@ void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
 {
     this->snapshot = snapshot;
     renderer.Clear();
-    dibujar_fondo();
+
+    InfoJugador* jugador_principal = snapshot->getJugadorPorId(client_id);
+    float centro_x = ANCHO_MIN / 2.0f;
+    float centro_y = ALTO_MIN / 2.0f;
+
+    for (const ElementoMapa& elemento : elementos) {
+        if(elemento.tipo == FONDO){
+            dibujar_fondo(elemento);
+        }
+        else if(elemento.tipo == OBSTACULO){
+
+            float pantalla_x = elemento.dst.x - jugador_principal->pos_x + centro_x;
+            float pantalla_y = elemento.dst.y - 1920 +jugador_principal->pos_y + centro_y; // YA ESTA EN COORDENADA SDL
+
+            if (pantalla_x + elemento.dst.w >= 0 && pantalla_x <= ANCHO_MIN &&
+                pantalla_y + elemento.dst.h >= 0 && pantalla_y <= ALTO_MIN) {
+                renderer.Copy(*elemento.texture, NullOpt, Rect(pantalla_x, pantalla_y, elemento.dst.w, elemento.dst.h));
+            }
+
+        }
+    }
     dibujar_balas();
     dibujar_jugadores();
     dibujar_sight();

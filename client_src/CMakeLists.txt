@@ -8,12 +8,14 @@ target_sources(client
     client_parseador.cpp
     client.cpp
     client_main.cpp
+    client_map.cpp
     client_dibujador.cpp
     lobby_window.cpp
     inicio_window.cpp
     personaje_popup.cpp
     PUBLIC
     client_event_handler.h
+    client_map.h
     client_protocol.h
     client_receiver.h
     client_sender.h

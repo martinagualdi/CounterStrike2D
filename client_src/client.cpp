@@ -1,4 +1,5 @@
 #include "client.h"
+#include "client_map.h"
 #include <SDL2pp/SDL2pp.hh>
 #include <SDL2/SDL.h>
 #include <QApplication>
@@ -29,7 +30,8 @@ void Client::iniciar() {
         SDL_ShowCursor(SDL_DISABLE);
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
-        Dibujador dibujador(cliente_id, renderer);
+        ClientMap mapa("m2.yaml", renderer);
+        Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa());
         EventHandler eventHandler(cola_enviador, cliente_id);
 
         int ms_per_frame = 1000 / FPS;
@@ -41,7 +43,7 @@ void Client::iniciar() {
                 ultimo_snapshot_recibido = snapshotActual;
             }
             
-            eventHandler.manejarEventos(clienteActivo, ultimo_snapshot_recibido);
+            eventHandler.manejarEventos(clienteActivo);
             dibujador.renderizar(&ultimo_snapshot_recibido);
             auto t2 = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
@@ -50,7 +52,6 @@ void Client::iniciar() {
             }
         }
     }
-
 }
 
 Client::~Client(){

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #define ALTO_MIN 720
+#define ANCHO_MIN 960
 
 #define CMD_ESTADISTICAS 5
 #define CMD_COMPRAR_BALAS_PRIMARIA 7
@@ -81,29 +82,25 @@ void EventHandler::convertir_coordenadas(float &x, float &y) {
     y = ALTO_MIN - y;
 }
 
-float EventHandler::procesarPuntero(Snapshot& snapshot) {
-    InfoJugador* jugador = snapshot.getJugadorPorId(client_id);
-    float jugador_x = jugador->pos_x;
-    float jugador_y = jugador->pos_y;
-    convertir_coordenadas(jugador_x, jugador_y);    
+float EventHandler::procesarPuntero() { 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    return calcularAngulo(jugador_x, jugador_y, mouseX, mouseY);
+    return calcularAngulo(ANCHO_MIN/2, ALTO_MIN/2, mouseX, mouseY);
 }
 
-void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
+void EventHandler::procesarMouse(const SDL_Event &event)
 {
     if(event.type == SDL_MOUSEMOTION){
         
         ComandoDTO comando;
         comando.tipo = ROTACION;
-        comando.angulo = procesarPuntero(snapshot);
+        comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }
     else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         ComandoDTO comando;
         comando.tipo = DISPARO;
-        comando.angulo = procesarPuntero(snapshot);
+        comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }  else if (event.type == SDL_MOUSEWHEEL) {
         if (event.wheel.y < 0) {
@@ -115,7 +112,7 @@ void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
     
 }
 
-void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snapshot)
+void EventHandler::manejarEventos(bool &jugador_activo)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event)){
@@ -124,7 +121,7 @@ void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snapshot)
             //cola_enviador.try_push(CMD_EXIT);
             return;
         } 
-        procesarMouse(event, snapshot);
+        procesarMouse(event);
         procesarTeclado(event);
 
     }

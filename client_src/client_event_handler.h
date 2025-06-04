@@ -14,14 +14,14 @@ private:
     std::unordered_set<SDL_Scancode> teclas_validas;
     std::unordered_set<SDL_Scancode> teclas_presionadas;
     void procesarTeclado(const SDL_Event& event);
-    void procesarMouse(const SDL_Event& event, Snapshot& snapshot);
-    float procesarPuntero(Snapshot& snapshot);
+    void procesarMouse(const SDL_Event& event);
+    float procesarPuntero();
     void convertir_coordenadas(float& x, float& y);
     float calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse);
 
 public:
     explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
-    void manejarEventos(bool& isRunning, Snapshot& snapshot);
+    void manejarEventos(bool& isRunning);
     EventHandler(const EventHandler&) = delete;
     EventHandler& operator=(const EventHandler&) = delete;
     EventHandler(EventHandler&&) = default;

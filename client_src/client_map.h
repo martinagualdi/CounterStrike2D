@@ -22,14 +22,14 @@ struct ElementoMapa{
 
 class ClientMap {
 private:
-    const std::string& yamlPath;
+    const std::string& map_str;
     Renderer& renderer;
     std::unordered_map<std::string, std::shared_ptr<Texture>> cache;
     std::vector<ElementoMapa> elementos;
     std::shared_ptr<Texture> cargarTextura(const char* path);
 
 public:
-    explicit ClientMap(const std::string& yamlPath, Renderer& renderer);
+    explicit ClientMap(const std::string& map_str, Renderer& renderer);
     std::vector<ElementoMapa> parsearMapa();
     ClientMap(const ClientMap&) = delete;
     ClientMap& operator=(const ClientMap&) = delete;

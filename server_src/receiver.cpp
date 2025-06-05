@@ -24,7 +24,6 @@ void Receiver::comunicacion_del_lobby() {
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, queue_enviadora)) {
-                    protocol.enviar_mensaje("Error: ID de partida no valido");
                     continue;
                 }
                 partida_id = std::stoi(comando_inicial[1]);

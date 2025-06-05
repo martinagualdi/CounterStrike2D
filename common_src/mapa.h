@@ -5,7 +5,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-typedef enum {FONDO, OBSTACULO, PISO, ARMA, INICIO_CT, INICIO_TT} TipoElementoMapa;
+typedef enum {FONDO, OBSTACULO, PISO, ARMA, INICIO_CT, INICIO_TT, ZONA_BOMBAS} TipoElementoMapa;
 
 struct ElementoDeMapa {
     int x;  

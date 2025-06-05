@@ -1,11 +1,12 @@
 #include "mapa.h"
 
 #include <sstream>
+#include <iostream>
 
 Mapa::Mapa(std::string yamlPath) {
     YAML::Node data = YAML::LoadFile(yamlPath);
-    this->ancho_mapa = data["ancho_max_mapa"].as<int>();
-    this->alto_mapa = data["alto_max_mapa"].as<int>();
+    this->ancho_mapa = 1920;/*data["ancho_max_mapa"].as<int>();*/
+    this->alto_mapa = 1920;/*data["alto_max_mapa"].as<int>();*/
     for (const auto &nodo : data["elementos"]) {
         ElementoDeMapa elemento;
         elemento.x = nodo["x"].as<int>();
@@ -24,6 +25,8 @@ Mapa::Mapa(std::string yamlPath) {
             tipo = INICIO_CT; 
         } else if (tipo_str == "inicio_tt"){
             tipo = INICIO_TT; 
+        } else if (tipo_str == "zona_bombas") {
+            tipo = ZONA_BOMBAS;
         }
         elemento.tipo = tipo;
         elementos.push_back(elemento);

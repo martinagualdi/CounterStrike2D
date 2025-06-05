@@ -2,7 +2,7 @@
 
 int MonitorPartidas::crear_partida(int player_id, Queue<Snapshot>& queue_enviadora, std::string yaml_path) {
     std::lock_guard<std::mutex> lock(mtx);
-    partidas[id_para_partidas] = std::make_unique<Partida>(id_para_partidas);
+    partidas[id_para_partidas] = std::make_unique<Partida>(id_para_partidas, yaml_path);
     partidas[id_para_partidas]->agregar_jugador(player_id, queue_enviadora);
     id_para_partidas++;
     return id_para_partidas - 1;

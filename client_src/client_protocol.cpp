@@ -128,6 +128,27 @@ std::string ProtocoloCliente::recibir_lista_partidas() {
    return lista_partidas;
 }
 
+void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
+   std::vector<uint8_t> buffer;
+   uint16_t largo = htons(static_cast<uint16_t>(mensaje.size()));
+   buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
+   buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
+   buffer.insert(buffer.end(), mensaje.begin(), mensaje.end());
+   if (!socket.sendall(buffer.data(), buffer.size())) {
+      throw std::runtime_error("Error al enviar el mensaje");
+   }
+}
+
+std::string ProtocoloCliente::recibir_mapa() {
+   uint16_t largo;
+   socket.recvall(&largo, sizeof(largo));
+   largo = ntohs(largo);
+   std::vector<uint8_t> buffer(largo);
+   socket.recvall(buffer.data(), largo);
+   std::string mapa(buffer.begin(), buffer.end());
+   return mapa;
+}
+
 ProtocoloCliente::~ProtocoloCliente(){
    socket.shutdown(RW_CLOSE);
    socket.close();

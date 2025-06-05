@@ -79,6 +79,7 @@ private:
     void agregarImagenBomba(const QRectF& rect);
     void limpiarPreviewZona();
     void eliminarZona(ZonaRectItem* zonaItem);
+    int pedirDimensionMapa(const QString& titulo, const QString& label, int valorPorDefecto);
 
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);

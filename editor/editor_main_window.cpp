@@ -202,7 +202,7 @@ void MainWindow::guardarMapa() {
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        "",
+        "editor/mapas",
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 

@@ -19,19 +19,17 @@ TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
     setFocusPolicy(Qt::StrongFocus);
 }
 
-void TopWidget::preguntarTamanioMapa() {
-    if (tamanioEstablecidoDesdeYAML) return;
+int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, int valorPorDefecto) {
+    QInputDialog dialog(this);
+    dialog.setLabelText(label);
+    dialog.setWindowTitle(titulo);
+    dialog.setInputMode(QInputDialog::IntInput);
+    dialog.setIntMinimum(500);
+    dialog.setIntMaximum(10000);
+    dialog.setIntStep(64);
+    dialog.setIntValue(valorPorDefecto);
 
-    QInputDialog anchoDialog(this);
-    anchoDialog.setLabelText("Ancho del mapa (px):");
-    anchoDialog.setWindowTitle("Tamaño del mapa");
-    anchoDialog.setInputMode(QInputDialog::IntInput);
-    anchoDialog.setIntMinimum(500);
-    anchoDialog.setIntMaximum(10000);
-    anchoDialog.setIntStep(64);
-    anchoDialog.setIntValue(2048);
-
-    anchoDialog.setStyleSheet(R"(
+    QString estilo = R"(
         QInputDialog {
             background-color: #2c2c2c;
             font-family: Arial;
@@ -82,36 +80,29 @@ void TopWidget::preguntarTamanioMapa() {
         QPushButton:hover {
             background-color: #2980b9;
         }
-    )");
+    )";
 
-    if (anchoDialog.exec() != QDialog::Accepted) {
-        maxAncho = 2048;
-        maxAlto = 2048;
+    dialog.setStyleSheet(estilo);
+
+    return (dialog.exec() == QDialog::Accepted) ? dialog.intValue() : -1;
+}
+
+void TopWidget::preguntarTamanioMapa() {
+    if (tamanioEstablecidoDesdeYAML) return;
+
+    int ancho = pedirDimensionMapa("Tamaño del mapa", "Ancho del mapa (px):", 2048);
+    if (ancho == -1) {
+        maxAncho = maxAlto = 2048;
         setSceneRect(0, 0, 2048, 2048);
         return;
     }
 
-    int ancho = anchoDialog.intValue();
-
-    QInputDialog altoDialog(this);
-    altoDialog.setLabelText("Alto del mapa (px):");
-    altoDialog.setWindowTitle("Tamaño del mapa");
-    altoDialog.setInputMode(QInputDialog::IntInput);
-    altoDialog.setIntMinimum(500);
-    altoDialog.setIntMaximum(10000);
-    altoDialog.setIntStep(64);
-    altoDialog.setIntValue(2048);
-
-    altoDialog.setStyleSheet(anchoDialog.styleSheet());
-
-    if (altoDialog.exec() != QDialog::Accepted) {
-        maxAncho = 2048;
-        maxAlto = 2048;
+    int alto = pedirDimensionMapa("Tamaño del mapa", "Alto del mapa (px):", 2048);
+    if (alto == -1) {
+        maxAncho = maxAlto = 2048;
         setSceneRect(0, 0, 2048, 2048);
         return;
     }
-
-    int alto = altoDialog.intValue();
 
     maxAncho = ancho;
     maxAlto = alto;

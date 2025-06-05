@@ -53,7 +53,7 @@ En ambos casos tener las siguientes consideraciones:
 
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
-Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **client_src/gfx/mapas**. 
+Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Para que un mapa pueda ser utilizado en el juego, su respectivo .yml debe ser movido **manualmente** al servidor en la carpeta correspondiente.
 
 Al momento de editar un mapa ya existe se abre automaticamente esa carpeta para que se seleccione el mapa deseado, luego de finalizar la edición se debe guardar con el mismo nombre para reemplazar el archivo existente por el nuevo que contiene los cambios realizados. 
 

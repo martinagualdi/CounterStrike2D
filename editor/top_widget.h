@@ -78,6 +78,7 @@ private:
     QString textoParaTipo(const QString& tipo) const;
     void agregarImagenBomba(const QRectF& rect);
     void limpiarPreviewZona();
+    void eliminarZona(ZonaRectItem* zonaItem);
 
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);

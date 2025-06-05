@@ -186,7 +186,7 @@ void TopWidget::setBackgroundPath(const QString& path) {
 
     QPixmap scaledTile = tile.scaled(gridSize, gridSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    scene()->setSceneRect(0, 0, 2000, 2000);
+    scene()->setSceneRect(0, 0, maxAncho, maxAlto);
     QRectF rect = scene()->sceneRect();
     int width = int(rect.width());
     int height = int(rect.height());
@@ -245,12 +245,29 @@ void TopWidget::dragLeaveEvent(QDragLeaveEvent* event) {
     currentDraggedPixmap = QPixmap();
 }
 
+void TopWidget::eliminarZona(ZonaRectItem* zonaItem) {
+    if (!zonaItem) return;
+
+    auto it = std::remove_if(zonasInicio.begin(), zonasInicio.end(),
+        [zonaItem](const ZonaMapa& z) {
+            return z.id == zonaItem->getId();
+        });
+    zonasInicio.erase(it, zonasInicio.end());
+
+    scene()->removeItem(zonaItem);
+    delete zonaItem;
+}
+
 void TopWidget::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
         for (QGraphicsItem* item : scene()->selectedItems()) {
             if (item->zValue() > 0) {
-                scene()->removeItem(item);
-                delete item;
+                if (auto* zonaItem = dynamic_cast<ZonaRectItem*>(item)) {
+                    eliminarZona(zonaItem);
+                } else {
+                    scene()->removeItem(item);
+                    delete item;
+                }
             }
         }
     } else {
@@ -312,34 +329,6 @@ void TopWidget::dropEvent(QDropEvent* event) {
     }
 
     event->acceptProposedAction();
-}
-
-void TopWidget::agregarElemento(const QString& path, int x, int y) {
-    QPixmap pixmap = filtrarFondo(path);
-    if (!pixmap.isNull()) {
-        auto* item = new QGraphicsPixmapItem(pixmap);
-        item->setPos(x, y);
-        item->setZValue(1);
-        item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
-
-        QString tipo = "otros";
-        if (path.contains("plantacion_bombas"))
-            tipo = "bombsite";
-        else if (path.contains("spawns"))
-            tipo = "spawn";
-        else if(path.contains("weapons"))
-            tipo = "arma";
-        else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
-            tipo = "obstaculo";
-        else if(path.contains("piso"))
-            tipo = "piso";
-        item->setData(0, path);
-        item->setData(1, tipo);
-        item->setData(2, pixmap.width());
-        item->setData(3, pixmap.height());
-
-        scene()->addItem(item);
-    }
 }
 
 void TopWidget::mousePressEvent(QMouseEvent* event) {
@@ -505,6 +494,34 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         limpiarPreviewZona();
     } else {
         QGraphicsView::mouseReleaseEvent(event);
+    }
+}
+
+void TopWidget::agregarElemento(const QString& path, int x, int y) {
+    QPixmap pixmap = filtrarFondo(path);
+    if (!pixmap.isNull()) {
+        auto* item = new QGraphicsPixmapItem(pixmap);
+        item->setPos(x, y);
+        item->setZValue(1);
+        item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+
+        QString tipo = "otros";
+        if (path.contains("plantacion_bombas"))
+            tipo = "bombsite";
+        else if (path.contains("spawns"))
+            tipo = "spawn";
+        else if(path.contains("weapons"))
+            tipo = "arma";
+        else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
+            tipo = "obstaculo";
+        else if(path.contains("piso"))
+            tipo = "piso";
+        item->setData(0, path);
+        item->setData(1, tipo);
+        item->setData(2, pixmap.width());
+        item->setData(3, pixmap.height());
+
+        scene()->addItem(item);
     }
 }
 

@@ -405,6 +405,19 @@ void TopWidget::conectarCambioTipo(ZonaRectItem* zonaItem) {
                     break;
                 }
             }
+    });
+
+}
+
+void TopWidget::conectarActualizacionRect(ZonaRectItem* item) {
+    connect(item, &ZonaRectItem::zonaRectActualizado, this,
+        [this](ZonaRectItem* source) {
+            for (ZonaMapa& zona : zonasInicio) {
+                if (zona.id == source->getId()) {
+                    zona.rect = source->mapRectToScene(source->rect());
+                    break;
+                }
+            }
         });
 }
 
@@ -465,8 +478,10 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
 
         QRectF rect = zonaPreview->rect();
 
-        auto* zonaItem = new ZonaRectItem(rect, tipo);
+        QUuid uuid = QUuid::createUuid();
+        auto* zonaItem = new ZonaRectItem(rect, tipo, uuid);
         conectarCambioTipo(zonaItem);
+        conectarActualizacionRect(zonaItem);
 
         QColor color = colorParaTipo(tipo);
         QString texto = textoParaTipo(tipo);
@@ -478,7 +493,12 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         if (tipo == "zona_bombas")
             agregarImagenBomba(rect);
 
-        zonasInicio.append({rect, tipo});
+        ZonaMapa zona;
+        zona.rect = rect;
+        zona.tipo = tipo;
+        zona.id = zonaItem->getId();
+        zonasInicio.append(zona);
+
         emit zonaCreada(tipo, rect);
 
         currentMode = DropMode::OBJETO;
@@ -488,8 +508,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
     }
 }
 
-
-void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
+void TopWidget::agregarZona(const QRectF& rect, const QString& tipo, const QUuid& id) {
     QColor color;
     QString texto;
     int cantidadExistente = 0;
@@ -508,7 +527,9 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
         color = QColor(255, 0, 0, 50);
     }
 
-    auto* zonaItem = new ZonaRectItem(rect, tipo);
+    auto* zonaItem = new ZonaRectItem(rect, tipo, id);
+    conectarCambioTipo(zonaItem);
+    conectarActualizacionRect(zonaItem);
     zonaItem->setColor(color);
     zonaItem->setTexto(texto);
 
@@ -517,10 +538,10 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo) {
     }
 
     scene()->addItem(zonaItem);
-
     ZonaMapa zona;
     zona.rect = rect;
     zona.tipo = tipo;
+    zona.id = zonaItem->getId();
     zonasInicio.append(zona);
 }
 

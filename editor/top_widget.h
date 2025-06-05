@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
+#include <QUuid>
 
 enum class DropMode {
     FONDO,
@@ -20,6 +21,7 @@ struct ElementoMapa {
 };
 
 struct ZonaMapa {
+    QUuid id;
     QRectF rect;
     QString tipo;
 };
@@ -35,7 +37,7 @@ public:
     QList<ElementoMapa> getElementos() const;
     void agregarElemento(const QString& path, int x, int y);
     QList<ZonaMapa> getZonas() const { return zonasInicio; }
-    void agregarZona(const QRectF& rect, const QString& tipo);
+    void agregarZona(const QRectF& rect, const QString& tipo, const QUuid& id);
     void preguntarTamanioMapa();
     void setTamanioMapaDesdeYAML(int ancho, int alto);
     int getMaxAncho() const { return maxAncho; }
@@ -64,12 +66,14 @@ private:
     QPointF zonaStartPoint;
     QGraphicsRectItem* zonaPreview = nullptr;
     bool tamanioEstablecidoDesdeYAML = false;
+    
     int maxAncho = 2048;
     int maxAlto = 2048;
 
     QString pedirTipoZona();
     bool validarCantidadZonas(const QString& tipo);
     void conectarCambioTipo(class ZonaRectItem* zonaItem);
+    void conectarActualizacionRect(ZonaRectItem* item);
     QColor colorParaTipo(const QString& tipo) const;
     QString textoParaTipo(const QString& tipo) const;
     void agregarImagenBomba(const QRectF& rect);

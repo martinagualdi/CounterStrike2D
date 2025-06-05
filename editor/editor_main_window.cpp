@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
                         if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el negro y el magenta
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
                         }
                     }
                 }
@@ -238,14 +238,15 @@ void MainWindow::guardarMapa() {
         out << "    alto: " << e.alto << "\n";
     }
 
+    out << "zonas:\n";
     for (const auto& zona : topWidget->getZonas()) {
-    out << "  - tipo: " << zona.tipo << "\n";
-    out << "    x: " << int(zona.rect.x()) << "\n";
-    out << "    y: " << int(zona.rect.y()) << "\n";
-    out << "    ancho: " << int(zona.rect.width()) << "\n";
-    out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "  - tipo: " << zona.tipo << "\n";
+        out << "    x: " << int(zona.rect.x()) << "\n";
+        out << "    y: " << int(zona.rect.y()) << "\n";
+        out << "    ancho: " << int(zona.rect.width()) << "\n";
+        out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "    id: \"" << zona.id.toString(QUuid::WithoutBraces) << "\"\n";
     }
-
 
     file.close();
     QApplication::quit();
@@ -265,27 +266,37 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        if (elemento["imagen"]) {
-
-            QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-            QString basePath = QCoreApplication::applicationDirPath();
-            QString fullPath = basePath + imagen; 
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-
-            QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
-            topWidget->agregarElemento(fullPath, x, y);
-        } else if (elemento["tipo"] && elemento["ancho"] && elemento["alto"]) {
-
-            QString tipoZona = QString::fromStdString(elemento["tipo"].as<std::string>());
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-            int ancho = elemento["ancho"].as<int>();
-            int alto = elemento["alto"].as<int>();
-            QRectF rect(x, y, ancho, alto);
-            topWidget->agregarZona(rect, tipoZona);
-        }
+        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+        QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
+        int x = elemento["x"].as<int>();
+        int y = elemento["y"].as<int>();
+        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
+        topWidget->agregarElemento(fullPath, x, y);
     }
+
+    const auto& zonas = root["zonas"];
+    for (const auto& zona : zonas) {
+        QString tipoZona = QString::fromStdString(zona["tipo"].as<std::string>());
+        int x = zona["x"].as<int>();
+        int y = zona["y"].as<int>();
+        int ancho = zona["ancho"].as<int>();
+        int alto = zona["alto"].as<int>();
+        QRectF rect(x, y, ancho, alto);
+
+        QUuid id;
+        try {
+            if (zona["id"]) {
+                std::string idStr = zona["id"].as<std::string>();
+                id = QUuid(QString::fromStdString(idStr));
+            } else {
+                id = QUuid::createUuid();
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "Error al convertir el id de zona a string:" << e.what() << "- Se generará un UUID nuevo.";
+            id = QUuid::createUuid();
+        }
+
+        topWidget->agregarZona(rect, tipoZona, id);
+    }
+
 }
-
-

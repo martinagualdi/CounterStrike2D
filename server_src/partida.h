@@ -27,6 +27,8 @@ public:
     void agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
 
     Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
+
+    std::string obtener_mapa();
 };
 
 #endif

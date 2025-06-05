@@ -148,3 +148,13 @@ void ServerProtocol::enviar_mensaje(const std::string& mensaje) {
     buffer.insert(buffer.end(), mensaje.begin(), mensaje.end());
     skt.sendall(buffer.data(), buffer.size());
 }
+
+std::string ServerProtocol::recibir_path_mapa() {
+    uint16_t largo;
+    skt.recvall(&largo, sizeof(largo));
+    largo = ntohs(largo);
+    std::vector<uint8_t> buffer(largo);
+    skt.recvall(buffer.data(), largo);
+    std::string path_mapa(buffer.begin(), buffer.end());
+    return path_mapa;
+}

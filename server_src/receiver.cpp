@@ -18,7 +18,9 @@ void Receiver::comunicacion_del_lobby() {
                 Aca iria la logica de elegir el mapa, que se debe recibir via socket el yaml del mapa
                 y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
                 */
-                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora, "m2.yaml");
+                std::string path = protocol.recibir_path_mapa(); 
+                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora, path);
+                protocol.enviar_mensaje(monitor_partidas.obtener_mapa_por_id(partida_id));
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, queue_enviadora)) {
@@ -26,6 +28,7 @@ void Receiver::comunicacion_del_lobby() {
                     continue;
                 }
                 partida_id = std::stoi(comando_inicial[1]);
+                protocol.enviar_mensaje(monitor_partidas.obtener_mapa_por_id(partida_id));
                 /*
                 Aca iria la logica del mapa ya debe estar dentro del gameloop porque no la estas creando.
                 */

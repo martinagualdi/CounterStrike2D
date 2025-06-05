@@ -31,6 +31,8 @@ class GameLoop : public Thread {
 
     void agregar_jugador_a_partida(const int id);
 
+    std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
+
     virtual void run() override;
 };
 

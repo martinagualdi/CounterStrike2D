@@ -19,6 +19,8 @@ public:
     
     std::vector<std::string> listar_partidas();
 
+    std::string obtener_mapa_por_id(int id_partida);
+
     Queue<ComandoDTO>* obtener_queue_de_partida(int id_partida);
 
 

@@ -12,3 +12,7 @@ void Partida::agregar_jugador(int id, Queue<Snapshot>& queue_enviadora) {
     jugadores_queues.agregar_queue(queue_enviadora, id);
     gameloop.agregar_jugador_a_partida(id);
 }
+
+std::string Partida::obtener_mapa() {
+    return gameloop.mapa_en_estado_inicial();
+}

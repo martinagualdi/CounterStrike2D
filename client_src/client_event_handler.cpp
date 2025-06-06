@@ -65,20 +65,6 @@ void EventHandler::procesarCompra(const SDL_Event &event) {
     if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
         SDL_Scancode sc = event.key.keysym.scancode;
     
-        
-        if(sc == SDL_SCANCODE_COMMA){
-            ComandoDTO comando = {};
-            comando.tipo = COMPRAR;
-            comando.compra = BALAS_PRIMARIA;
-            cola_enviador.try_push(comando);
-        }
-
-        if(sc == SDL_SCANCODE_PERIOD){
-            ComandoDTO comando = {};
-            comando.tipo = COMPRAR;
-            comando.compra = BALAS_SECUNDARIA;
-            cola_enviador.try_push(comando);
-        }
 
 
         if (sc == SDL_SCANCODE_B) {
@@ -106,6 +92,7 @@ void EventHandler::procesarCompra(const SDL_Event &event) {
 
             ComandoDTO comando;
             comando.tipo = COMPRAR;
+            comando.compra = C_NULL;
 
             switch (sc) {
                 case SDL_SCANCODE_1:
@@ -127,11 +114,13 @@ void EventHandler::procesarCompra(const SDL_Event &event) {
                     mercado_abierto = false;
                     break;
                 case SDL_SCANCODE_COMMA:
+                case SDL_SCANCODE_KP_COMMA:
                     comando.compra = BALAS_PRIMARIA;
                     cola_enviador.try_push(comando);
                     mercado_abierto = false;
                     break;
                 case SDL_SCANCODE_PERIOD:
+                case SDL_SCANCODE_KP_PERIOD:
                     comando.compra = BALAS_SECUNDARIA;
                     cola_enviador.try_push(comando);
                     mercado_abierto = false;

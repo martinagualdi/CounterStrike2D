@@ -124,13 +124,17 @@ void GameLoop::run() {
                                   << jugador->get_nombre_arma_en_mano() << std::endl;
                         break;
                     case COMPRAR:
-                        /*Hasta aca llega lo siguiente:
-                        comando.tipo = COMPRAR;
-                        comando.compra --> puede ser:
-                        {C_AK47, C_M3, C_AWP, BALAS_PRIMARIA, BALAS_SECUNDARIA};
-                        Para este tipo de trabajos en las que no necesitamos imprimir nada 
-                        por terminal esta bueno usar enum en vez de string, menos costoso
-                        */
+                        std::cout << comando.compra << std::endl;
+                        if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
+                            if (!jugador->comprarBalas(comando.compra)) {
+                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas." << std::endl;
+                            }
+                        } else {
+                            if (!jugador->comprarArma(comando.compra)) {
+                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
+                            }
+                        } 
+                        break;
                     default:
                         break;
                 }

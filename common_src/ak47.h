@@ -1,12 +1,12 @@
 #include "armaDeFuego.h"
 
-class AK47 : public ArmaDeFuego {
+class Ak47 : public ArmaDeFuego {
 
 
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    AK47(): ArmaDeFuego("AK-47", 0.7f, 20.0f, 15, 80, true,100)
+    Ak47(): ArmaDeFuego("AK-47", 0.7f, 20.0f, 15, 80, true,100)
     {}
     int accion(float distancia) override {
         if (municion_actual < 3) return 0;

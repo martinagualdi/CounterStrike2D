@@ -1,13 +1,13 @@
 #include "armaDeFuego.h"
 
 
-class M3 : public ArmaDeFuego {
+class m3 : public ArmaDeFuego {
 
 
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    M3() : ArmaDeFuego("M3", 0.7f, 15.0f, 20, 70, false,100) {}
+    m3() : ArmaDeFuego("M3", 0.7f, 15.0f, 20, 70, false,100) {}
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         municion_actual--;

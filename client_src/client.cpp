@@ -39,11 +39,8 @@ void Client::iniciar() {
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
         ClientMap mapa(mapa_inicial, renderer);
-        Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa());
-
         EventHandler eventHandler(cola_enviador, cliente_id);
         Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(), eventHandler, cola_recibidor);
-        
 
         int ms_per_frame = 1000 / FPS;
         while(clienteActivo){

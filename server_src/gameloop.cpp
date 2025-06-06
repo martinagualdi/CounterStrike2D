@@ -56,20 +56,18 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
             //jugador->setY(jugador->getY() + VELOCIDAD);
             nuevo_y += VELOCIDAD;
             break;
-        case ABAJO: {
+        case ABAJO:
             // float y = jugador->getY() - VELOCIDAD;
             // if(y > 0)
             //     jugador->setY(y);
             nuevo_y -= VELOCIDAD;
             break;
-        }
-        case IZQUIERDA: {
+        case IZQUIERDA:
             // float x = jugador->getX() - VELOCIDAD;
             // if(x > 0)
             //     jugador->setX(x);
             nuevo_x -= VELOCIDAD;
             break;
-        }
         case DERECHA:
             //jugador->setX(jugador->getX() + VELOCIDAD);
             nuevo_x += VELOCIDAD;
@@ -80,7 +78,6 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             break;
-        }
         case DIAGONAL_SUP_DER:
             // jugador->setX(jugador->getX() + velocidad_diagonal);
             // jugador->setY(jugador->getY() + velocidad_diagonal);
@@ -99,7 +96,7 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             break;
-        }
+
         case DETENER:
             break;
     }

@@ -9,23 +9,32 @@ ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) :
 
 
 std::vector<ElementoMapa> ClientMap::parsearMapa() {
+
     YAML::Node data = YAML::Load(map_str);
+
+    if (!data.IsMap()) {
+        throw std::runtime_error("Error: el archivo YAML no tiene formato de mapa.");
+    }
 
     std::string pathStr = data["fondo"].as<std::string>();
     const char* path_fondo = pathStr.c_str();
-    std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
-    SDL_Rect rect {0, 0, 1920, 1920};
-    TipoElementoMapa tipo = FONDO;
-    ElementoMapa fondo = {tex, rect, tipo};
-    elementos.emplace_back(fondo);
+    if(path_fondo){
+        std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
+        SDL_Rect rect {0, 0, 1920, 1920};
+        TipoElementoMapa tipo = FONDO;
+        ElementoMapa fondo = {tex, rect, tipo};
+        elementos.emplace_back(fondo);
+    }
 
     for (const auto &nodo : data["elementos"]) {
         if (!nodo["imagen"]) continue;
         std::string pathStr = nodo["imagen"].as<std::string>();
         const char* path = pathStr.c_str();
+        if(!path)
+            continue;
         std::shared_ptr<Texture> tex = cargarTextura(path);
-
-        if(!tex) continue;
+        if(!tex)
+            continue;
 
         SDL_Rect rect;
         rect.x = nodo["x"].as<int>();

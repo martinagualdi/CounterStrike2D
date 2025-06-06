@@ -41,11 +41,8 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
 }
 
 void ProtocoloCliente::enviarComando(ComandoDTO comando) {
-
    std::vector<uint8_t> mensaje;
-
    serializar_comando(comando, mensaje);
-
    if (!socket.sendall(mensaje.data(), mensaje.size())) {
       throw std::runtime_error("Error al enviar el comando");
    }
@@ -147,7 +144,8 @@ void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
 
 std::string ProtocoloCliente::recibir_mapa() {
    uint16_t largo;
-   socket.recvall(&largo, sizeof(largo));
+   if(!socket.recvall(&largo, sizeof(largo)))
+      throw std::runtime_error("Error del socket al recibir el mapa");
    largo = ntohs(largo);
    std::vector<uint8_t> buffer(largo);
    socket.recvall(buffer.data(), largo);

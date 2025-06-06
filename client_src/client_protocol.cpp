@@ -29,9 +29,15 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_ROTACION);
       uint16_t angulo = static_cast<uint16_t>(comando.angulo * 100);      
       push_back_uint16(mensaje, angulo);
-   }else if (comando.tipo == CAMBIAR_ARMA){
+   }
+   else if (comando.tipo == CAMBIAR_ARMA){
       mensaje.push_back(PREFIJO_CAMBIO_ARMA);
    }
+   else if (comando.tipo == COMPRAR){
+      mensaje.push_back(PREFIJO_COMPRAR);
+      mensaje.push_back(static_cast<uint8_t>(comando.compra));
+   }
+
 }
 
 void ProtocoloCliente::enviarComando(ComandoDTO comando) {

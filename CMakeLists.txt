@@ -98,6 +98,8 @@ if(TALLER_CLIENT OR TALLER_EDITOR)
         OVERRIDE_FIND_PACKAGE
     )
 
+    set(SDL2PP_WITH_TTF ON CACHE BOOL "" FORCE)
+
     FetchContent_Declare(
         libSDL2pp
         OVERRIDE_FIND_PACKAGE
@@ -138,10 +140,11 @@ if(TALLER_CLIENT)
     target_include_directories(client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
     # Link the taller_common lib target
-    target_link_libraries(client taller_common SDL2pp::SDL2pp SDL2_image)
+    target_link_libraries(client taller_common SDL2pp::SDL2pp SDL2_image SDL2_ttf)
 
     target_link_libraries(client Qt6::Widgets)
     target_link_libraries(client Qt6::Multimedia)
+
 
 endif()
 

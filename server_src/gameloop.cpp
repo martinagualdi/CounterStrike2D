@@ -80,6 +80,7 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             break;
+        }
         case DIAGONAL_SUP_DER:
             // jugador->setX(jugador->getX() + velocidad_diagonal);
             // jugador->setY(jugador->getY() + velocidad_diagonal);
@@ -98,6 +99,7 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             break;
+        }
         case DETENER:
             break;
     }
@@ -152,6 +154,17 @@ void GameLoop::run() {
                         jugador->cambiar_arma_en_mano();
                         std::cout << "Jugador de ID: " << jugador->getId() << " ha cambiado su arma a: " 
                                   << jugador->get_nombre_arma_en_mano() << std::endl;
+                        break;
+                    case COMPRAR:
+                        if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
+                            if (!jugador->comprarBalas(comando.compra)) {
+                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas." << std::endl;
+                            }
+                        } else {
+                            if (!jugador->comprarArma(comando.compra)) {
+                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
+                            }
+                        }
                         break;
                     default:
                         break;

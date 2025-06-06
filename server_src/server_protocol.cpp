@@ -97,6 +97,20 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
         case PREFIJO_CAMBIO_ARMA:
             comando.tipo = CAMBIAR_ARMA;
             break;
+        case PREFIJO_COMPRAR:
+            comando.tipo = COMPRAR;
+            uint8_t compra;
+            skt.recvall(&compra, 1);
+            if(compra == PREFIJO_AK47)
+                comando.compra = C_AK47;
+            else if(compra == PREFIJO_M3)
+                comando.compra = C_M3;
+            else if(compra == PREFIJO_AWP)
+                comando.compra = C_AWP;
+            else if(comando.compra == PREFIJO_BALAS_PRIMARIA)
+                comando.compra = BALAS_PRIMARIA;
+            else if(comando.compra == PREFIJO_BALAS_SECUNDARIA)
+                comando.compra = BALAS_SECUNDARIA;
         default:
             break;
     }

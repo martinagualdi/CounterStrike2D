@@ -43,22 +43,37 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         case DERECHA:
             jugador->setX(jugador->getX() + VELOCIDAD);
             break;
-        case DIAGONAL_SUP_IZQ:
-            jugador->setX(jugador->getX() - velocidad_diagonal);
-            jugador->setY(jugador->getY() + velocidad_diagonal);
+        case DIAGONAL_SUP_IZQ:{
+            float x = jugador->getX() - velocidad_diagonal;
+            float y = jugador->getY() + velocidad_diagonal;
+            if(x > 0){
+                jugador->setX(x);
+                jugador->setY(y);
+            }
             break;
+        }
         case DIAGONAL_SUP_DER:
             jugador->setX(jugador->getX() + velocidad_diagonal);
             jugador->setY(jugador->getY() + velocidad_diagonal);
             break;
-        case DIAGONAL_INF_IZQ:
-            jugador->setX(jugador->getX() - velocidad_diagonal);
-            jugador->setY(jugador->getY() - velocidad_diagonal);
+        case DIAGONAL_INF_IZQ:{
+            float x = jugador->getX() - velocidad_diagonal;
+            float y = jugador->getY() - velocidad_diagonal;
+            if(x > 0 && y > 0){
+                jugador->setX(x);
+                jugador->setY(y);
+            }
             break;
-        case DIAGONAL_INF_DER:
-            jugador->setX(jugador->getX() + velocidad_diagonal);
-            jugador->setY(jugador->getY() - velocidad_diagonal);
+        }
+        case DIAGONAL_INF_DER:{
+            float x = jugador->getX() + velocidad_diagonal;
+            float y = jugador->getY() - velocidad_diagonal;
+            if(y > 0){
+                jugador->setX(x);
+                jugador->setY(y);
+            }
             break;
+        }
         case DETENER:
             break;
     }
@@ -108,6 +123,14 @@ void GameLoop::run() {
                         std::cout << "Jugador de ID: " << jugador->getId() << " ha cambiado su arma a: " 
                                   << jugador->get_nombre_arma_en_mano() << std::endl;
                         break;
+                    case COMPRAR:
+                        /*Hasta aca llega lo siguiente:
+                        comando.tipo = COMPRAR;
+                        comando.compra --> puede ser:
+                        {C_AK47, C_M3, C_AWP, BALAS_PRIMARIA, BALAS_SECUNDARIA};
+                        Para este tipo de trabajos en las que no necesitamos imprimir nada 
+                        por terminal esta bueno usar enum en vez de string, menos costoso
+                        */
                     default:
                         break;
                 }

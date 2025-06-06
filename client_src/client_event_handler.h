@@ -11,9 +11,11 @@ class EventHandler {
 private:
     Queue<ComandoDTO>& cola_enviador;
     const int client_id;
+    bool mercado_abierto;
     std::unordered_set<SDL_Scancode> teclas_validas;
     std::unordered_set<SDL_Scancode> teclas_presionadas;
-    void procesarTeclado(const SDL_Event& event);
+    void procesarMovimiento(const SDL_Event& event);
+    void procesarCompra(const SDL_Event& event);
     void procesarMouse(const SDL_Event& event);
     float procesarPuntero();
     void convertir_coordenadas(float& x, float& y);
@@ -22,6 +24,7 @@ private:
 public:
     explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
     void manejarEventos(bool& isRunning);
+    bool mercadoAbierto() const;
     EventHandler(const EventHandler&) = delete;
     EventHandler& operator=(const EventHandler&) = delete;
     EventHandler(EventHandler&&) = default;

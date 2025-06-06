@@ -40,6 +40,18 @@ Para mover al jugador podes usar:
 
 - Mouse: para rotar el frente del jugador. 
 
+#### Comprar armas
+
+Para comprar armas al inicio de la partida:
+- Se debe estar dentro de la zona de compra, indicada con un carrito de compras en el HUD de la pantalla.
+- Presionar tecla B.
+- Seleccionar el número de arma correspondiente.
+- Para comprar balas del arma primaria usar la coma (,)
+- Para comprar balas del arma secundaria usar el punto (.)
+
+Cabe aclarar que para comprar balas no hace falta abrir el mercado. Solo para comprar armas es necesario abrirlo (apretar B).
+La idea de este mercado es simular el mismo sistema que usa el Counter-Strike real.
+
 
 #### Uso del editor de niveles/mapas
 

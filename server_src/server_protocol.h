@@ -26,6 +26,8 @@ public:
     void enviar_lista_partidas(const std::vector<std::string>& lista_partidas);
 
     void enviar_mensaje(const std::string& mensaje);
+
+    std::string recibir_path_mapa(); 
     /*
     
     IDEA:

@@ -23,6 +23,13 @@ void Client::iniciar() {
     LobbyWindow lobby(protocolo, username);
     int result = lobby.exec();
     if (result == QDialog::Accepted) {
+        /*HAY QUE HACER ESTO EN QT COMO PARTE DEL LOBBY*/
+        std::cout << "Enviar path del mapa a usar: ";
+        std::string respuesta;
+        getline(std::cin, respuesta);
+        protocolo.enviar_mensaje(respuesta);
+        std::string mapa_inicial = protocolo.recibir_mapa();
+        /*HAY QUE HACER ESTO EN QT COMO PARTE DEL LOBBY*/
         hilo_enviador.start();
         hilo_recibidor.start();
         
@@ -31,7 +38,9 @@ void Client::iniciar() {
         SDL_ShowCursor(SDL_DISABLE);
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
-        ClientMap mapa("m2.yaml", renderer);
+        ClientMap mapa(mapa_inicial, renderer);
+        Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa());
+
         EventHandler eventHandler(cola_enviador, cliente_id);
         Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(), eventHandler, cola_recibidor);
         

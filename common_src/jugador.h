@@ -31,7 +31,9 @@ class Jugador {
     Arma* arma_en_mano;
 
   public:  
+
     explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), vida(100), dinero(500), equipo_actual(), skin_tipo(), vivo(true), arma_principal(nullptr),arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+
 
 
     /*Jugador(int id, float x, float y, float angulo, enum Equipo equipo, enum SkinTipos skin, int vida, int dinero, uint8_t arma_secundaria_id)

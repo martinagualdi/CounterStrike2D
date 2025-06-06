@@ -1,7 +1,7 @@
 #include "client_map.h"
 
-ClientMap::ClientMap(const std::string& yamlPath, Renderer& renderer) : 
-    yamlPath(yamlPath),
+ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) : 
+    map_str(map_str),
     renderer(renderer),
     cache(), 
     elementos()
@@ -9,7 +9,7 @@ ClientMap::ClientMap(const std::string& yamlPath, Renderer& renderer) :
 
 
 std::vector<ElementoMapa> ClientMap::parsearMapa() {
-    YAML::Node data = YAML::LoadFile(yamlPath);
+    YAML::Node data = YAML::Load(map_str);
 
     std::string pathStr = data["fondo"].as<std::string>();
     const char* path_fondo = pathStr.c_str();

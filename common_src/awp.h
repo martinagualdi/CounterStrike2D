@@ -5,7 +5,7 @@ class Awp : public ArmaDeFuego {
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    Awp() : ArmaDeFuego("Awp", 0.7f, 35.0f, 50, 100, false,25) {}
+    Awp() : ArmaDeFuego("AWP", 0.7f, 35.0f, 50, 100, false,25) {}
     int accion(float /*distancia*/) override {
         if (municion_actual <= 0) return 0;
         municion_actual--;

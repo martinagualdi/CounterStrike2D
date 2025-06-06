@@ -9,6 +9,9 @@ class ServerProtocol {
 private:
     Socket& skt;
 
+    void push_back_uint16_t(std::vector<uint8_t>& buffer, uint16_t value);
+    void push_back_uint32_t(std::vector<uint8_t>& buffer, uint32_t value);
+
 public:
     explicit ServerProtocol(Socket& skt);
 

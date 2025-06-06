@@ -35,16 +35,7 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
    }
    else if (comando.tipo == COMPRAR){
       mensaje.push_back(PREFIJO_COMPRAR);
-      if (comando.compra == C_AK47)
-         mensaje.push_back(PREFIJO_AK47);
-      else if(comando.compra == C_M3)
-         mensaje.push_back(PREFIJO_M3);
-      else if(comando.compra == C_AWP)
-         mensaje.push_back(PREFIJO_AWP);
-      else if(comando.compra == BALAS_PRIMARIA) 
-         mensaje.push_back(PREFIJO_BALAS_PRIMARIA);
-      else if(comando.compra == BALAS_SECUNDARIA)
-         mensaje.push_back(PREFIJO_BALAS_SECUNDARIA);
+      mensaje.push_back(static_cast<uint8_t>(comando.compra));
    }
 
 }

@@ -124,7 +124,6 @@ void GameLoop::run() {
                                   << jugador->get_nombre_arma_en_mano() << std::endl;
                         break;
                     case COMPRAR:
-                        std::cout << comando.compra << std::endl;
                         if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                             if (!jugador->comprarBalas(comando.compra)) {
                                 std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas." << std::endl;
@@ -133,7 +132,7 @@ void GameLoop::run() {
                             if (!jugador->comprarArma(comando.compra)) {
                                 std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
                             }
-                        } 
+                        }
                         break;
                     default:
                         break;

@@ -133,7 +133,10 @@ class Jugador {
         } else if (arma_en_mano == arma_secundaria.get()) {
             arma_en_mano = cuchillo.get();
         } else {
-            arma_en_mano = arma_principal.get();
+            if(arma_principal != nullptr)
+                arma_en_mano = arma_principal.get();
+            else
+                arma_en_mano = arma_secundaria.get();
         }
     }
 

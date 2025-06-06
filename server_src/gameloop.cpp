@@ -20,8 +20,30 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     jugadores.push_back(jugador);
 }
 
-bool GameLoop::chequear_colisiones_con_mapa(float nuevo_x, float nuevo_y) {
-    return mapa.colision_contra_pared(nuevo_x, nuevo_y);
+bool GameLoop::jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y) {
+    return mapa.jugador_colision_contra_pared(nuevo_x, nuevo_y);
+}
+
+bool GameLoop::bala_golpea_jugador(const Municion &bala) {
+    for (Jugador *jugador : jugadores) {
+        if (jugador->getId() == bala.quien_disparo()) return false; // No se puede disparar a uno mismo
+        float pos_x = bala.getPosX();
+        float pos_y = bala.getPosY();
+        float max_pos_x_jugador = jugador->getX() + 20; 
+        float min_pos_x_jugador = jugador->getX() - 20;
+        float max_pos_y_jugador = jugador->getY() + 20; 
+        float min_pos_y_jugador = jugador->getY() - 20;
+        if (pos_x >= min_pos_x_jugador && pos_x <= max_pos_x_jugador &&
+            pos_y >= min_pos_y_jugador && pos_y <= max_pos_y_jugador) {
+            jugador->recibir_danio(10);
+            
+            std::cout << "Jugador de ID: " << jugador->getId() << " ha sido impactado por la bala del jugador de ID: " 
+                << bala.quien_disparo() << " || ";
+            std::cout << "Vida restante del jugador: " << jugador->get_vida() << std::endl;
+            return true;
+        }
+    }
+    return false;
 }
 
 void GameLoop::ejecutar_movimiento(Jugador *jugador) {
@@ -79,11 +101,8 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         case DETENER:
             break;
     }
-    if (chequear_colisiones_con_mapa(nuevo_x, nuevo_y)) {
+    if (jugador_colisiones_con_mapa(nuevo_x, nuevo_y)) {
         // Si hay colisión, no se actualizan las coordenadas
-        std::cout << "Colisión detectada, no se actualizan las coordenadas del jugador." << std::endl;
-        std::cout << "Posición actual: (" << jugador->getX() << ", " << jugador->getY() << ")" << std::endl;
-        std::cout << "Intento de movimiento a: (" << nuevo_x << ", " << nuevo_y << ")" << std::endl;
         return;
     }
     jugador->setX(nuevo_x);
@@ -145,27 +164,9 @@ void GameLoop::run() {
             size_t i = 0;
             while ( i < balas_disparadas.size()) {
                 Municion &bala = balas_disparadas[i];
-                bool bala_impacto = false;
-                for (Jugador *jugador : jugadores) {
-                    if (jugador->getId() == bala.quien_disparo()) continue; // No se puede disparar a uno mismo
-                    float pos_x = bala.getPosX();
-                    float pos_y = bala.getPosY();
-                    float max_pos_x_jugador = jugador->getX() + 20; 
-                    float min_pos_x_jugador = jugador->getX() - 20;
-                    float max_pos_y_jugador = jugador->getY() + 20; 
-                    float min_pos_y_jugador = jugador->getY() - 20;
-                    if (pos_x >= min_pos_x_jugador && pos_x <= max_pos_x_jugador &&
-                        pos_y >= min_pos_y_jugador && pos_y <= max_pos_y_jugador) {
-                        jugador->recibir_danio(10);
-                        balas_disparadas.erase(balas_disparadas.begin() + i);
-                        std::cout << "Jugador de ID: " << jugador->getId() << " ha sido impactado por la bala del jugador de ID: " 
-                                  << bala.quien_disparo() << " || ";
-                        std::cout << "Vida restante del jugador: " << jugador->get_vida() << std::endl;
-                        bala_impacto = true;
-                        break; 
-                    }
-                }
-                if (!bala_impacto) {
+                if(bala_golpea_jugador(bala) || mapa.bala_colision_contra_pared(bala.getPosX(), bala.getPosY())) {
+                    balas_disparadas.erase(balas_disparadas.begin() + i);
+                } else {
                     bala.setPosX(bala.getPosX() + std::cos(bala.getAnguloDisparo() * M_PI / 180.0f) * 8);
                     bala.setPosY(bala.getPosY() + std::sin(bala.getAnguloDisparo() * M_PI / 180.0f) * 8);
                 }

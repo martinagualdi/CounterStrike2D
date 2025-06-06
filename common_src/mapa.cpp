@@ -36,11 +36,11 @@ Mapa::Mapa(std::string yamlPath) {
     this->inicio_mapa_dto = dto.str();
 }
 
-bool Mapa::colision_contra_pared(float x, float y) {
-    float max_pos_x_jugador = x + 20; 
-    float min_pos_x_jugador = x - 20;
-    float max_pos_y_jugador = y + 20; 
-    float min_pos_y_jugador = y - 20;
+bool Mapa::jugador_colision_contra_pared(float pos_x, float pos_y) {
+    float max_pos_x_jugador = pos_x + 20; 
+    float min_pos_x_jugador = pos_x - 20;
+    float max_pos_y_jugador = pos_y + 20; 
+    float min_pos_y_jugador = pos_y - 20;
     for (const ElementoDeMapa &elemento : elementos) {
         if (elemento.tipo == OBSTACULO) {
             float max_pos_x_elemento = elemento.x + elemento.ancho;
@@ -51,9 +51,26 @@ bool Mapa::colision_contra_pared(float x, float y) {
                 min_pos_x_jugador < max_pos_x_elemento &&
                 max_pos_y_jugador > min_pos_y_elemento &&
                 min_pos_y_jugador < max_pos_y_elemento) {
-                return true; // Hay colisión
+                return true; 
             }
         }
     }
-    return false; // No hay colisión
+    return false;
+}
+
+bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
+    for (const ElementoDeMapa &elemento : elementos) {
+        if (elemento.tipo == OBSTACULO) {
+            float max_pos_x_elemento = elemento.x + elemento.ancho;
+            float min_pos_x_elemento = elemento.x;
+            float max_pos_y_elemento = elemento.y + elemento.alto;
+            float min_pos_y_elemento = elemento.y;
+            if (pos_x >= min_pos_x_elemento && pos_x <= max_pos_x_elemento &&
+                pos_y >= min_pos_y_elemento && pos_y <= max_pos_y_elemento) {
+                std::cout << "Bala colisiona con pared" << std::endl;
+                return true; 
+            }
+        }
+    }
+    return false;
 }

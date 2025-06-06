@@ -279,7 +279,7 @@ void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
 
             float pantalla_x = elemento.dst.x - jugador_principal->pos_x + centro_x;
             float pantalla_y = elemento.dst.y - 1920 +jugador_principal->pos_y + centro_y - 64; // YA ESTA EN COORDENADA SDL
-            std::cout << "Posiciones: " << pantalla_x << ", " << pantalla_y <<  " son floats" << std::endl;
+            //std::cout << "Posiciones: " << pantalla_x << ", " << pantalla_y <<  " son floats" << std::endl;
 
             if (pantalla_x + elemento.dst.w >= 0 && pantalla_x <= ANCHO_MIN &&
                 pantalla_y + elemento.dst.h >= 0 && pantalla_y <= ALTO_MIN) {

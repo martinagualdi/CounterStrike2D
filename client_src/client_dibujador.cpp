@@ -261,6 +261,9 @@ void Dibujador::dibujar_hud() {
 
 void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
 {
+    if(!snapshot) {
+        return;
+    }
     this->snapshot = snapshot;
     renderer.Clear();
 
@@ -275,7 +278,8 @@ void Dibujador::renderizar(Snapshot* snapshot/*, bool &jugador_activo*/)
         else if(elemento.tipo == OBSTACULO){
 
             float pantalla_x = elemento.dst.x - jugador_principal->pos_x + centro_x;
-            float pantalla_y = elemento.dst.y - 1920 +jugador_principal->pos_y + centro_y; // YA ESTA EN COORDENADA SDL
+            float pantalla_y = elemento.dst.y - 1920 +jugador_principal->pos_y + centro_y - 64; // YA ESTA EN COORDENADA SDL
+            std::cout << "Posiciones: " << pantalla_x << ", " << pantalla_y <<  " son floats" << std::endl;
 
             if (pantalla_x + elemento.dst.w >= 0 && pantalla_x <= ANCHO_MIN &&
                 pantalla_y + elemento.dst.h >= 0 && pantalla_y <= ALTO_MIN) {

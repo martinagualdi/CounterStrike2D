@@ -10,7 +10,7 @@ Mapa::Mapa(std::string yamlPath) {
     for (const auto &nodo : data["elementos"]) {
         ElementoDeMapa elemento;
         elemento.x = nodo["x"].as<int>();
-        elemento.y = nodo["y"].as<int>();
+        elemento.y = alto_mapa - nodo["y"].as<int>();
         elemento.ancho = nodo["ancho"].as<int>();
         elemento.alto = nodo["alto"].as<int>();
         std::string tipo_str = nodo["tipo"].as<std::string>();

@@ -35,3 +35,25 @@ Mapa::Mapa(std::string yamlPath) {
     dto << data;
     this->inicio_mapa_dto = dto.str();
 }
+
+bool Mapa::colision_contra_pared(float x, float y) {
+    float max_pos_x_jugador = x + 20; 
+    float min_pos_x_jugador = x - 20;
+    float max_pos_y_jugador = y + 20; 
+    float min_pos_y_jugador = y - 20;
+    for (const ElementoDeMapa &elemento : elementos) {
+        if (elemento.tipo == OBSTACULO) {
+            float max_pos_x_elemento = elemento.x + elemento.ancho;
+            float min_pos_x_elemento = elemento.x;
+            float max_pos_y_elemento = elemento.y + elemento.alto;
+            float min_pos_y_elemento = elemento.y;
+            if (max_pos_x_jugador > min_pos_x_elemento &&
+                min_pos_x_jugador < max_pos_x_elemento &&
+                max_pos_y_jugador > min_pos_y_elemento &&
+                min_pos_y_jugador < max_pos_y_elemento) {
+                return true; // Hay colisión
+            }
+        }
+    }
+    return false; // No hay colisión
+}

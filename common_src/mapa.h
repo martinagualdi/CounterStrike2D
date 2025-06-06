@@ -25,6 +25,8 @@ public:
     Mapa(std::string yamlPath);
     std::string mapa_en_estado_inicial() const { return inicio_mapa_dto; }
 
+    bool colision_contra_pared(float x, float y);
+
 };
 
 #endif

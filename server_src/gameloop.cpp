@@ -20,51 +20,77 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     jugadores.push_back(jugador);
 }
 
+bool GameLoop::chequear_colisiones_con_mapa(float nuevo_x, float nuevo_y) {
+    return mapa.colision_contra_pared(nuevo_x, nuevo_y);
+}
+
 void GameLoop::ejecutar_movimiento(Jugador *jugador) {
 
     float velocidad_diagonal = VELOCIDAD / std::sqrt(2.0f);
-
+    float nuevo_x = jugador->getX();
+    float nuevo_y = jugador->getY();
     switch (jugador->getMovimiento()) {
         case ARRIBA:
-            jugador->setY(jugador->getY() + VELOCIDAD);
+            //jugador->setY(jugador->getY() + VELOCIDAD);
+            nuevo_y += VELOCIDAD;
             break;
         case ABAJO: {
-            float y = jugador->getY() - VELOCIDAD;
-            if(y > 0)
-                jugador->setY(y);
+            // float y = jugador->getY() - VELOCIDAD;
+            // if(y > 0)
+            //     jugador->setY(y);
+            nuevo_y -= VELOCIDAD;
             break;
         }
         case IZQUIERDA: {
-            float x = jugador->getX() - VELOCIDAD;
-            if(x > 0)
-                jugador->setX(x);
+            // float x = jugador->getX() - VELOCIDAD;
+            // if(x > 0)
+            //     jugador->setX(x);
+            nuevo_x -= VELOCIDAD;
             break;
         }
         case DERECHA:
-            jugador->setX(jugador->getX() + VELOCIDAD);
+            //jugador->setX(jugador->getX() + VELOCIDAD);
+            nuevo_x += VELOCIDAD;
             break;
         case DIAGONAL_SUP_IZQ:
-            jugador->setX(jugador->getX() - velocidad_diagonal);
-            jugador->setY(jugador->getY() + velocidad_diagonal);
+            // jugador->setX(jugador->getX() - velocidad_diagonal);
+            // jugador->setY(jugador->getY() + velocidad_diagonal);
+            nuevo_x -= velocidad_diagonal;
+            nuevo_y += velocidad_diagonal;
             break;
         case DIAGONAL_SUP_DER:
-            jugador->setX(jugador->getX() + velocidad_diagonal);
-            jugador->setY(jugador->getY() + velocidad_diagonal);
+            // jugador->setX(jugador->getX() + velocidad_diagonal);
+            // jugador->setY(jugador->getY() + velocidad_diagonal);
+            nuevo_x += velocidad_diagonal;
+            nuevo_y += velocidad_diagonal;
             break;
         case DIAGONAL_INF_IZQ:
-            jugador->setX(jugador->getX() - velocidad_diagonal);
-            jugador->setY(jugador->getY() - velocidad_diagonal);
+            // jugador->setX(jugador->getX() - velocidad_diagonal);
+            // jugador->setY(jugador->getY() - velocidad_diagonal);
+            nuevo_x -= velocidad_diagonal;
+            nuevo_y -= velocidad_diagonal;
             break;
         case DIAGONAL_INF_DER:
-            jugador->setX(jugador->getX() + velocidad_diagonal);
-            jugador->setY(jugador->getY() - velocidad_diagonal);
+            // jugador->setX(jugador->getX() + velocidad_diagonal);
+            // jugador->setY(jugador->getY() - velocidad_diagonal);
+            nuevo_x += velocidad_diagonal;
+            nuevo_y -= velocidad_diagonal;
             break;
         case DETENER:
             break;
     }
+    if (chequear_colisiones_con_mapa(nuevo_x, nuevo_y)) {
+        // Si hay colisión, no se actualizan las coordenadas
+        std::cout << "Colisión detectada, no se actualizan las coordenadas del jugador." << std::endl;
+        std::cout << "Posición actual: (" << jugador->getX() << ", " << jugador->getY() << ")" << std::endl;
+        std::cout << "Intento de movimiento a: (" << nuevo_x << ", " << nuevo_y << ")" << std::endl;
+        return;
+    }
+    jugador->setX(nuevo_x);
+    jugador->setY(nuevo_y);
 
     if ((!jugador->esta_moviendose() && jugador->getMovimiento() != DETENER)
-        || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)) {
+        || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)){
         jugador->cambiar_estado_moviendose(); 
     }
     /*if (jugador->esta_moviendose())

@@ -22,7 +22,7 @@ class GameLoop : public Thread {
     Mapa mapa;
 
 
-
+    bool chequear_colisiones_con_mapa(float nuevo_x, float nuevo_y);
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
 

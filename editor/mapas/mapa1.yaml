@@ -2,399 +2,345 @@ fondo: /editor/gfx/backgrounds/dust.png
 ancho_max_mapa: 2048
 alto_max_mapa: 2048
 elementos:
-  - imagen: /editor/gfx/plantacion_bombas/platacion1.png
-    x: 672
-    y: 1632
-    tipo: bombsite
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1952
-    y: 640
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1888
-    y: 640
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1824
-    y: 640
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 672
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 736
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 800
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 768
-    y: 832
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 704
-    y: 832
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 640
-    y: 832
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
+  - imagen: /editor/gfx/dust/obstaculo2.png
     x: 576
-    y: 768
+    y: 160
     tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 512
-    y: 704
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 448
-    y: 640
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 384
-    y: 576
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
     x: 576
-    y: 832
+    y: 96
     tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 512
-    y: 768
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 544
+    y: 64
     tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 448
-    y: 704
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 544
+    y: 96
     tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 384
-    y: 640
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 576
+    y: 32
     tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/weapons/redflag.bmp
-    x: 1408
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 544
+    y: 32
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 544
     y: 0
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 512
+    y: 96
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 512
+    y: 32
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 480
+    y: 0
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 480
+    y: 32
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 448
+    y: 32
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/weapons/aug_m.bmp
+    x: 576
+    y: 320
+    tipo: arma
+    ancho: 51
+    alto: 19
+  - imagen: /editor/gfx/weapons/mac10_m.bmp
+    x: 1824
+    y: 1888
+    tipo: arma
+    ancho: 29
+    alto: 18
+  - imagen: /editor/gfx/weapons/noflag.bmp
+    x: 480
+    y: 1792
+    tipo: arma
+    ancho: 8
+    alto: 33
+  - imagen: /editor/gfx/weapons/m249_m.bmp
+    x: 224
+    y: 1856
+    tipo: arma
+    ancho: 51
+    alto: 20
+  - imagen: /editor/gfx/weapons/blueflag.bmp
+    x: 1408
+    y: 1568
     tipo: arma
     ancho: 20
     alto: 33
-  - imagen: /editor/gfx/weapons/galil_m.bmp
-    x: 1780
-    y: 332
-    tipo: arma
-    ancho: 53
-    alto: 18
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1984
-    y: 1728
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1984
-    y: 1792
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1984
-    y: 1856
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1920
-    y: 1856
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
+  - imagen: /editor/gfx/weapons/ak47_m.bmp
     x: 1856
-    y: 1856
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1920
-    y: 1728
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1856
-    y: 1728
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso6.png
-    x: 1856
-    y: 1792
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso7.png
-    x: 1920
-    y: 1792
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso7.png
-    x: 1152
-    y: 833
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/piso7.png
-    x: 1408
-    y: 576
-    tipo: piso
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo15.png
-    x: 832
-    y: 960
-    tipo: obstaculo
-    ancho: 32
-    alto: 96
-  - imagen: /editor/gfx/dust/obstaculo15.png
-    x: 832
-    y: 896
-    tipo: obstaculo
-    ancho: 32
-    alto: 96
-  - imagen: /editor/gfx/dust/obstaculo15.png
-    x: 832
-    y: 832
-    tipo: obstaculo
-    ancho: 32
-    alto: 96
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 832
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 768
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
     y: 704
+    tipo: arma
+    ancho: 51
+    alto: 17
+  - imagen: /editor/gfx/weapons/deagle_m.bmp
+    x: 352
+    y: 704
+    tipo: arma
+    ancho: 28
+    alto: 17
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 0
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1792
-    y: 640
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 64
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1856
-    y: 640
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 128
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1920
-    y: 640
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 192
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
-    x: 1984
-    y: 640
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 256
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1472
-    y: 1408
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 320
+    y: 0
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1472
-    y: 1536
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 384
+    y: 64
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1472
-    y: 1472
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1664
-    y: 1408
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1600
-    y: 1408
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
-    x: 1536
-    y: 1408
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 576
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 448
     y: 128
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 576
-    y: 64
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
     x: 512
-    y: 64
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 576
-    y: 0
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 512
-    y: 0
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 448
-    y: 0
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1984
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1920
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1856
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1792
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1600
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1536
-    y: 256
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1536
     y: 192
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1536
-    y: 128
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1536
-    y: 64
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo12.png
-    x: 1536
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 384
     y: 0
     tipo: obstaculo
     ancho: 64
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 320
-    y: 1920
+    x: 448
+    y: 64
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 512
+    y: 128
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 576
+    y: 256
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 576
+    y: 192
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 0
+    y: 512
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 64
+    y: 512
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 128
+    y: 512
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 192
+    y: 512
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 256
+    y: 512
     tipo: obstaculo
     ancho: 64
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
     x: 320
-    y: 1856
+    y: 512
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 0
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 64
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 128
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 192
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 256
+    y: 576
     tipo: obstaculo
     ancho: 64
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
     x: 320
-    y: 1600
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 0
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 64
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 128
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 192
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 256
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 0
+    y: 1728
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 64
+    y: 1728
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 128
+    y: 1728
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 192
+    y: 1728
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 256
+    y: 1728
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 320
+    y: 1792
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 320
+    y: 1728
     tipo: obstaculo
     ancho: 64
     alto: 64
@@ -406,358 +352,410 @@ elementos:
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
     x: 320
-    y: 1728
+    y: 1600
     tipo: obstaculo
     ancho: 64
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
     x: 320
-    y: 1792
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 256
-    y: 1728
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 192
-    y: 1728
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 128
-    y: 1728
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 64
-    y: 1728
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 0
-    y: 1728
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 256
-    y: 1792
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 192
-    y: 1792
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 128
-    y: 1792
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 64
-    y: 1792
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 0
-    y: 1792
+    y: 1856
     tipo: obstaculo
     ancho: 64
     alto: 64
   - imagen: /editor/gfx/dust/obstaculo09.png
     x: 320
-    y: 576
+    y: 1920
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 256
-    y: 576
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1536
+    y: 0
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 192
-    y: 576
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1536
+    y: 64
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 128
-    y: 576
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1536
+    y: 128
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 64
-    y: 576
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 0
-    y: 576
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 320
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 256
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 192
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 128
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 64
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 0
-    y: 512
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 576
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1536
     y: 192
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 576
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1536
     y: 256
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 512
-    y: 128
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1600
+    y: 256
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 448
-    y: 64
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1792
+    y: 256
     tipo: obstaculo
     ancho: 64
     alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 384
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 512
-    y: 192
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 448
-    y: 128
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 384
-    y: 64
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 320
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 256
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 192
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 128
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 64
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/dust/obstaculo09.png
-    x: 0
-    y: 0
-    tipo: obstaculo
-    ancho: 64
-    alto: 64
-  - imagen: /editor/gfx/weapons/deagle_m.bmp
-    x: 378
-    y: 717
-    tipo: arma
-    ancho: 28
-    alto: 17
-  - imagen: /editor/gfx/weapons/ak47_m.bmp
+  - imagen: /editor/gfx/dust/obstaculo12.png
     x: 1856
-    y: 713
+    y: 256
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1920
+    y: 256
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo12.png
+    x: 1984
+    y: 256
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 448
+    y: 0
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 512
+    y: 0
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 576
+    y: 0
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 512
+    y: 64
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 576
+    y: 64
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo2.png
+    x: 576
+    y: 128
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1536
+    y: 1408
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1600
+    y: 1408
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1664
+    y: 1408
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1472
+    y: 1472
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1472
+    y: 1536
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion2.png
+    x: 1472
+    y: 1408
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1984
+    y: 640
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1920
+    y: 640
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1856
+    y: 640
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 640
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 704
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 768
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 832
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/obstaculo15.png
+    x: 832
+    y: 832
+    tipo: obstaculo
+    ancho: 32
+    alto: 96
+  - imagen: /editor/gfx/dust/obstaculo15.png
+    x: 832
+    y: 896
+    tipo: obstaculo
+    ancho: 32
+    alto: 96
+  - imagen: /editor/gfx/dust/obstaculo15.png
+    x: 832
+    y: 960
+    tipo: obstaculo
+    ancho: 32
+    alto: 96
+  - imagen: /editor/gfx/dust/piso7.png
+    x: 1408
+    y: 576
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso7.png
+    x: 1184
+    y: 864
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso7.png
+    x: 1920
+    y: 1792
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1856
+    y: 1792
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1856
+    y: 1728
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1920
+    y: 1728
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1856
+    y: 1856
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1920
+    y: 1856
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1984
+    y: 1856
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1984
+    y: 1792
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/dust/piso6.png
+    x: 1984
+    y: 1728
+    tipo: piso
+    ancho: 32
+    alto: 32
+  - imagen: /editor/gfx/weapons/galil_m.bmp
+    x: 1760
+    y: 320
     tipo: arma
-    ancho: 51
-    alto: 17
-  - imagen: /editor/gfx/weapons/blueflag.bmp
-    x: 1426
-    y: 1596
+    ancho: 53
+    alto: 18
+  - imagen: /editor/gfx/weapons/redflag.bmp
+    x: 1408
+    y: 0
     tipo: arma
     ancho: 20
     alto: 33
-  - imagen: /editor/gfx/weapons/m249_m.bmp
-    x: 245
-    y: 1876
-    tipo: arma
-    ancho: 51
-    alto: 20
-  - imagen: /editor/gfx/weapons/noflag.bmp
-    x: 507
-    y: 1797
-    tipo: arma
-    ancho: 8
-    alto: 33
-  - imagen: /editor/gfx/weapons/mac10_m.bmp
-    x: 1836
-    y: 1895
-    tipo: arma
-    ancho: 29
-    alto: 18
-  - imagen: /editor/gfx/weapons/aug_m.bmp
-    x: 576
-    y: 320
-    tipo: arma
-    ancho: 51
-    alto: 19
-  - imagen: /editor/gfx/dust/obstaculo2.png
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 384
+    y: 640
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
     x: 448
-    y: 32
+    y: 704
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 480
-    y: 32
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 480
-    y: 0
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
     x: 512
-    y: 32
+    y: 768
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 576
+    y: 832
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 384
+    y: 576
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 448
+    y: 640
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
     x: 512
-    y: 96
+    y: 704
     tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 544
-    y: 0
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 544
-    y: 32
-    tipo: obstaculo
-    ancho: 32
-    alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
     x: 576
-    y: 32
+    y: 768
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 640
+    y: 832
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 704
+    y: 832
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/dust/obstaculo09.png
+    x: 768
+    y: 832
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 800
     tipo: obstaculo
     ancho: 32
     alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 544
-    y: 96
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 736
     tipo: obstaculo
     ancho: 32
     alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 544
-    y: 64
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1792
+    y: 672
     tipo: obstaculo
     ancho: 32
     alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 576
-    y: 96
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1824
+    y: 640
     tipo: obstaculo
     ancho: 32
     alto: 32
-  - imagen: /editor/gfx/dust/obstaculo2.png
-    x: 576
-    y: 160
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1888
+    y: 640
     tipo: obstaculo
     ancho: 32
     alto: 32
+  - imagen: /editor/gfx/proteccion_disparos/proteccion3.png
+    x: 1952
+    y: 640
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+zonas:
   - tipo: inicio_ct
     x: 11
     y: 74
     ancho: 342
     alto: 411
+    id: "3589db08-f415-46bd-a4ae-8017290bae21"
   - tipo: inicio_tt
     x: 1616
     y: 13
     ancho: 376
     alto: 235
+    id: "6014ff9e-23be-4faa-87ec-8ffdbf1d5935"
   - tipo: zona_bombas
     x: 561
     y: 1534
     ancho: 254
     alto: 230
+    id: "0c1d0896-e7ba-4add-9c8c-a79b7531cc02"

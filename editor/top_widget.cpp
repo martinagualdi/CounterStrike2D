@@ -491,7 +491,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
 void TopWidget::agregarElemento(const QString& path, int x, int y) {
     QPixmap pixmap = filtrarFondo(path);
     if (!pixmap.isNull()) {
-        auto* item = new GridPixmapItem(pix, gridSize);
+        auto* item = new GridPixmapItem(pixmap, gridSize);
         item->setPos(x, y);
         item->setZValue(1);
 

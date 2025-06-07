@@ -26,17 +26,35 @@ El archivo de configuración contiene el puerto al cual conectarse, predefinido 
 ```sh
 ./client
 ```
-Una vez ejecutado deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 
 ###### **Para ejecutar el editor:**
 ```sh
 ./taller_editor
 ```
 
+#### Lobby
+Una vez ejecutado el cliente se deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
+De esta manera, cuando el cliente ya este correctamente conectado se podrá:
+
+- **Crear una partida:**
+
+    Se le asignaŕa automaticamente un bando y el cliente podrá elegir su skin (correspondiente al equipo) haciendo click en la imagen deseada.
+    Se podrá elegir el mapa en el cual se quiere jugar haciendo click en el mismo. 
+
+- **Listar las partidas activas:**
+
+    Aparecerá una lista de las partidas, para seleccionar una se deberá hacer click sobre la misma. 
+
+- **Unirse a una partida ya existente:**
+
+    Una vez seleccionada una lista del item anterior, presionar el boton de unirse. 
+    Se le asignaŕa automaticamente un bando y el cliente podrá elegir su skin (correspondiente al equipo) haciendo click en la imagen deseada.
+    Se incorporará automaticamente a la partida con el mapa elegido por quien haya creado la misma. 
+
 #### Movimientos del jugador
 Para mover al jugador podes usar:
 
-- Teclado: W(arriba), S(abajo), A(derecha), D(izquierda). 
+- Teclado: **W**(arriba), **S**(abajo), **A**(derecha), **D**(izquierda). 
 
 - Mouse: para rotar el frente del jugador. 
 
@@ -52,7 +70,6 @@ Para comprar armas al inicio de la partida:
 Cabe aclarar que para comprar balas no hace falta abrir el mercado. Solo para comprar armas es necesario abrirlo (apretar B).
 La idea de este mercado es simular el mismo sistema que usa el Counter-Strike real.
 
-
 #### Uso del editor de niveles/mapas
 
 El editor cuenta con un lobby el cual tiene dos opciones **editar** o **crear** un mapa.
@@ -63,15 +80,26 @@ En ambos casos tener las siguientes consideraciones:
 
 - Para posicionar un elemento se utiliza **drag and drop**, arrastrar la imagen a la posición deseada. 
 
+- Para "pintar" el piso se cuenta con un boton **activar pincel piso** el cual al ser clickeado transforma el cursos en un pincel para los sprites de pisos, es decir, cuando clickeamos el boton se activa dicho modo luego hay que clickear sobre el piso deseado y pintar la pantalla. Para pintar lo que hay que hacer es hacer click en la zona donde queres comenzar a pintar y arrastrar el mouse presionado, una vez que se deja de presionar le mousee el modo se desactivará. 
+**IMPORTANTE:** si el modo pincel no esta activado podemos colocar pisos individualmente como cualquier otro objeto. Ademas una vez pintado cada piso en su individualidad podrá ser movido o eliminado al igual que el resto de los elementos. 
+
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
-Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **client_src/gfx/mapas**. 
+Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Para que un mapa pueda ser utilizado en el juego, su respectivo .yml debe ser movido **manualmente** al servidor en la carpeta correspondiente.
 
 Al momento de editar un mapa ya existe se abre automaticamente esa carpeta para que se seleccione el mapa deseado, luego de finalizar la edición se debe guardar con el mismo nombre para reemplazar el archivo existente por el nuevo que contiene los cambios realizados. 
 
 Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion de bombas el editor cuenta con un boton **Marcar zona** una vez presionado se habilita para marcar una zona cualquiera con el cursor. Al finalizar la seleccion se consultara a que zona hace referencia lo marcado (inicio_ct, inicio_tt o zona_bombas). 
 
-**IMPORTANTE:** al finalizar de marcar una zona, el modo del mismo se desactiva, por lo que para crear otra zona se deberá volver a presionar el botón. De esta maner se permite:
+**IMPORTANTE 1:** un mapa no podrá ser guardado si:
+
+- No cuenta con una zona de inicio TT (tampoco se permite crear mas de una).
+
+- No cuenta con una zona de inicio CT (tampoco se permite crear mas de una).
+
+- No cuenta con al menos una zona de BOMBAS (se permiten máximo dos zonas de este tipo).
+
+**IMPORTANTE 2:** al finalizar de marcar una zona, el modo del mismo se desactiva, por lo que para crear otra zona se deberá volver a presionar el botón. De esta maner se permite:
 
 - Hacer **click** sobre la zona y moverla al lugar que desees. 
 

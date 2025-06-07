@@ -36,14 +36,17 @@ El archivo de configuración contiene el puerto al cual conectarse, predefinido 
 Una vez ejecutado el cliente se deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 De esta manera, cuando el cliente ya este correctamente conectado se podrá:
 
-- Crear una partida:
+- **Crear una partida:**
+
     Se le asignaŕa automaticamente un bando y el cliente podrá elegir su skin (correspondiente al equipo) haciendo click en la imagen deseada.
     Se podrá elegir el mapa en el cual se quiere jugar haciendo click en el mismo. 
 
-- Listar las partidas activas.
+- **Listar las partidas activas:**
+
     Aparecerá una lista de las partidas, para seleccionar una se deberá hacer click sobre la misma. 
 
-- Unirse a una partida ya existente. 
+- **Unirse a una partida ya existente:**
+
     Una vez seleccionada una lista del item anterior, presionar el boton de unirse. 
     Se le asignaŕa automaticamente un bando y el cliente podrá elegir su skin (correspondiente al equipo) haciendo click en la imagen deseada.
     Se incorporará automaticamente a la partida con el mapa elegido por quien haya creado la misma. 

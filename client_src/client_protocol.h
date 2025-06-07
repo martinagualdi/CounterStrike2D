@@ -25,6 +25,8 @@ public:
     void enviar_unirse_partida(int id_partida);
     void enviar_listar_partida();
     std::string recibir_lista_partidas();
+    void enviar_mensaje(const std::string& mensaje);
+    std::string recibir_mapa();
 
     ProtocoloCliente(const ProtocoloCliente&) = delete;
     ProtocoloCliente& operator=(const ProtocoloCliente&) = delete;

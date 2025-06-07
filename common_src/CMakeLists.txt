@@ -6,6 +6,7 @@ target_sources(taller_common
     socket.cpp
     municion.cpp
     jugador.cpp
+    mapa.cpp
     PUBLIC
     comando_dto.h
     jugador.h
@@ -26,4 +27,5 @@ target_sources(taller_common
     cuchillo.h
     bomba.h
     municion.h
+    mapa.h
     )

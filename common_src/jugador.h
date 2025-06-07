@@ -6,6 +6,8 @@
 #include "arma.h"
 #include "glock.h"
 #include "ak47.h"
+#include "m3.h"
+#include "awp.h"
 #include "armaDeFuego.h"
 #include "enums_jugador.h"
 
@@ -29,7 +31,9 @@ class Jugador {
     Arma* arma_en_mano;
 
   public:  
-    explicit Jugador(int id) : id(id), x(10), y(10), angulo(0), vida(100), dinero(500), equipo_actual(), skin_tipo(), vivo(true), arma_principal(new AK47()),arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+
+    explicit Jugador(int id) : id(id), x(150), y(150), angulo(0), vida(100), dinero(500), equipo_actual(), skin_tipo(), vivo(true), arma_principal(nullptr),arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+
 
 
     /*Jugador(int id, float x, float y, float angulo, enum Equipo equipo, enum SkinTipos skin, int vida, int dinero, uint8_t arma_secundaria_id)
@@ -131,8 +135,65 @@ class Jugador {
         } else if (arma_en_mano == arma_secundaria.get()) {
             arma_en_mano = cuchillo.get();
         } else {
-            arma_en_mano = arma_principal.get();
+            if(arma_principal != nullptr)
+                arma_en_mano = arma_principal.get();
+            else
+                arma_en_mano = arma_secundaria.get();
         }
+    }
+
+    bool comprarArma(enum Compra arma) {
+        switch (arma) {
+            case C_AK47:
+                if (dinero >= 150 && arma_principal != std::make_unique<Ak47>()) {
+                    arma_principal = std::make_unique<Ak47>();
+                    dinero -= 150;
+                    arma_en_mano = arma_principal.get();
+                    return true;
+                }
+                break;
+            case C_M3:
+                if (dinero >= 100 && arma_principal != std::make_unique<m3>()) {
+                    arma_principal = std::make_unique<m3>();
+                    dinero -= 100;
+                    arma_en_mano = arma_principal.get();
+                    return true;
+                }
+                break;
+            case C_AWP:
+                if (dinero >= 200 && arma_principal != std::make_unique<Awp>()) {
+                    arma_principal = std::make_unique<Awp>();
+                    dinero -= 200;
+                    arma_en_mano = arma_principal.get();
+                    return true;
+                }
+                break;
+            default:
+                return false; // No se compró nada
+        }
+        return false;
+    }
+
+    bool comprarBalas(enum Compra tipo_bala) {
+        switch (tipo_bala) {
+            case BALAS_PRIMARIA:
+                if (dinero >= 5){
+                    arma_principal->setMunicion(10);
+                    dinero -= 5;
+                    return true;
+                }
+                break;
+            case BALAS_SECUNDARIA:
+                if (dinero >= 2){
+                    arma_secundaria->setMunicion(10);
+                    dinero -= 2;
+                    return true;
+                }
+                break;
+            default:
+                return false; // No se compró nada
+        }
+        return false;
     }
 
     enum ArmaEnMano get_codigo_arma_en_mano() const {

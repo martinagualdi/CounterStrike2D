@@ -4,26 +4,21 @@
 #include <iostream>
 
 #define ALTO_MIN 720
-
-#define CMD_ESTADISTICAS 5
-#define CMD_COMPRAR_BALAS_PRIMARIA 7
-#define CMD_COMPRAR_BALAS_SECUNDARIA 8
-#define CMD_CLICK_IZQUIERDO 9
-#define CMD_SCROLL_ARRIBA 10
-#define CMD_SCROLL_ABAJO 11
-#define CMD_EXIT 12
+#define ANCHO_MIN 960
 
 EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, const int client_id) :
     cola_enviador(cola_enviador),
     client_id(client_id),
+    mercado_abierto(false),
     teclas_validas({
         SDL_SCANCODE_W,
         SDL_SCANCODE_S,
         SDL_SCANCODE_A,
-        SDL_SCANCODE_D
+        SDL_SCANCODE_D,
+        SDL_SCANCODE_B
         }){}
 
-void EventHandler::procesarTeclado(const SDL_Event &event)
+void EventHandler::procesarMovimiento(const SDL_Event &event)
 {
     if(!teclas_validas.contains(event.key.keysym.scancode)) {
         return;
@@ -66,6 +61,88 @@ void EventHandler::procesarTeclado(const SDL_Event &event)
     cola_enviador.try_push(comando);
 }
 
+void EventHandler::procesarCompra(const SDL_Event &event) {
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
+        SDL_Scancode sc = event.key.keysym.scancode;
+
+        if(!mercado_abierto){
+            if(sc == SDL_SCANCODE_COMMA){
+                ComandoDTO comando;
+                comando.tipo = COMPRAR;
+                comando.compra = BALAS_PRIMARIA;
+                cola_enviador.try_push(comando);
+            } else if(sc == SDL_SCANCODE_PERIOD){
+                ComandoDTO comando;
+                comando.tipo = COMPRAR;
+                comando.compra = BALAS_SECUNDARIA;
+                cola_enviador.try_push(comando);
+            }
+        }
+
+
+        if (sc == SDL_SCANCODE_B) {
+            mercado_abierto = !mercado_abierto;
+
+            if (mercado_abierto) {
+                // Si el mercado se acaba de abrir, detener el movimiento
+                if (!teclas_presionadas.empty()) {
+                    ComandoDTO comando;
+                    comando.tipo = MOVIMIENTO;
+                    comando.movimiento = DETENER;
+                    cola_enviador.try_push(comando);
+                    teclas_presionadas.clear();
+                }
+            }
+
+            return; 
+        }
+
+        if (mercado_abierto) {
+            if (sc == SDL_SCANCODE_ESCAPE) {
+                mercado_abierto = false;
+                return;
+            }
+
+            ComandoDTO comando;
+            comando.tipo = COMPRAR;
+
+            switch (sc) {
+                case SDL_SCANCODE_1:
+                case SDL_SCANCODE_KP_1:
+                    comando.compra = C_AK47;
+                    cola_enviador.try_push(comando);
+                    mercado_abierto = false;
+                    break;
+                case SDL_SCANCODE_2:
+                case SDL_SCANCODE_KP_2:
+                    comando.compra = C_M3;
+                    cola_enviador.try_push(comando);
+                    mercado_abierto = false;
+                    break;
+                case SDL_SCANCODE_3:
+                case SDL_SCANCODE_KP_3:
+                    comando.compra = C_AWP;
+                    cola_enviador.try_push(comando);
+                    mercado_abierto = false;
+                    break;
+                case SDL_SCANCODE_COMMA:
+                    comando.compra = BALAS_PRIMARIA;
+                    cola_enviador.try_push(comando);
+                    mercado_abierto = false;
+                    break;
+                case SDL_SCANCODE_PERIOD:
+                    comando.compra = BALAS_SECUNDARIA;
+                    cola_enviador.try_push(comando);
+                    mercado_abierto = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+
 float EventHandler::calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse) {
     float dx = x_mouse - x_personaje;
     float dy = y_personaje  -y_mouse;
@@ -76,34 +153,34 @@ float EventHandler::calcularAngulo(float x_personaje, float y_personaje, int x_m
     return angulo_grados;
 }
 
+bool EventHandler::mercadoAbierto() const {
+    return mercado_abierto;
+}
+
 void EventHandler::convertir_coordenadas(float &x, float &y) {
     x = x;
     y = ALTO_MIN - y;
 }
 
-float EventHandler::procesarPuntero(Snapshot& snapshot) {
-    InfoJugador* jugador = snapshot.getJugadorPorId(client_id);
-    float jugador_x = jugador->pos_x;
-    float jugador_y = jugador->pos_y;
-    convertir_coordenadas(jugador_x, jugador_y);    
+float EventHandler::procesarPuntero() { 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    return calcularAngulo(jugador_x, jugador_y, mouseX, mouseY);
+    return calcularAngulo(ANCHO_MIN/2, ALTO_MIN/2, mouseX, mouseY);
 }
 
-void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
+void EventHandler::procesarMouse(const SDL_Event &event)
 {
     if(event.type == SDL_MOUSEMOTION){
         
         ComandoDTO comando;
         comando.tipo = ROTACION;
-        comando.angulo = procesarPuntero(snapshot);
+        comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }
     else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         ComandoDTO comando;
         comando.tipo = DISPARO;
-        comando.angulo = procesarPuntero(snapshot);
+        comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }  else if (event.type == SDL_MOUSEWHEEL) {
         if (event.wheel.y < 0) {
@@ -115,7 +192,7 @@ void EventHandler::procesarMouse(const SDL_Event &event, Snapshot& snapshot)
     
 }
 
-void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snapshot)
+void EventHandler::manejarEventos(bool &jugador_activo)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event)){
@@ -123,10 +200,14 @@ void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snapshot)
             jugador_activo = false;
             //cola_enviador.try_push(CMD_EXIT);
             return;
-        } 
-        procesarMouse(event, snapshot);
-        procesarTeclado(event);
+        }
 
+        procesarCompra(event);
+
+        if(!mercado_abierto){
+            procesarMouse(event);
+            procesarMovimiento(event);
+        }
     }
 }
 

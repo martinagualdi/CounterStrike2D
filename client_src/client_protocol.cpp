@@ -29,17 +29,20 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_ROTACION);
       uint16_t angulo = static_cast<uint16_t>(comando.angulo * 100);      
       push_back_uint16(mensaje, angulo);
-   }else if (comando.tipo == CAMBIAR_ARMA){
+   }
+   else if (comando.tipo == CAMBIAR_ARMA){
       mensaje.push_back(PREFIJO_CAMBIO_ARMA);
    }
+   else if (comando.tipo == COMPRAR){
+      mensaje.push_back(PREFIJO_COMPRAR);
+      mensaje.push_back(static_cast<uint8_t>(comando.compra));
+   }
+
 }
 
 void ProtocoloCliente::enviarComando(ComandoDTO comando) {
-
    std::vector<uint8_t> mensaje;
-
    serializar_comando(comando, mensaje);
-
    if (!socket.sendall(mensaje.data(), mensaje.size())) {
       throw std::runtime_error("Error al enviar el comando");
    }
@@ -126,6 +129,28 @@ std::string ProtocoloCliente::recibir_lista_partidas() {
    socket.recvall(buffer.data(), largo);
    std::string lista_partidas(buffer.begin(), buffer.end());
    return lista_partidas;
+}
+
+void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
+   std::vector<uint8_t> buffer;
+   uint16_t largo = htons(static_cast<uint16_t>(mensaje.size()));
+   buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[0]);
+   buffer.push_back(reinterpret_cast<uint8_t*>(&largo)[1]);
+   buffer.insert(buffer.end(), mensaje.begin(), mensaje.end());
+   if (!socket.sendall(buffer.data(), buffer.size())) {
+      throw std::runtime_error("Error al enviar el mensaje");
+   }
+}
+
+std::string ProtocoloCliente::recibir_mapa() {
+   uint16_t largo;
+   if(!socket.recvall(&largo, sizeof(largo)))
+      throw std::runtime_error("Error del socket al recibir el mapa");
+   largo = ntohs(largo);
+   std::vector<uint8_t> buffer(largo);
+   socket.recvall(buffer.data(), largo);
+   std::string mapa(buffer.begin(), buffer.end());
+   return mapa;
 }
 
 ProtocoloCliente::~ProtocoloCliente(){

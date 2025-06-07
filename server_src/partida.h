@@ -20,13 +20,15 @@ private:
     std::mutex mtx;
 
 public:
-    Partida(const int codigo);
+    Partida(const int codigo, std::string yaml_partida);
 
     int get_codigo_partida() {return this->codigo_partida;};
 
     void agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
 
     Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
+
+    std::string obtener_mapa();
 };
 
 #endif

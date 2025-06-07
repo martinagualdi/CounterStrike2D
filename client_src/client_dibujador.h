@@ -3,9 +3,12 @@
 
 #include "../common_src/queue.h"
 #include "../common_src/snapshot.h"
+#include "client_event_handler.h"
 #include "client_parseador.h"
+#include "client_map.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2pp/Font.hh>
 #include <SDL2pp/SDL2pp.hh>
 
 #define ANCHO_MIN 960
@@ -18,17 +21,24 @@ class Dibujador{
 private:
     const int client_id;
     Renderer& renderer;
+    EventHandler& eventHandler;
+    Queue<Snapshot>& cola_recibidor;
+    std::vector<ElementoMapa> elementos;
     ParseadorSpriteSheets parseador;
-    Snapshot* snapshot;
-    
-    Texture fondo;
+    Snapshot snapshot;
+    Font fuente;
+    Font fuenteChica;
+    Color amarillo;
+    Texture fondo_mercado;
     Texture balas;
+    Texture cs2d;
     Texture dropped_bomb;
     Texture player_legs;
     Texture simbolos_hud;
     Texture numeros_hud;
     Texture sight;
     std::vector<Texture> armas;
+    std::vector<Texture> armas_mercado;
     std::vector<Texture> ct_players;
     std::vector<Texture> tt_players;
     SDL_Rect sprite_arma;
@@ -40,23 +50,27 @@ private:
     std::vector<SDL_Rect> sprites_numeros_hud;
     std::vector<int> separar_digitos(int n);
     float convertir_angulo(float angulo);
+    void convertir_a_pantalla(float pos_x, float pos_y, float& pantalla_x, float& pantalla_y);
     void convertir_coordenadas(float &x, float &y);
+    Texture crearTextoArma(std::string nombre, int precio);
     void dibujar_salud(int salud);
     void dibujar_saldo(int saldo);
     void dibujar_balas_hud(int balas);
     void dibujar_tiempo();
     void dibujar_jugadores();
-    void dibujar_fondo();
+    void dibujar_fondo(const ElementoMapa& elemento);
     void dibujar_balas();
     void dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin, enum ArmaEnMano arma);
     void dibujar_pies(float x, float y, float angulo);
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
     void dibujar_hud();
-
+    void dibujar_mercado();
+    void dibujar_mapa();
 public:
-    Dibujador(const int id, Renderer& renderer);
-    void renderizar(Snapshot* snapshot/*, bool& jugador_activo*/);
+    explicit Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa> elementos, 
+                EventHandler& handler, Queue<Snapshot>& cola_recibidor);
+    void renderizar();
     Dibujador(const Dibujador&) = delete;
     Dibujador& operator=(const Dibujador&) = delete;
     Dibujador(Dibujador&&) = default;

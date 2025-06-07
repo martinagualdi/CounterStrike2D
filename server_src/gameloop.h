@@ -8,6 +8,8 @@
 #include "../common_src/snapshot.h"
 #include "lista_queues.h"
 #include "../common_src/municion.h"
+#include "../common_src/mapa.h"
+
 
 class GameLoop : public Thread {
   private:
@@ -17,16 +19,20 @@ class GameLoop : public Thread {
     std::atomic<bool> activo;
     std::vector<Municion> balas_disparadas;
     std::atomic<bool> ultimo_unido_ct;
+    Mapa mapa;
 
 
-
+    bool jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y);
+    bool bala_golpea_jugador(const Municion &bala);
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
 
   public:
-    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores);
+    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);
 
     void agregar_jugador_a_partida(const int id);
+
+    std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
 
     virtual void run() override;
 };

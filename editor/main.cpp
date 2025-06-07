@@ -11,13 +11,14 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(lobby, &EditorLobby::crearMapaSolicitado, [=]() {
         auto* ventana = new MainWindow;
+        ventana->gettopWidget()->preguntarTamanioMapa();
         ventana->show();
         lobby->close();
     });
 
     QObject::connect(lobby, &EditorLobby::editarMapaSolicitado, [=]() {
         auto* seleccion = new EditorSeleccionMapa;
-        
+
         QObject::connect(seleccion, &EditorSeleccionMapa::mapaSeleccionado, [=](const QString& rutaYaml) {
             auto* ventana = new MainWindow;
             ventana->cargarDesdeYAML(rutaYaml);

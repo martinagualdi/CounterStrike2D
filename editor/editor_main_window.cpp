@@ -39,6 +39,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         topWidget->setDropMode(DropMode::ZONA_INICIO);
     });
 
+    QPushButton* botonPincelPiso = new QPushButton("Activar Pincel Piso");
+    botonPincelPiso->setFixedSize(180, 30);
+    topBarLayout->addWidget(botonPincelPiso);
+    connect(botonPincelPiso, &QPushButton::clicked, [this]() {
+        topWidget->setDropMode(DropMode::PINCEL_PISO);
+        topWidget->activarPincelPiso();
+    });
+
     QPushButton* saveButton = new QPushButton("Guardar");
     saveButton->setFixedSize(100, 30);
     topBarLayout->addWidget(saveButton);
@@ -65,7 +73,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Dust",  "editor/gfx/dust/" },
         { "Inferno", "editor/gfx/inferno/" },
         { "Armas", "editor/gfx/weapons/" },
-        { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
         { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
     };
 
@@ -100,7 +107,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
                         if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el negro y el magenta
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
                         }
                     }
                 }
@@ -121,8 +128,13 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 hLayout->addWidget(clickable);
             } else {
                 auto* draggable = new DraggableLabel(fullPath);
-                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
-                    topWidget->setDropMode(DropMode::OBJETO);
+                connect(draggable, &DraggableLabel::dragStarted, this, [this, fullPath]() {
+                    if (topWidget->estaPincelActivo()) {
+                        topWidget->setDropMode(DropMode::PINCEL_PISO);
+                        topWidget->setPisoPath(fullPath);
+                    } else {
+                        topWidget->setDropMode(DropMode::OBJETO);
+                    }
                 });
                 draggable->setPixmap(pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 draggable->setFixedSize(100, 100);
@@ -136,6 +148,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);
+}
+
+TopWidget* MainWindow::gettopWidget() const {
+    return this->topWidget;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
@@ -199,7 +215,7 @@ void MainWindow::guardarMapa() {
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        "",
+        "editor/mapas",
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
@@ -218,24 +234,32 @@ void MainWindow::guardarMapa() {
 
     QTextStream out(&file);
     out << "fondo: " << topWidget->getFondoPath() << "\n";
+
+    out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
+    out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
+
     out << "elementos:\n";
 
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
-        out << "  - imagen: " << e.path << "\n";
+        QString rutaRelativa = e.path.mid(e.path.indexOf("/editor"));
+        out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
+        out << "    ancho: " << e.ancho << "\n";
+        out << "    alto: " << e.alto << "\n";
     }
 
+    out << "zonas:\n";
     for (const auto& zona : topWidget->getZonas()) {
-    out << "  - tipo: " << zona.tipo << "\n";
-    out << "    x: " << int(zona.rect.x()) << "\n";
-    out << "    y: " << int(zona.rect.y()) << "\n";
-    out << "    ancho: " << int(zona.rect.width()) << "\n";
-    out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "  - tipo: " << zona.tipo << "\n";
+        out << "    x: " << int(zona.rect.x()) << "\n";
+        out << "    y: " << int(zona.rect.y()) << "\n";
+        out << "    ancho: " << int(zona.rect.width()) << "\n";
+        out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "    id: \"" << zona.id.toString(QUuid::WithoutBraces) << "\"\n";
     }
-
 
     file.close();
     QApplication::quit();
@@ -244,31 +268,48 @@ void MainWindow::guardarMapa() {
 void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());
 
+    int ancho = root["ancho_max_mapa"] ? root["ancho_max_mapa"].as<int>() : 2048;
+    int alto  = root["alto_max_mapa"] ? root["alto_max_mapa"].as<int>() : 2048;
+    topWidget->setTamanioMapaDesdeYAML(ancho, alto);
+
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
+    QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(fondo);
+    topWidget->setBackgroundPath(basePath + fondo);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        if (elemento["imagen"]) {
-
-            QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-
-            QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
-            topWidget->agregarElemento(imagen, x, y);
-        } else if (elemento["tipo"] && elemento["ancho"] && elemento["alto"]) {
-
-            QString tipoZona = QString::fromStdString(elemento["tipo"].as<std::string>());
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-            int ancho = elemento["ancho"].as<int>();
-            int alto = elemento["alto"].as<int>();
-            QRectF rect(x, y, ancho, alto);
-            topWidget->agregarZona(rect, tipoZona);
-        }
+        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+        QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
+        int x = elemento["x"].as<int>();
+        int y = elemento["y"].as<int>();
+        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
+        topWidget->agregarElemento(fullPath, x, y);
     }
+
+    const auto& zonas = root["zonas"];
+    for (const auto& zona : zonas) {
+        QString tipoZona = QString::fromStdString(zona["tipo"].as<std::string>());
+        int x = zona["x"].as<int>();
+        int y = zona["y"].as<int>();
+        int ancho = zona["ancho"].as<int>();
+        int alto = zona["alto"].as<int>();
+        QRectF rect(x, y, ancho, alto);
+
+        QUuid id;
+        try {
+            if (zona["id"]) {
+                std::string idStr = zona["id"].as<std::string>();
+                id = QUuid(QString::fromStdString(idStr));
+            } else {
+                id = QUuid::createUuid();
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "Error al convertir el id de zona a string:" << e.what() << "- Se generará un UUID nuevo.";
+            id = QUuid::createUuid();
+        }
+
+        topWidget->agregarZona(rect, tipoZona, id);
+    }
+
 }
-
-

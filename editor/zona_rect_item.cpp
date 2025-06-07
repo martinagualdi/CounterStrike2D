@@ -5,11 +5,11 @@
 #include <QGraphicsScene>
 #include <QInputDialog>
 
-ZonaRectItem::ZonaRectItem(const QRectF& rect, const QString& tipo, QGraphicsItem* parent)
-    : QGraphicsRectItem(rect, parent), label(nullptr), tipo(tipo) {
+ZonaRectItem::ZonaRectItem(const QRectF& rect, const QString& tipo, QUuid id, QGraphicsItem* parent)
+    : QGraphicsRectItem(rect, parent), label(nullptr), tipo(tipo), id(id) {
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
     setPen(QPen(Qt::DashLine));
-    setZValue(1);
+    setZValue(10);
 }
 
 void ZonaRectItem::setTexto(const QString& texto) {
@@ -27,7 +27,7 @@ void ZonaRectItem::setTexto(const QString& texto) {
     QRectF r = rect();
     QRectF textRect = label->boundingRect();
     label->setPos(r.center().x() - textRect.width() / 2, r.center().y() - textRect.height() / 2);
-    label->setZValue(2);
+    label->setZValue(11);
 }
 
 void ZonaRectItem::setColor(const QColor& color) {
@@ -49,6 +49,14 @@ void ZonaRectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
         setColor(color);
         emit tipoZonaCambiado(this, tipo);
     }
+}
+
+QVariant ZonaRectItem::itemChange(GraphicsItemChange change, const QVariant& value) {
+    if (change == ItemPositionHasChanged) {
+        if (!resizing)
+            emit zonaRectActualizado(this);
+    }
+    return QGraphicsRectItem::itemChange(change, value);
 }
 
 void ZonaRectItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
@@ -74,8 +82,10 @@ void ZonaRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
         newRect.setHeight(std::max(10.0, newRect.height() + delta.y()));
         setRect(newRect);
         setTexto(label->toPlainText());
+        emit zonaRectActualizado(this);
     } else {
         QGraphicsRectItem::mouseMoveEvent(event);
+        emit zonaRectActualizado(this);
     }
 }
 
@@ -83,7 +93,12 @@ void ZonaRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
     if (resizing) {
         resizing = false;
         event->accept();
+
+        if (rect() != originalRect) {
+            emit zonaRectActualizado(this);
+        }
     } else {
         QGraphicsRectItem::mouseReleaseEvent(event);
     }
 }
+

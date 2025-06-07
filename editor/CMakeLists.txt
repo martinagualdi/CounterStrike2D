@@ -8,6 +8,7 @@ target_sources(taller_editor
     editor_lobby.cpp
     editor_seleccion_mapa.cpp
     zona_rect_item.cpp
+    grid_pixmap_item.cpp
     PUBLIC
     editor_main_window.h
     clickable_label.h
@@ -16,4 +17,5 @@ target_sources(taller_editor
     editor_lobby.h
     editor_seleccion_mapa.h
     zona_rect_item.h
+    grid_pixmap_item.h
     )

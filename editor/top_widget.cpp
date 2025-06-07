@@ -1,5 +1,6 @@
 #include "top_widget.h"
 #include "zona_rect_item.h"
+#include "grid_pixmap_item.h"
 #include <QMimeData>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
@@ -289,10 +290,9 @@ void TopWidget::dropEvent(QDropEvent* event) {
         int y = int(scenePos.y()) / gridSize * gridSize;
 
         if (currentMode == DropMode::OBJETO) {
-            auto* item = new QGraphicsPixmapItem(pix);
+            auto* item = new GridPixmapItem(pix, gridSize);
             item->setPos(x, y);
             item->setZValue(1);
-            item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 
             QString tipo = "otros";
             if (path.contains("plantacion_bombas"))
@@ -491,10 +491,9 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
 void TopWidget::agregarElemento(const QString& path, int x, int y) {
     QPixmap pixmap = filtrarFondo(path);
     if (!pixmap.isNull()) {
-        auto* item = new QGraphicsPixmapItem(pixmap);
+        auto* item = new GridPixmapItem(pix, gridSize);
         item->setPos(x, y);
         item->setZValue(1);
-        item->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 
         QString tipo = "otros";
         if (path.contains("plantacion_bombas"))

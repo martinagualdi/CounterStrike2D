@@ -9,7 +9,7 @@ ZonaRectItem::ZonaRectItem(const QRectF& rect, const QString& tipo, QUuid id, QG
     : QGraphicsRectItem(rect, parent), label(nullptr), tipo(tipo), id(id) {
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
     setPen(QPen(Qt::DashLine));
-    setZValue(1);
+    setZValue(10);
 }
 
 void ZonaRectItem::setTexto(const QString& texto) {
@@ -27,7 +27,7 @@ void ZonaRectItem::setTexto(const QString& texto) {
     QRectF r = rect();
     QRectF textRect = label->boundingRect();
     label->setPos(r.center().x() - textRect.width() / 2, r.center().y() - textRect.height() / 2);
-    label->setZValue(2);
+    label->setZValue(11);
 }
 
 void ZonaRectItem::setColor(const QColor& color) {

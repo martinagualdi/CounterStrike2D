@@ -380,6 +380,7 @@ void TopWidget::mouseMoveEvent(QMouseEvent* event) {
         QRectF rect(zonaStartPoint, currentPos);
         if (!zonaPreview) {
             zonaPreview = scene()->addRect(rect.normalized(), QPen(Qt::blue, 2, Qt::DashLine));
+            zonaPreview->setZValue(100);
         } else {
             zonaPreview->setRect(rect.normalized());
         }

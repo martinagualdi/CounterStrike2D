@@ -39,6 +39,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         topWidget->setDropMode(DropMode::ZONA_INICIO);
     });
 
+    QPushButton* botonPincelPiso = new QPushButton("Activar Pincel Piso");
+    botonPincelPiso->setFixedSize(180, 30);
+    topBarLayout->addWidget(botonPincelPiso);
+    connect(botonPincelPiso, &QPushButton::clicked, [this]() {
+        topWidget->setDropMode(DropMode::PINCEL_PISO);
+        topWidget->activarPincelPiso();
+    });
+
     QPushButton* saveButton = new QPushButton("Guardar");
     saveButton->setFixedSize(100, 30);
     topBarLayout->addWidget(saveButton);
@@ -120,8 +128,13 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 hLayout->addWidget(clickable);
             } else {
                 auto* draggable = new DraggableLabel(fullPath);
-                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
-                    topWidget->setDropMode(DropMode::OBJETO);
+                connect(draggable, &DraggableLabel::dragStarted, this, [this, fullPath]() {
+                    if (topWidget->estaPincelActivo()) {
+                        topWidget->setDropMode(DropMode::PINCEL_PISO);
+                        topWidget->setPisoPath(fullPath);
+                    } else {
+                        topWidget->setDropMode(DropMode::OBJETO);
+                    }
                 });
                 draggable->setPixmap(pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 draggable->setFixedSize(100, 100);

@@ -51,6 +51,9 @@ En ambos casos tener las siguientes consideraciones:
 
 - Para posicionar un elemento se utiliza **drag and drop**, arrastrar la imagen a la posición deseada. 
 
+- Para "pintar" el piso se cuenta con un boton **activar pincel piso** el cual al ser clickeado transforma el cursos en un pincel para los sprites de pisos, es decir, cuando clickeamos el boton se activa dicho modo luego hay que clickear sobre el piso deseado y pintar la pantalla. Para pintar lo que hay que hacer es hacer click en la zona donde queres comenzar a pintar y arrastrar el mouse presionado, una vez que se deja de presionar le mousee el modo se desactivará. 
+**IMPORTANTE:** si el modo pincel no esta activado podemos colocar pisos individualmente como cualquier otro objeto. Ademas una vez pintado cada piso en su individualidad podrá ser movido o eliminado al igual que el resto de los elementos. 
+
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
 Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Para que un mapa pueda ser utilizado en el juego, su respectivo .yml debe ser movido **manualmente** al servidor en la carpeta correspondiente.

@@ -9,7 +9,8 @@
 enum class DropMode {
     FONDO,
     OBJETO,
-    ZONA_INICIO
+    ZONA_INICIO,
+    PINCEL_PISO
 };
 
 struct ElementoMapa {
@@ -42,6 +43,9 @@ public:
     void setTamanioMapaDesdeYAML(int ancho, int alto);
     int getMaxAncho() const { return maxAncho; }
     int getMaxAlto() const { return maxAlto; }
+    void setPisoPath(const QString& path);
+    void activarPincelPiso();
+    bool estaPincelActivo() const;
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
@@ -54,6 +58,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     QPixmap filtrarFondo(const QString& path);
+    void pintarPisoEnPosicion(const QPoint& pos);
 
 private:
     QPixmap backgroundPixmap;
@@ -66,6 +71,10 @@ private:
     QPointF zonaStartPoint;
     QGraphicsRectItem* zonaPreview = nullptr;
     bool tamanioEstablecidoDesdeYAML = false;
+    QString currentPisoPath;
+    bool mousePressed = false;
+    QSet<QPoint> celdasPintadas;
+    bool pincelActivo = false;
     
     int maxAncho = 2048;
     int maxAlto = 2048;

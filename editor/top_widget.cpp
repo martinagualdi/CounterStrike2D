@@ -110,6 +110,13 @@ void TopWidget::preguntarTamanioMapa() {
     setSceneRect(0, 0, ancho, alto);
 }
 
+void TopWidget::activarPincelPiso(){
+    pincelActivo = true;
+}
+
+bool TopWidget::estaPincelActivo() const {
+    return pincelActivo;
+}
 
 void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
     setSceneRect(0, 0, ancho, alto);
@@ -322,6 +329,34 @@ void TopWidget::dropEvent(QDropEvent* event) {
     event->acceptProposedAction();
 }
 
+void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
+    QPointF scenePos = mapToScene(pos);
+    int x = int(scenePos.x()) / gridSize * gridSize;
+    int y = int(scenePos.y()) / gridSize * gridSize;
+    QPoint celda(x, y);
+
+    if (celdasPintadas.contains(celda))
+        return;
+
+    celdasPintadas.insert(celda);
+
+    QPixmap pix(currentPisoPath);
+    if (!pix.isNull()) {
+        auto* item = new GridPixmapItem(pix, gridSize);
+        item->setPos(x, y);
+        item->setZValue(1);
+        item->setData(0, currentPisoPath);
+        item->setData(1, "piso");
+        item->setData(2, pix.width());
+        item->setData(3, pix.height());
+        scene()->addItem(item);
+    }
+}
+
+void TopWidget::setPisoPath(const QString& path) {
+    currentPisoPath = path;
+}
+
 void TopWidget::mousePressEvent(QMouseEvent* event) {
     if (currentMode == DropMode::ZONA_INICIO) {
         zonaStartPoint = mapToScene(event->pos());
@@ -330,6 +365,10 @@ void TopWidget::mousePressEvent(QMouseEvent* event) {
             delete zonaPreview;
             zonaPreview = nullptr;
         }
+    } else if (currentMode == DropMode::PINCEL_PISO && !currentPisoPath.isEmpty()) {
+        mousePressed = true;
+        celdasPintadas.clear();
+        pintarPisoEnPosicion(event->pos());
     } else {
         QGraphicsView::mousePressEvent(event);
     }
@@ -344,8 +383,60 @@ void TopWidget::mouseMoveEvent(QMouseEvent* event) {
         } else {
             zonaPreview->setRect(rect.normalized());
         }
-    } else {
+    } else if(mousePressed && currentMode == DropMode::PINCEL_PISO && !currentPisoPath.isEmpty()){
+        pintarPisoEnPosicion(event->pos());
+    }else {
         QGraphicsView::mouseMoveEvent(event);
+    }
+}
+
+void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
+    if (currentMode == DropMode::ZONA_INICIO && zonaPreview) {
+        QString tipo = pedirTipoZona();
+        if (tipo.isEmpty()) {
+            limpiarPreviewZona();
+            return;
+        }
+
+        if (!validarCantidadZonas(tipo)) {
+            limpiarPreviewZona();
+            return;
+        }
+
+        QRectF rect = zonaPreview->rect();
+
+        QUuid uuid = QUuid::createUuid();
+        auto* zonaItem = new ZonaRectItem(rect, tipo, uuid);
+        conectarCambioTipo(zonaItem);
+        conectarActualizacionRect(zonaItem);
+
+        QColor color = colorParaTipo(tipo);
+        QString texto = textoParaTipo(tipo);
+
+        zonaItem->setColor(color);
+        zonaItem->setTexto(texto);
+        scene()->addItem(zonaItem);
+
+        if (tipo == "zona_bombas")
+            agregarImagenBomba(rect);
+
+        ZonaMapa zona;
+        zona.rect = rect;
+        zona.tipo = tipo;
+        zona.id = zonaItem->getId();
+        zonasInicio.append(zona);
+
+        emit zonaCreada(tipo, rect);
+
+        currentMode = DropMode::OBJETO;
+        limpiarPreviewZona();
+    } else if (currentMode == DropMode::PINCEL_PISO){
+        pincelActivo = false;
+        mousePressed = false;
+        celdasPintadas.clear();
+        setDropMode(DropMode::OBJETO);
+    } else{
+        QGraphicsView::mouseReleaseEvent(event);
     }
 }
 
@@ -441,51 +532,6 @@ void TopWidget::limpiarPreviewZona() {
     scene()->removeItem(zonaPreview);
     delete zonaPreview;
     zonaPreview = nullptr;
-}
-
-void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
-    if (currentMode == DropMode::ZONA_INICIO && zonaPreview) {
-        QString tipo = pedirTipoZona();
-        if (tipo.isEmpty()) {
-            limpiarPreviewZona();
-            return;
-        }
-
-        if (!validarCantidadZonas(tipo)) {
-            limpiarPreviewZona();
-            return;
-        }
-
-        QRectF rect = zonaPreview->rect();
-
-        QUuid uuid = QUuid::createUuid();
-        auto* zonaItem = new ZonaRectItem(rect, tipo, uuid);
-        conectarCambioTipo(zonaItem);
-        conectarActualizacionRect(zonaItem);
-
-        QColor color = colorParaTipo(tipo);
-        QString texto = textoParaTipo(tipo);
-
-        zonaItem->setColor(color);
-        zonaItem->setTexto(texto);
-        scene()->addItem(zonaItem);
-
-        if (tipo == "zona_bombas")
-            agregarImagenBomba(rect);
-
-        ZonaMapa zona;
-        zona.rect = rect;
-        zona.tipo = tipo;
-        zona.id = zonaItem->getId();
-        zonasInicio.append(zona);
-
-        emit zonaCreada(tipo, rect);
-
-        currentMode = DropMode::OBJETO;
-        limpiarPreviewZona();
-    } else {
-        QGraphicsView::mouseReleaseEvent(event);
-    }
 }
 
 void TopWidget::agregarElemento(const QString& path, int x, int y) {

@@ -502,7 +502,6 @@ QColor TopWidget::colorParaTipo(const QString& tipo) const {
 QString TopWidget::textoParaTipo(const QString& tipo) const {
     if (tipo == "inicio_ct") return "CT";
     if (tipo == "inicio_tt") return "TT";
-    if (tipo == "zona_bombas") return "BOMBAS";
     return "";
 }
 

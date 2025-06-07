@@ -21,15 +21,19 @@ TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
 }
 
 int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, int valorPorDefecto) {
-    QInputDialog dialog(this);
-    dialog.setLabelText(label);
-    dialog.setWindowTitle(titulo);
-    dialog.setInputMode(QInputDialog::IntInput);
-    dialog.setIntMinimum(500);
-    dialog.setIntMaximum(10000);
-    dialog.setIntStep(64);
-    dialog.setIntValue(valorPorDefecto);
+    QStringList opciones;
+    for (int i = 640; i <= 2048; i += 32) {
+        opciones << QString::number(i);
+    }
 
+    QInputDialog dialog(this);
+    dialog.setComboBoxItems(opciones);
+    dialog.setWindowTitle(titulo);
+    dialog.setLabelText(label);
+    dialog.setOption(QInputDialog::UseListViewForComboBoxItems); // activa scroll automático
+    dialog.setTextValue(QString::number(valorPorDefecto));
+
+    // Estilo opcional (como tenías antes)
     QString estilo = R"(
         QInputDialog {
             background-color: #2c2c2c;
@@ -39,53 +43,33 @@ int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, i
         QLabel {
             color: white;
         }
-        QLineEdit, QSpinBox {
+        QComboBox, QLineEdit {
             background-color: #444;
             color: white;
             border: 1px solid #888;
             border-radius: 5px;
             padding: 4px;
         }
-        QSpinBox::up-button {
-            subcontrol-origin: border;
-            subcontrol-position: top right;
-            width: 20px;
-            border-left: 1px solid #888;
-            background-color: #555;
+        QScrollBar:vertical {
+            background: #333;
+            width: 12px;
         }
-        QSpinBox::down-button {
-            subcontrol-origin: border;
-            subcontrol-position: bottom right;
-            width: 20px;
-            border-left: 1px solid #888;
-            background-color: #555;
+        QScrollBar::handle:vertical {
+            background: #888;
+            min-height: 20px;
         }
-        QSpinBox::up-arrow {
-            image: none;
-            color: white;
-            font-size: 12px;
-            qproperty-text: "▲";
-        }
-        QSpinBox::down-arrow {
-            image: none;
-            color: white;
-            font-size: 12px;
-            qproperty-text: "▼";
-        }
-        QPushButton {
-            background-color: #3498db;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-        }
-        QPushButton:hover {
-            background-color: #2980b9;
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0px;
         }
     )";
-
     dialog.setStyleSheet(estilo);
 
-    return (dialog.exec() == QDialog::Accepted) ? dialog.intValue() : -1;
+    if (dialog.exec() == QDialog::Accepted) {
+        return dialog.textValue().toInt();
+    }
+
+    return -1;
 }
 
 void TopWidget::preguntarTamanioMapa() {

@@ -250,31 +250,52 @@ void MainWindow::guardarMapa() {
 void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());
 
+    int ancho = root["ancho_max_mapa"] ? root["ancho_max_mapa"].as<int>() : 2048;
+    int alto  = root["alto_max_mapa"] ? root["alto_max_mapa"].as<int>() : 2048;
+    topWidget->setTamanioMapaDesdeYAML(ancho, alto);
+
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
+    if (!fondo.startsWith('/'))
+        fondo.prepend('/');
+    QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(fondo);
+    topWidget->setBackgroundPath(basePath + fondo);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        if (elemento["imagen"]) {
-
-            QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-
-            QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
-            topWidget->agregarElemento(imagen, x, y);
-        } else if (elemento["tipo"] && elemento["ancho"] && elemento["alto"]) {
-
-            QString tipoZona = QString::fromStdString(elemento["tipo"].as<std::string>());
-            int x = elemento["x"].as<int>();
-            int y = elemento["y"].as<int>();
-            int ancho = elemento["ancho"].as<int>();
-            int alto = elemento["alto"].as<int>();
-            QRectF rect(x, y, ancho, alto);
-            topWidget->agregarZona(rect, tipoZona);
-        }
+        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+        if (!imagen.startsWith('/'))
+            imagen.prepend('/');
+        QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
+        int x = elemento["x"].as<int>();
+        int y = elemento["y"].as<int>();
+        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
+        topWidget->agregarElemento(fullPath, x, y);
     }
+
+    const auto& zonas = root["zonas"];
+    for (const auto& zona : zonas) {
+        QString tipoZona = QString::fromStdString(zona["tipo"].as<std::string>());
+        int x = zona["x"].as<int>();
+        int y = zona["y"].as<int>();
+        int ancho = zona["ancho"].as<int>();
+        int alto = zona["alto"].as<int>();
+        QRectF rect(x, y, ancho, alto);
+
+        QUuid id;
+        try {
+            if (zona["id"]) {
+                std::string idStr = zona["id"].as<std::string>();
+                id = QUuid(QString::fromStdString(idStr));
+            } else {
+                id = QUuid::createUuid();
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "Error al convertir el id de zona a string:" << e.what() << "- Se generará un UUID nuevo.";
+            id = QUuid::createUuid();
+        }
+
+        topWidget->agregarZona(rect, tipoZona, id);
+    }
+
 }
-
-

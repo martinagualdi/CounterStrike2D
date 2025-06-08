@@ -17,7 +17,9 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     previewLabel = new QLabel("Previsualización del mapa", this);
     QPushButton* okButton = new QPushButton("Aceptar", this);
 
-    previewLabel->setFixedSize(300, 300); 
+    previewLabel->setMinimumSize(256, 256);
+    previewLabel->setMaximumSize(256, 256);
+    previewLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     // Estética
     titulo->setAlignment(Qt::AlignLeft);
@@ -50,8 +52,9 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
         QLabel {
             background-color: #222;
             color: white;
-            padding: 10px;
-            border: 2px solid #aaa;
+            padding: 0px;
+            border: none;
+            margin: 0px;
         }
     )");
 
@@ -84,7 +87,6 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     // Guardamos el mapeo
     for (const auto& par : mapas) {
         QListWidgetItem* item = new QListWidgetItem(par.first);
-        item->setToolTip("Preview disponible a la derecha");
         listaMapas->addItem(item);
         this->mapaToMiniatura[par.first] = par.second;
     }
@@ -106,7 +108,12 @@ void MapSelectionDialog::mostrarPreview(QListWidgetItem* item) {
 
     if (QFile::exists(fullPath)) {
         QPixmap miniatura(fullPath);
-        previewLabel->setPixmap(miniatura.scaled(previewLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        previewLabel->clear();  // Limpiar cualquier texto o imagen anterior
+        previewLabel->setPixmap(miniatura.scaled(
+            previewLabel->size(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        ));
     } else {
         previewLabel->setText("No se encontró la miniatura para:\n" + nombreMapa);
     }

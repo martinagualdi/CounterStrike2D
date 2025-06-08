@@ -26,6 +26,9 @@ private:
     Renderer& renderer;
     std::unordered_map<std::string, std::shared_ptr<Texture>> cache;
     std::vector<ElementoMapa> elementos;
+    int ancho_max_mapa;
+    int alto_max_mapa;
+    //std::vector<ZonaRectItem> zonas;
     std::shared_ptr<Texture> cargarTextura(const char* path);
 
 public:

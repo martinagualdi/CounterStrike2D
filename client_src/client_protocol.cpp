@@ -151,6 +151,25 @@ std::string ProtocoloCliente::recibir_mapa() {
    return yaml_serializado;
 }
 
+std::vector<std::string> ProtocoloCliente::recibir_lista_mapas() {
+    uint8_t cantidad;
+    socket.recvall(&cantidad, 1);
+
+    std::vector<std::string> mapas;
+    for (int i = 0; i < cantidad; ++i) {
+        uint16_t largo_red;
+        socket.recvall(&largo_red, sizeof(largo_red));
+        uint16_t largo = ntohs(largo_red);
+
+        std::vector<char> buffer(largo);
+        socket.recvall(buffer.data(), largo);
+
+        mapas.emplace_back(buffer.begin(), buffer.end());
+    }
+
+    return mapas;
+}
+
 ProtocoloCliente::~ProtocoloCliente(){
    socket.shutdown(RW_CLOSE);
    socket.close();

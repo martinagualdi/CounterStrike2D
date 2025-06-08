@@ -170,3 +170,16 @@ void ServerProtocol::enviar_mapa(const std::string& yaml_serializado){
     skt.sendall(header, 4);
     skt.sendall((uint8_t*)yaml_serializado.data(), yaml_serializado.size());
 }
+
+void ServerProtocol::enviar_lista_mapas(const std::vector<std::string>& mapas) {
+    uint8_t cantidad = mapas.size();
+    skt.sendall(&cantidad, 1);
+
+    for (const auto& nombre : mapas) {
+        uint16_t largo = nombre.size();
+        uint16_t largo_red = htons(largo);
+
+        skt.sendall(&largo_red, sizeof(largo_red));
+        skt.sendall((uint8_t*)nombre.data(), largo);
+    }
+}

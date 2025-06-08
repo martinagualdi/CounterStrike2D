@@ -217,12 +217,17 @@ void MainWindow::guardarMapa() {
     }
 
     QTextStream out(&file);
-    out << "fondo: " << topWidget->getFondoPath() << "\n";
+    if (fondoPath.startsWith('/'))
+        fondoPath.remove(0, 1);
+    out << "fondo: " << fondoPath << "\n";
     out << "elementos:\n";
 
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
-        out << "  - imagen: " << e.path << "\n";
+        QString path = e.path;
+        if (path.startsWith('/'))
+            path.remove(0, 1);
+        out << "  - imagen: " << path << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";

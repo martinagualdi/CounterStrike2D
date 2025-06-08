@@ -20,6 +20,8 @@ private:
     Sender s;
     int id_client;
 
+    std::vector<std::string> listar_mapas_disponibles();
+
   public:
     explicit ClientHandler(Socket skt, MonitorPartidas& monitor_partidas, int id);
 

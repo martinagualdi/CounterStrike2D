@@ -1,7 +1,7 @@
 #include "clienthandler.h"
 
 #include <utility>
-
+#include <filesystem>
 #include <syslog.h>
 
 #include "../common_src/liberror.h"
@@ -16,6 +16,20 @@ ClientHandler::ClientHandler(Socket s, MonitorPartidas& monitor_partidas, int id
     s(protocolo, queue_enviadora, is_alive, id), 
     id_client(id) {}
 
+std::vector<std::string> ClientHandler::listar_mapas_disponibles() {
+    namespace fs = std::filesystem;
+    std::vector<std::string> mapas;
+
+    const std::string ruta = "server_src/mapas_disponibles";
+    for (const auto& entry : fs::directory_iterator(ruta)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".yaml") {
+            mapas.push_back(entry.path().filename().string());  // solo el nombre
+        }
+    }
+
+    return mapas;
+}
+
 void ClientHandler::comunicacion_del_lobby() {
     int partida_id;
     while (is_alive) {
@@ -26,7 +40,10 @@ void ClientHandler::comunicacion_del_lobby() {
                 Aca iria la logica de elegir el mapa, que se debe recibir via socket el yaml del mapa
                 y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
                 */
+                std::vector<std::string> mapas_disponibles = listar_mapas_disponibles();
+                protocolo.enviar_lista_mapas(mapas_disponibles);
                 std::string path = protocolo.recibir_path_mapa(); 
+                path = "server_src/mapas_disponibles/" + path;
                 partida_id = monitor_partidas.crear_partida(id_client, queue_enviadora, path);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocolo.enviar_mapa(yaml_serializado);

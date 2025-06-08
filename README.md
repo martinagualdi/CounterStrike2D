@@ -85,9 +85,11 @@ En ambos casos tener las siguientes consideraciones:
 
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
-Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Para que un mapa pueda ser utilizado en el juego, su respectivo .yml debe ser movido **manualmente** al servidor en la carpeta correspondiente.
+Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Al guardar un mapa se guardarán dos cosas: un **.yaml** y un **.jpg**, este ultimo es una imagen que se usaŕa de previsualizacion para la seleccion de mapa en el cliente. 
 
-Al momento de editar un mapa ya existe se abre automaticamente esa carpeta para que se seleccione el mapa deseado, luego de finalizar la edición se debe guardar con el mismo nombre para reemplazar el archivo existente por el nuevo que contiene los cambios realizados. 
+Para que un mapa pueda ser utilizado en el juego, su respectivo .yml y .jpg deben ser movidos **manualmente** al servidor en la carpeta **mapas_disponibles**.
+
+Al momento de editar un mapa ya existe se abre automaticamente esa carpeta (del editor) para que se seleccione el mapa deseado (el .yaml). Al finalizar la edición se debe guardar con el mismo nombre para reemplazar ambos archivos existentes por los nuevos que contienen los cambios realizados. 
 
 Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion de bombas el editor cuenta con un boton **Marcar zona** una vez presionado se habilita para marcar una zona cualquiera con el cursor. Al finalizar la seleccion se consultara a que zona hace referencia lo marcado (inicio_ct, inicio_tt o zona_bombas). 
 

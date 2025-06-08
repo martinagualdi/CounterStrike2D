@@ -601,3 +601,15 @@ QPixmap TopWidget::filtrarFondo(const QString& path) {
 
     return QPixmap::fromImage(img);
 }
+
+QImage TopWidget::generarMiniatura(const QRectF& area, const QSize& destino) {
+    QRectF renderArea = area.isNull() ? this->scene()->sceneRect() : area;
+
+    QImage imagen(renderArea.size().toSize(), QImage::Format_ARGB32);
+    imagen.fill(Qt::transparent);
+
+    QPainter painter(&imagen);
+    this->scene()->render(&painter, QRectF(QPointF(0, 0), renderArea.size()), renderArea);
+    return imagen.scaled(destino, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+

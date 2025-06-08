@@ -164,15 +164,24 @@ void ServerProtocol::enviar_mapa(const std::string& yaml_serializado){
     skt.sendall((uint8_t*)yaml_serializado.data(), yaml_serializado.size());
 }
 
-void ServerProtocol::enviar_lista_mapas(const std::vector<std::string>& mapas) {
+void ServerProtocol::enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas) {
     uint8_t cantidad = mapas.size();
-    skt.sendall(&cantidad, 1);
+    skt.sendall(&cantidad, 1);  // Enviamos la cantidad de pares (mapa, imagen)
 
-    for (const auto& nombre : mapas) {
-        uint16_t largo = nombre.size();
-        uint16_t largo_red = htons(largo);
+    for (const auto& par : mapas) {
+        const std::string& nombre_mapa = par.first;
+        const std::string& imagen_miniatura = par.second;
 
-        skt.sendall(&largo_red, sizeof(largo_red));
-        skt.sendall((uint8_t*)nombre.data(), largo);
+        // Enviar nombre del mapa
+        uint16_t largo_nombre = nombre_mapa.size();
+        uint16_t largo_nombre_red = htons(largo_nombre);
+        skt.sendall(&largo_nombre_red, sizeof(largo_nombre_red));
+        skt.sendall((uint8_t*)nombre_mapa.data(), largo_nombre);
+
+        // Enviar nombre de la miniatura
+        uint16_t largo_img = imagen_miniatura.size();
+        uint16_t largo_img_red = htons(largo_img);
+        skt.sendall(&largo_img_red, sizeof(largo_img_red));
+        skt.sendall((uint8_t*)imagen_miniatura.data(), largo_img);
     }
 }

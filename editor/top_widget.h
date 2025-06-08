@@ -46,6 +46,8 @@ public:
     void setPisoPath(const QString& path);
     void activarPincelPiso();
     bool estaPincelActivo() const;
+    QImage generarMiniatura(const QRectF& area = QRectF(), const QSize& destino = QSize(256, 256));
+
 
 protected:
     void drawBackground(QPainter* painter, const QRectF& rect) override;

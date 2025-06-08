@@ -31,7 +31,7 @@ public:
 
     void enviar_mapa(const std::string& yaml_serializado);
 
-    void enviar_lista_mapas(const std::vector<std::string>& mapas);
+    void enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas);
     /*
     
     IDEA:

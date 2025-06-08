@@ -154,23 +154,32 @@ std::string ProtocoloCliente::recibir_mapa() {
    return yaml_serializado;
 }
 
-std::vector<std::string> ProtocoloCliente::recibir_lista_mapas() {
-    uint8_t cantidad;
+std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista_mapas() {
+    uint8_t cantidad = 0;
     socket.recvall(&cantidad, 1);
 
-    std::vector<std::string> mapas;
-    for (int i = 0; i < cantidad; ++i) {
-        uint16_t largo_red;
-        socket.recvall(&largo_red, sizeof(largo_red));
-        uint16_t largo = ntohs(largo_red);
+    std::vector<std::pair<std::string, std::string>> resultado;
+    for (uint8_t i = 0; i < cantidad; ++i) {
+        // Recibir nombre del mapa
+        uint16_t len_nombre = 0;
+        socket.recvall(&len_nombre, 2);
+        len_nombre = ntohs(len_nombre);
 
-        std::vector<char> buffer(largo);
-        socket.recvall(buffer.data(), largo);
+        std::string nombre_mapa(len_nombre, '\0');
+        socket.recvall((uint8_t*)nombre_mapa.data(), len_nombre);
 
-        mapas.emplace_back(buffer.begin(), buffer.end());
+        // Recibir nombre de la imagen
+        uint16_t len_img = 0;
+        socket.recvall(&len_img, 2);
+        len_img = ntohs(len_img);
+
+        std::string nombre_img(len_img, '\0');
+        socket.recvall((uint8_t*)nombre_img.data(), len_img);
+
+        resultado.emplace_back(nombre_mapa, nombre_img);
     }
 
-    return mapas;
+    return resultado;
 }
 
 ProtocoloCliente::~ProtocoloCliente(){

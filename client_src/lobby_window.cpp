@@ -1,5 +1,6 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
+#include "map_selection.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -90,45 +91,34 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
-
 void LobbyWindow::onCrearClicked() {
     protocolo.enviar_crear_partida();
 
-    std::vector<std::string> mapas_disponibles = protocolo.recibir_lista_mapas();
-
+    std::vector<std::pair<std::string, std::string>> mapas_disponibles = protocolo.recibir_lista_mapas();
     if (mapas_disponibles.empty()) {
         QMessageBox::warning(this, "Error", "No se recibieron mapas desde el servidor.");
         return;
     }
 
-    QStringList lista_mapas;
+    // Convertimos a QVector de pares de QString
+    QVector<QPair<QString, QString>> lista_mapas;
     for (const auto& m : mapas_disponibles) {
-        lista_mapas << QString::fromStdString(m);
+        QString nombre = QString::fromStdString(m.first);
+        QString miniatura = QString::fromStdString(m.second);
+        lista_mapas.append(qMakePair(nombre, miniatura));
     }
 
-    bool ok = false;
-    QString mapaSeleccionado = QInputDialog::getItem(
-        this,
-        "Seleccionar Mapa",
-        "Elige el mapa para usar en la partida:",
-        lista_mapas,
-        0,
-        false,
-        &ok
-    );
+    MapSelectionDialog selector(lista_mapas, this);
+    if (selector.exec() == QDialog::Accepted) {
+        QString mapaSeleccionado = selector.getSelectedMap();
+        protocolo.enviar_mensaje(mapaSeleccionado.toStdString());
 
-    if (!ok || mapaSeleccionado.isEmpty()) {
-        QMessageBox::information(this, "Selección cancelada", "No se seleccionó ningún mapa.");
-        return;
+        MensajePopup popup("Partida", "Partida creada con éxito.", this);
+        popup.exec();
+        emit partidaSeleccionada();
+        fadeOutAudioAndClose();
     }
-
-    protocolo.enviar_mensaje(mapaSeleccionado.toStdString());
-
-    MensajePopup popup("Partida", "Partida creada con éxito.", this);
-    popup.exec();
-    emit partidaSeleccionada();
-    fadeOutAudioAndClose();
-}    
+}
 
 void LobbyWindow::fadeOutAudioAndClose() {
     QTimer *fadeTimer = new QTimer(this);

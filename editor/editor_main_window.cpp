@@ -242,7 +242,7 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-       |QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
+        QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
         if (rutaRelativa.startsWith('/'))
             rutaRelativa.remove(0, 1);
         out << "  - imagen: " << rutaRelativa << "\n";

@@ -9,8 +9,10 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     setWindowTitle("Seleccionar Mapa");
     resize(600, 400);
 
-    setStyleSheet("background-color: rgba(0, 0, 0, 180);");
+    setAttribute(Qt::WA_TranslucentBackground);
+    setStyleSheet("background-color: rgba(0, 0, 0, 200);");
 
+    QLabel* titulo = new QLabel("CS2D  Seleccione el mapa", this);
     listaMapas = new QListWidget(this);
     previewLabel = new QLabel("Previsualización del mapa", this);
     QPushButton* okButton = new QPushButton("Aceptar", this);
@@ -18,17 +20,62 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     previewLabel->setFixedSize(300, 300); 
 
     // Estética
-    listaMapas->setStyleSheet("QListWidget { background-color: #222; color: white; }");
+    titulo->setAlignment(Qt::AlignLeft);
+    titulo->setStyleSheet(R"(
+        QLabel {
+            color: yellow;
+            font-weight: bold;
+            font-size: 24px;
+            padding: 10px;
+        }
+    )");
+
+    listaMapas->setStyleSheet(R"(
+        QListWidget {
+            color: yellow;
+            font-weight: bold;
+            font-size: 20px;
+            border: none;
+        }
+        QListWidget::item:hover {
+            background-color: rgba(255, 255, 255, 40);
+        }
+        QListWidget::item:selected {
+            background-color: rgba(255, 255, 255, 60);
+        }
+    )");
+
     previewLabel->setAlignment(Qt::AlignCenter);
-    previewLabel->setStyleSheet("QLabel { background-color: #444; color: white; padding: 10px; }");
-    okButton->setStyleSheet("QPushButton { background-color: #2a82da; color: white; padding: 6px; }");
+    previewLabel->setStyleSheet(R"(
+        QLabel {
+            background-color: #222;
+            color: white;
+            padding: 10px;
+            border: 2px solid #aaa;
+        }
+    )");
+
+    okButton->setFixedHeight(40);
+    okButton->setStyleSheet(R"(
+        QPushButton {
+            color: yellow;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+        QPushButton:hover {
+            background-color: rgb(255, 255, 0);
+            color: black;
+        }
+    )");
 
     // Layout
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(listaMapas);
-    layout->addWidget(previewLabel, 1);
+    layout->addWidget(previewLabel);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->insertWidget(0, titulo);
     mainLayout->addLayout(layout);
     mainLayout->addWidget(okButton);
 

@@ -143,14 +143,34 @@ void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
 }
 
 std::string ProtocoloCliente::recibir_mapa() {
-   uint16_t largo;
-   if(!socket.recvall(&largo, sizeof(largo)))
-      throw std::runtime_error("Error del socket al recibir el mapa");
-   largo = ntohs(largo);
-   std::vector<uint8_t> buffer(largo);
-   socket.recvall(buffer.data(), largo);
-   std::string mapa(buffer.begin(), buffer.end());
-   return mapa;
+   uint8_t header[4];
+   socket.recvall(header, 4);
+   uint32_t tam = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3];
+
+   std::vector<uint8_t> buffer(tam);
+   socket.recvall(buffer.data(), tam);
+   std::string yaml_serializado(buffer.begin(), buffer.end());
+
+   return yaml_serializado;
+}
+
+std::vector<std::string> ProtocoloCliente::recibir_lista_mapas() {
+    uint8_t cantidad;
+    socket.recvall(&cantidad, 1);
+
+    std::vector<std::string> mapas;
+    for (int i = 0; i < cantidad; ++i) {
+        uint16_t largo_red;
+        socket.recvall(&largo_red, sizeof(largo_red));
+        uint16_t largo = ntohs(largo_red);
+
+        std::vector<char> buffer(largo);
+        socket.recvall(buffer.data(), largo);
+
+        mapas.emplace_back(buffer.begin(), buffer.end());
+    }
+
+    return mapas;
 }
 
 ProtocoloCliente::~ProtocoloCliente(){

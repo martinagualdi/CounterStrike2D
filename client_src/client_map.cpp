@@ -7,34 +7,28 @@ ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) :
     elementos()
     {}
 
-
 std::vector<ElementoMapa> ClientMap::parsearMapa() {
-
     YAML::Node data = YAML::Load(map_str);
 
-    if (!data.IsMap()) {
-        throw std::runtime_error("Error: el archivo YAML no tiene formato de mapa.");
-    }
-
+    // Cargar fondo
     std::string pathStr = data["fondo"].as<std::string>();
     const char* path_fondo = pathStr.c_str();
-    if(path_fondo){
-        std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
-        SDL_Rect rect {0, 0, 1920, 1920};
-        TipoElementoMapa tipo = FONDO;
-        ElementoMapa fondo = {tex, rect, tipo};
-        elementos.emplace_back(fondo);
-    }
+    std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
+    SDL_Rect rect {0, 0, 1920, 1920}; // O bien usá ancho_max_mapa/alto_max_mapa si querés escalar
+    TipoElementoMapa tipo = FONDO;
+    elementos.emplace_back(ElementoMapa{tex, rect, tipo});
 
-    for (const auto &nodo : data["elementos"]) {
+    // Guardar dimensiones del mapa
+    if (data["ancho_max_mapa"]) ancho_max_mapa = data["ancho_max_mapa"].as<int>();
+    if (data["alto_max_mapa"]) alto_max_mapa = data["alto_max_mapa"].as<int>();
+
+    // Cargar elementos
+    for (const auto& nodo : data["elementos"]) {
         if (!nodo["imagen"]) continue;
+
         std::string pathStr = nodo["imagen"].as<std::string>();
-        const char* path = pathStr.c_str();
-        if(!path)
-            continue;
-        std::shared_ptr<Texture> tex = cargarTextura(path);
-        if(!tex)
-            continue;
+        std::shared_ptr<Texture> tex = cargarTextura(pathStr.c_str());
+        if (!tex) continue;
 
         SDL_Rect rect;
         rect.x = nodo["x"].as<int>();
@@ -43,17 +37,13 @@ std::vector<ElementoMapa> ClientMap::parsearMapa() {
         rect.h = nodo["alto"].as<int>();
 
         std::string tipo_str = nodo["tipo"].as<std::string>();
-        TipoElementoMapa tipo = {};
-        if(tipo_str == "obstaculo"){
-            tipo = OBSTACULO;
-        } else if(tipo_str == "piso"){
-            tipo = PISO;
-        } else if(tipo_str == "arma"){
-            tipo = ARMA;
-        }
+        TipoElementoMapa tipo;
+        if (tipo_str == "obstaculo") tipo = OBSTACULO;
+        else if (tipo_str == "piso") tipo = PISO;
+        else if (tipo_str == "arma") tipo = ARMA;
+        else continue;
 
-        ElementoMapa elemento = {tex, rect, tipo};
-        elementos.emplace_back(elemento);
+        elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
 
     return elementos;

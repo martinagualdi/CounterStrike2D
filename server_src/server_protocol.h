@@ -25,6 +25,8 @@ public:
     void enviar_mensaje(const std::string& mensaje);
 
     std::string recibir_path_mapa(); 
+
+    void enviar_mapa(const std::string& yaml_serializado);
     /*
     
     IDEA:

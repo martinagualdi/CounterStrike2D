@@ -140,13 +140,15 @@ void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
 }
 
 std::string ProtocoloCliente::recibir_mapa() {
-   uint16_t largo;
-   socket.recvall(&largo, sizeof(largo));
-   largo = ntohs(largo);
-   std::vector<uint8_t> buffer(largo);
-   socket.recvall(buffer.data(), largo);
-   std::string mapa(buffer.begin(), buffer.end());
-   return mapa;
+   uint8_t header[4];
+   socket.recvall(header, 4);
+   uint32_t tam = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3];
+
+   std::vector<uint8_t> buffer(tam);
+   socket.recvall(buffer.data(), tam);
+   std::string yaml_serializado(buffer.begin(), buffer.end());
+
+   return yaml_serializado;
 }
 
 ProtocoloCliente::~ProtocoloCliente(){

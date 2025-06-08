@@ -158,3 +158,15 @@ std::string ServerProtocol::recibir_path_mapa() {
     std::string path_mapa(buffer.begin(), buffer.end());
     return path_mapa;
 }
+
+void ServerProtocol::enviar_mapa(const std::string& yaml_serializado){
+    uint32_t tam = yaml_serializado.size();
+    uint8_t header[4] = {
+        static_cast<uint8_t>((tam >> 24) & 0xFF),
+        static_cast<uint8_t>((tam >> 16) & 0xFF),
+        static_cast<uint8_t>((tam >> 8) & 0xFF),
+        static_cast<uint8_t>(tam & 0xFF)
+    };
+    skt.sendall(header, 4);
+    skt.sendall((uint8_t*)yaml_serializado.data(), yaml_serializado.size());
+}

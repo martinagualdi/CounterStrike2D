@@ -217,6 +217,7 @@ void MainWindow::guardarMapa() {
     }
 
     QTextStream out(&file);
+    QString fondoPath = topWidget->getFondoPath();
     if (fondoPath.startsWith('/'))
         fondoPath.remove(0, 1);
     out << "fondo: " << fondoPath << "\n";

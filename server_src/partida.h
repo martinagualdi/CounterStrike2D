@@ -14,17 +14,21 @@
 class Partida{
 private: 
     int codigo_partida;
+    std::string creador;
     Queue<ComandoDTO> queue_comandos;
     ListaQueues jugadores_queues;
     GameLoop gameloop;
+    int cant_jugadores = 0;
     std::mutex mtx;
 
 public:
-    Partida(const int codigo, std::string yaml_partida);
+    Partida(std::string creador_username, const int codigo, std::string yaml_partida);
+    
+    std::string get_creador() {return this->creador;};
 
     int get_codigo_partida() {return this->codigo_partida;};
 
-    void agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
+    bool agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
 
     Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
 

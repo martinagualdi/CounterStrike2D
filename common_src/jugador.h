@@ -212,6 +212,17 @@ class Jugador {
             return BOMBA_TT;
         }
     }
+
+    void reiniciar() {
+        x = 150;
+        y = 150;
+        angulo = 0;
+        vida = 100;
+        dinero = 500;
+        vivo = true;
+        moviendose = false;
+        movimiento_actual = DETENER;
+    }
     
     ~Jugador() {
        

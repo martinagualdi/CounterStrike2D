@@ -19,10 +19,11 @@ void Receiver::comunicacion_del_lobby() {
                 y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
                 */
                 std::string path = protocol.recibir_path_mapa(); 
-                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora, path);
+                partida_id = monitor_partidas.crear_partida(player_id, comando_inicial[1], queue_enviadora, path);
                 protocol.enviar_mensaje(monitor_partidas.obtener_mapa_por_id(partida_id));
                 break;
             } else if (comando_inicial[0] == "unirse") {
+                std::cout << "Unirse a partida: " << comando_inicial[1] << std::endl;
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, queue_enviadora)) {
                     continue;
                 }

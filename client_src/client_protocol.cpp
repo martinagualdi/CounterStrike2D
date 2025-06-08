@@ -97,9 +97,14 @@ int ProtocoloCliente::recibirID() {
    return id_jugador;
 }
 
-void ProtocoloCliente::enviar_crear_partida() {
+void ProtocoloCliente::enviar_crear_partida(std::string username) {
    uint8_t comando = PREFIJO_CREAR_PARTIDA;
-   if (!socket.sendall(&comando, sizeof(comando))) {
+   uint16_t largo = static_cast<uint16_t>(username.size());
+   std::vector<uint8_t> buffer;
+   buffer.push_back(comando);
+   push_back_uint16(buffer, largo);
+   buffer.insert(buffer.end(), username.begin(), username.end());
+   if (!socket.sendall(buffer.data(), buffer.size())) {
       throw std::runtime_error("Error al enviar el comando de crear partida");
    }
 }

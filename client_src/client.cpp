@@ -27,7 +27,9 @@ void Client::iniciar() {
         std::cout << "Enviar path del mapa a usar: ";
         std::string respuesta;
         getline(std::cin, respuesta);
-        protocolo.enviar_mensaje(respuesta);
+        if (!respuesta.empty()) {
+            protocolo.enviar_mensaje(respuesta);
+        }
         std::string mapa_inicial = protocolo.recibir_mapa();
         /*HAY QUE HACER ESTO EN QT COMO PARTE DEL LOBBY*/
         hilo_enviador.start();

@@ -105,13 +105,22 @@ bool ServerProtocol::enviarID(int id_jugador) {
 
 std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
     uint8_t codigo;
-    std::cout << "Esperando comando..." << std::endl;
+    //std::cout << "Esperando comando..." << std::endl;
     skt.recvall(&codigo, sizeof(codigo));
     std::vector<std::string> comando;
     if (codigo == PREFIJO_CREAR_PARTIDA) {
         /* Caso: Crear partida */
         comando.push_back("crear");
-        std::cout << "Creando partida..." << std::endl;
+        //std::cout << "Recibiendo nombre de usuario..." << std::endl;
+        uint16_t largo;
+        skt.recvall(&largo, sizeof(largo));
+        largo = ntohs(largo);
+        //std::cout << "Largo del nombre de usuario: " << largo << std::endl;
+        std::vector<uint8_t> buffer(largo);
+        skt.recvall(buffer.data(), largo);
+        std::string username(buffer.begin(), buffer.end());
+        comando.push_back(username);
+        //std::cout << "Creando partida..." << std::endl;
     }else if (codigo == PREFIJO_UNIRSE_PARTIDA) {
         /* Caso: Unirse a partida */
         comando.push_back("unirse");

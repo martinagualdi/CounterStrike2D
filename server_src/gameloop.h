@@ -20,12 +20,16 @@ class GameLoop : public Thread {
     std::vector<Municion> balas_disparadas;
     std::atomic<bool> ultimo_unido_ct;
     Mapa mapa;
-
+    int ronda_actual;
+    std::vector<Jugador *> equipo_ct;
+    std::vector<Jugador *> equipo_tt;
 
     bool jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y);
     bool bala_golpea_jugador(const Municion &bala);
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
+    bool jugar_ronda();
+    bool se_termino_ronda();
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);

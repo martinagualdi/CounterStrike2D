@@ -15,9 +15,9 @@ EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
 }
 
 void EditorSeleccionMapa::seleccionarArchivo() {
-    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa", "client_src/gfx/mapas", "Archivos YAML (*.yaml)");
-    if (!ruta.isEmpty()) {
+    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa", "editor/mapas", "Archivos YAML (*.yaml)");
+    if (!ruta.isEmpty())
         emit mapaSeleccionado(ruta);
-        close();
-    }
+
+    close();
 }

@@ -7,7 +7,6 @@ ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) :
     elementos()
     {}
 
-
 std::vector<ElementoMapa> ClientMap::parsearMapa() {
     YAML::Node data = YAML::Load(map_str);
 
@@ -46,21 +45,6 @@ std::vector<ElementoMapa> ClientMap::parsearMapa() {
 
         elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
-
-    // (Opcional) Cargar zonas
-    /*if (data["zonas"]) {
-        for (const auto& zona : data["zonas"]) {
-            std::string tipo_zona = zona["tipo"].as<std::string>();
-            int x = zona["x"].as<int>();
-            int y = zona["y"].as<int>();
-            int ancho = zona["ancho"].as<int>();
-            int alto = zona["alto"].as<int>();
-            std::string id = zona["id"].as<std::string>();
-
-            // Creá tu clase o struct `ZonaRectItem` según lo necesites
-            zonas.emplace_back(ZonaRectItem{tipo_zona, x, y, ancho, alto, id});
-        }
-    }*/
 
     return elementos;
 }

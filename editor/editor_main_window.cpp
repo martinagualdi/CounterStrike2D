@@ -39,6 +39,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         topWidget->setDropMode(DropMode::ZONA_INICIO);
     });
 
+    QPushButton* botonPincelPiso = new QPushButton("Activar Pincel Piso");
+    botonPincelPiso->setFixedSize(180, 30);
+    topBarLayout->addWidget(botonPincelPiso);
+    connect(botonPincelPiso, &QPushButton::clicked, [this]() {
+        topWidget->setDropMode(DropMode::PINCEL_PISO);
+        topWidget->activarPincelPiso();
+    });
+
     QPushButton* saveButton = new QPushButton("Guardar");
     saveButton->setFixedSize(100, 30);
     topBarLayout->addWidget(saveButton);
@@ -65,7 +73,6 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Dust",  "editor/gfx/dust/" },
         { "Inferno", "editor/gfx/inferno/" },
         { "Armas", "editor/gfx/weapons/" },
-        { "Plantacion de bombas", "editor/gfx/plantacion_bombas/" },
         { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
     };
 
@@ -100,7 +107,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
                         if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el negro y el magenta
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
                         }
                     }
                 }
@@ -121,8 +128,13 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 hLayout->addWidget(clickable);
             } else {
                 auto* draggable = new DraggableLabel(fullPath);
-                connect(draggable, &DraggableLabel::dragStarted, this, [this](const QString&) {
-                    topWidget->setDropMode(DropMode::OBJETO);
+                connect(draggable, &DraggableLabel::dragStarted, this, [this, fullPath]() {
+                    if (topWidget->estaPincelActivo()) {
+                        topWidget->setDropMode(DropMode::PINCEL_PISO);
+                        topWidget->setPisoPath(fullPath);
+                    } else {
+                        topWidget->setDropMode(DropMode::OBJETO);
+                    }
                 });
                 draggable->setPixmap(pixmap.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                 draggable->setFixedSize(100, 100);
@@ -136,6 +148,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);
+}
+
+TopWidget* MainWindow::gettopWidget() const {
+    return this->topWidget;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
@@ -199,7 +215,7 @@ void MainWindow::guardarMapa() {
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        "",
+        "editor/mapas",
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
@@ -226,22 +242,26 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-        if (path.startsWith('/'))
-            path.remove(0, 1);
-        out << "  - imagen: " << path << "\n";
+       |QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
+        if (rutaRelativa.startsWith('/'))
+            rutaRelativa.remove(0, 1);
+        out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
+        out << "    ancho: " << e.ancho << "\n";
+        out << "    alto: " << e.alto << "\n";
     }
 
+    out << "zonas:\n";
     for (const auto& zona : topWidget->getZonas()) {
-    out << "  - tipo: " << zona.tipo << "\n";
-    out << "    x: " << int(zona.rect.x()) << "\n";
-    out << "    y: " << int(zona.rect.y()) << "\n";
-    out << "    ancho: " << int(zona.rect.width()) << "\n";
-    out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "  - tipo: " << zona.tipo << "\n";
+        out << "    x: " << int(zona.rect.x()) << "\n";
+        out << "    y: " << int(zona.rect.y()) << "\n";
+        out << "    ancho: " << int(zona.rect.width()) << "\n";
+        out << "    alto: " << int(zona.rect.height()) << "\n";
+        out << "    id: \"" << zona.id.toString(QUuid::WithoutBraces) << "\"\n";
     }
-
 
     file.close();
     QApplication::quit();

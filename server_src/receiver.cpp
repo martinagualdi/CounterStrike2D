@@ -7,20 +7,27 @@
 Receiver::Receiver(ServerProtocol &protocolo, MonitorPartidas& monitor_partidas, std::atomic<bool> &is_alive, int player_id, Queue<Snapshot>& queue_enviadora)
     : protocol(protocolo), monitor_partidas(monitor_partidas), alive(is_alive), player_id(player_id), queue_enviadora(queue_enviadora) {}
 
+void Receiver::asignar_queue_comandos(Queue<ComandoDTO>* q) {
+    this->queue_comandos = q;
+}
 
+/*
 void Receiver::comunicacion_del_lobby() {
     int partida_id;
     while (alive) {
         try {
             std::vector<std::string> comando_inicial = protocol.recibir_inicio_juego();
             if (comando_inicial[0] == "crear") {
-                /*
+                
                 Aca iria la logica de elegir el mapa, que se debe recibir via socket el yaml del mapa
                 y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
-                */
+                
                 std::string path = protocol.recibir_path_mapa(); 
-                partida_id = monitor_partidas.crear_partida(player_id, comando_inicial[1], queue_enviadora, path);
-                protocol.enviar_mensaje(monitor_partidas.obtener_mapa_por_id(partida_id));
+
+                std::cout << "path recibido correctamente: " << path << "\n";
+                partida_id = monitor_partidas.crear_partida(player_id, queue_enviadora, path);
+                std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
+                protocol.enviar_mapa(yaml_serializado);
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 std::cout << "Unirse a partida: " << comando_inicial[1] << std::endl;
@@ -29,9 +36,9 @@ void Receiver::comunicacion_del_lobby() {
                 }
                 partida_id = std::stoi(comando_inicial[1]);
                 protocol.enviar_mensaje(monitor_partidas.obtener_mapa_por_id(partida_id));
-                /*
+                
                 Aca iria la logica del mapa ya debe estar dentro del gameloop porque no la estas creando.
-                */
+                
                 break;
             } else {
                 std::vector<std::string> lista_partidas = monitor_partidas.listar_partidas();
@@ -42,7 +49,7 @@ void Receiver::comunicacion_del_lobby() {
         }
     }
     queue_comandos = monitor_partidas.obtener_queue_de_partida(partida_id);
-}
+}*/
 
 void Receiver::comunicacion_de_partida() {
     while (alive) {
@@ -58,7 +65,7 @@ void Receiver::comunicacion_de_partida() {
 }
 
 void Receiver::run() {
-    comunicacion_del_lobby();
+    //comunicacion_del_lobby();
     comunicacion_de_partida();
 }
 

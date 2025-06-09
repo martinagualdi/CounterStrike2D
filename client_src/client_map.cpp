@@ -4,37 +4,28 @@ ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) :
     map_str(map_str),
     renderer(renderer),
     cache(), 
-    elementos()
+    mapa(0, 0)
     {}
 
-
-std::vector<ElementoMapa> ClientMap::parsearMapa() {
-
+struct Mapa ClientMap::parsearMapa() {
     YAML::Node data = YAML::Load(map_str);
 
-    if (!data.IsMap()) {
-        throw std::runtime_error("Error: el archivo YAML no tiene formato de mapa.");
-    }
+    if (data["ancho_max_mapa"]) mapa.ancho_mapa_max = data["ancho_max_mapa"].as<int>();
+    if (data["alto_max_mapa"]) mapa.alto_mapa_max = data["alto_max_mapa"].as<int>();
 
     std::string pathStr = data["fondo"].as<std::string>();
     const char* path_fondo = pathStr.c_str();
-    if(path_fondo){
-        std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
-        SDL_Rect rect {0, 0, 1920, 1920};
-        TipoElementoMapa tipo = FONDO;
-        ElementoMapa fondo = {tex, rect, tipo};
-        elementos.emplace_back(fondo);
-    }
+    std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
+    SDL_Rect rect {0, 0, mapa.ancho_mapa_max, mapa.alto_mapa_max};
+    TipoElementoMapa tipo = FONDO;
+    mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
 
-    for (const auto &nodo : data["elementos"]) {
+    for (const auto& nodo : data["elementos"]) {
         if (!nodo["imagen"]) continue;
+
         std::string pathStr = nodo["imagen"].as<std::string>();
-        const char* path = pathStr.c_str();
-        if(!path)
-            continue;
-        std::shared_ptr<Texture> tex = cargarTextura(path);
-        if(!tex)
-            continue;
+        std::shared_ptr<Texture> tex = cargarTextura(pathStr.c_str());
+        if (!tex) continue;
 
         SDL_Rect rect;
         rect.x = nodo["x"].as<int>();
@@ -43,20 +34,16 @@ std::vector<ElementoMapa> ClientMap::parsearMapa() {
         rect.h = nodo["alto"].as<int>();
 
         std::string tipo_str = nodo["tipo"].as<std::string>();
-        TipoElementoMapa tipo = {};
-        if(tipo_str == "obstaculo"){
-            tipo = OBSTACULO;
-        } else if(tipo_str == "piso"){
-            tipo = PISO;
-        } else if(tipo_str == "arma"){
-            tipo = ARMA;
-        }
+        TipoElementoMapa tipo;
+        if (tipo_str == "obstaculo") tipo = OBSTACULO;
+        else if (tipo_str == "piso") tipo = PISO;
+        else if (tipo_str == "arma") tipo = ARMA;
+        else continue;
 
-        ElementoMapa elemento = {tex, rect, tipo};
-        elementos.emplace_back(elemento);
+        mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
 
-    return elementos;
+    return mapa;
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {

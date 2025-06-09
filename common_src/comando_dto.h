@@ -3,8 +3,9 @@
 
 #include <string>
 #include <cstdint>
+#include "enums_jugador.h"
 
-enum Tipo {MOVIMIENTO, ROTACION, DISPARO, DESCONECTAR, CAMBIAR_ARMA, COMPRAR};
+enum Tipo {MOVIMIENTO, ROTACION, DISPARO, DESCONECTAR, CAMBIAR_ARMA, COMPRAR, SELECCIONAR_SKIN};
 enum Movimiento {ARRIBA, ABAJO, IZQUIERDA, DERECHA, DIAGONAL_SUP_IZQ, DIAGONAL_SUP_DER, DIAGONAL_INF_IZQ, DIAGONAL_INF_DER, DETENER};
 enum Compra{C_AK47, C_M3, C_AWP, BALAS_PRIMARIA, BALAS_SECUNDARIA};
 
@@ -12,6 +13,7 @@ struct ComandoDTO {
     enum Tipo tipo;
     enum Movimiento movimiento;
     enum Compra compra;
+    enum SkinTipos skin;
     uint8_t id_jugador;
     float angulo;
 };

@@ -27,7 +27,7 @@ class Receiver : public Thread {
     Queue<ComandoDTO>* queue_comandos = nullptr;
     Queue<Snapshot>& queue_enviadora;
 
-    void comunicacion_del_lobby();
+    //void comunicacion_del_lobby();
     void comunicacion_de_partida();
 
   public:
@@ -40,6 +40,8 @@ class Receiver : public Thread {
     void terminar_ejecucion() {
         this->alive = false;
     }
+
+    void asignar_queue_comandos(Queue<ComandoDTO>* q);
 
     virtual ~Receiver();
 };

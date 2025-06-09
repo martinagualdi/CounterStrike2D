@@ -233,16 +233,18 @@ void MainWindow::guardarMapa() {
     }
 
     QTextStream out(&file);
-    out << "fondo: " << topWidget->getFondoPath() << "\n";
-
-    out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
-    out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
-
+    QString fondoPath = topWidget->getFondoPath();
+    if (fondoPath.startsWith('/'))
+        fondoPath.remove(0, 1);
+    out << "fondo: " << fondoPath << "\n";
     out << "elementos:\n";
 
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
-        QString rutaRelativa = e.path.mid(e.path.indexOf("/editor"));
+        QString path = e.path;
+        QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
+        if (rutaRelativa.startsWith('/'))
+            rutaRelativa.remove(0, 1);
         out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
@@ -262,6 +264,18 @@ void MainWindow::guardarMapa() {
     }
 
     file.close();
+
+    // ============================
+    // GUARDAR MINIATURA .JPG
+    // ============================
+    QString thumbPath = fileName;
+    thumbPath.replace(".yaml", ".jpg");
+
+    QImage thumbnail = topWidget->generarMiniatura();
+    if (!thumbnail.save(thumbPath, "JPG")) {
+        qWarning() << "No se pudo guardar la miniatura del mapa.";
+    }
+    
     QApplication::quit();
 }
 
@@ -273,6 +287,8 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     topWidget->setTamanioMapaDesdeYAML(ancho, alto);
 
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
+    if (!fondo.startsWith('/'))
+        fondo.prepend('/');
     QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
     topWidget->setBackgroundPath(basePath + fondo);
@@ -280,6 +296,8 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
         QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
+        if (!imagen.startsWith('/'))
+            imagen.prepend('/');
         QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
         int x = elemento["x"].as<int>();
         int y = elemento["y"].as<int>();

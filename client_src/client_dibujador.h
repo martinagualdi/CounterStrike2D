@@ -23,13 +23,13 @@ private:
     Renderer& renderer;
     EventHandler& eventHandler;
     Queue<Snapshot>& cola_recibidor;
-    std::vector<ElementoMapa> elementos;
+    struct Mapa mapa;
     ParseadorSpriteSheets parseador;
     Snapshot snapshot;
     Font fuente;
     Font fuenteChica;
     Color amarillo;
-    Texture fondo_mercado;
+    Texture fondo_transparente;
     Texture balas;
     Texture cs2d;
     Texture dropped_bomb;
@@ -41,6 +41,9 @@ private:
     std::vector<Texture> armas_mercado;
     std::vector<Texture> ct_players;
     std::vector<Texture> tt_players;
+    std::vector<Texture> textos_skin;
+    std::vector<Texture> ct_nombres;
+    std::vector<Texture> tt_nombres;
     SDL_Rect sprite_arma;
     SDL_Rect sprite_bala;
     SDL_Rect sprite_sight;
@@ -49,6 +52,7 @@ private:
     std::vector<SDL_Rect> sprites_simbolos_hud;
     std::vector<SDL_Rect> sprites_numeros_hud;
     std::vector<int> separar_digitos(int n);
+    void inicializar_textos();
     float convertir_angulo(float angulo);
     void convertir_a_pantalla(float pos_x, float pos_y, float& pantalla_x, float& pantalla_y);
     void convertir_coordenadas(float &x, float &y);
@@ -60,15 +64,17 @@ private:
     void dibujar_jugadores();
     void dibujar_fondo(const ElementoMapa& elemento);
     void dibujar_balas();
-    void dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin, enum ArmaEnMano arma);
+    void dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin,
+             enum ArmaEnMano arma, enum Equipo equipo);
     void dibujar_pies(float x, float y, float angulo);
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
     void dibujar_hud();
     void dibujar_mercado();
     void dibujar_mapa();
+    void dibujar_seleccionar_skin();
 public:
-    explicit Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa> elementos, 
+    explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 
                 EventHandler& handler, Queue<Snapshot>& cola_recibidor);
     void renderizar();
     Dibujador(const Dibujador&) = delete;

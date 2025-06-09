@@ -5,8 +5,8 @@
 
 Mapa::Mapa(std::string yamlPath) {
     YAML::Node data = YAML::LoadFile(yamlPath);
-    this->ancho_mapa = 1920;/*data["ancho_max_mapa"].as<int>();*/
-    this->alto_mapa = 1920;/*data["alto_max_mapa"].as<int>();*/
+    this->ancho_mapa = data["ancho_max_mapa"].as<int>();
+    this->alto_mapa =  data["alto_max_mapa"].as<int>();
     for (const auto &nodo : data["elementos"]) {
         ElementoDeMapa elemento;
         elemento.x = nodo["x"].as<int>();

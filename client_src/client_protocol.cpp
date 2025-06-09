@@ -37,6 +37,10 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_COMPRAR);
       mensaje.push_back(static_cast<uint8_t>(comando.compra));
    }
+   else if(comando.tipo == SELECCIONAR_SKIN){
+      mensaje.push_back(PREFIJO_SELECCIONAR_SKIN);
+      mensaje.push_back(static_cast<uint8_t>(comando.skin));
+   }
 
 }
 
@@ -156,14 +160,43 @@ void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
 }
 
 std::string ProtocoloCliente::recibir_mapa() {
-   uint16_t largo;
-   if(!socket.recvall(&largo, sizeof(largo)))
-      throw std::runtime_error("Error del socket al recibir el mapa");
-   largo = ntohs(largo);
-   std::vector<uint8_t> buffer(largo);
-   socket.recvall(buffer.data(), largo);
-   std::string mapa(buffer.begin(), buffer.end());
-   return mapa;
+   uint8_t header[4];
+   socket.recvall(header, 4);
+   uint32_t tam = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3];
+
+   std::vector<uint8_t> buffer(tam);
+   socket.recvall(buffer.data(), tam);
+   std::string yaml_serializado(buffer.begin(), buffer.end());
+
+   return yaml_serializado;
+}
+
+std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista_mapas() {
+    uint8_t cantidad = 0;
+    socket.recvall(&cantidad, 1);
+
+    std::vector<std::pair<std::string, std::string>> resultado;
+    for (uint8_t i = 0; i < cantidad; ++i) {
+        // Recibir nombre del mapa
+        uint16_t len_nombre = 0;
+        socket.recvall(&len_nombre, 2);
+        len_nombre = ntohs(len_nombre);
+
+        std::string nombre_mapa(len_nombre, '\0');
+        socket.recvall((uint8_t*)nombre_mapa.data(), len_nombre);
+
+        // Recibir nombre de la imagen
+        uint16_t len_img = 0;
+        socket.recvall(&len_img, 2);
+        len_img = ntohs(len_img);
+
+        std::string nombre_img(len_img, '\0');
+        socket.recvall((uint8_t*)nombre_img.data(), len_img);
+
+        resultado.emplace_back(nombre_mapa, nombre_img);
+    }
+
+    return resultado;
 }
 
 ProtocoloCliente::~ProtocoloCliente(){

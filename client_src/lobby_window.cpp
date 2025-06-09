@@ -1,6 +1,6 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
-#include "personaje_popup.h"
+#include "map_selection.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -91,24 +91,35 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
-
 void LobbyWindow::onCrearClicked() {
     //std::cout << "Creando partida para: " << username << std::endl;
     protocolo.enviar_crear_partida(username);
 
-    PersonajePopup equipoDialog(this);
-    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
-        qDebug() << "Skin seleccionada (crear):" << skinIndex;
-        // protocolo.enviar_skin(skinIndex);
-    });
+    std::vector<std::pair<std::string, std::string>> mapas_disponibles = protocolo.recibir_lista_mapas();
+    if (mapas_disponibles.empty()) {
+        QMessageBox::warning(this, "Error", "No se recibieron mapas desde el servidor.");
+        return;
+    }
 
-    if (equipoDialog.exec() == QDialog::Accepted) {
+    // Convertimos a QVector de pares de QString
+    QVector<QPair<QString, QString>> lista_mapas;
+    for (const auto& m : mapas_disponibles) {
+        QString nombre = QString::fromStdString(m.first);
+        QString miniatura = QString::fromStdString(m.second);
+        lista_mapas.append(qMakePair(nombre, miniatura));
+    }
+
+    MapSelectionDialog selector(lista_mapas, this);
+    if (selector.exec() == QDialog::Accepted) {
+        QString mapaSeleccionado = selector.getSelectedMap();
+        protocolo.enviar_mensaje(mapaSeleccionado.toStdString());
+
         MensajePopup popup("Partida", "Partida creada con éxito.", this);
         popup.exec();
         emit partidaSeleccionada();
         fadeOutAudioAndClose();
     }
-}    
+}
 
 void LobbyWindow::fadeOutAudioAndClose() {
     QTimer *fadeTimer = new QTimer(this);
@@ -162,18 +173,9 @@ void LobbyWindow::onUnirseClicked() {
 
     protocolo.enviar_unirse_partida(id);
 
+    MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
+    popup.exec();
+    emit partidaSeleccionada();
+    fadeOutAudioAndClose();
 
-    PersonajePopup equipoDialog(this);
-    connect(&equipoDialog, &PersonajePopup::skinSeleccionado, this, [this](int skinIndex) {
-        qDebug() << "Skin seleccionada (crear):" << skinIndex;
-        // protocolo.enviar_skin(skinIndex);
-    });
-
-
-    if (equipoDialog.exec() == QDialog::Accepted) {
-        MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
-        popup.exec();
-        emit partidaSeleccionada();
-        fadeOutAudioAndClose();
-    }
 }

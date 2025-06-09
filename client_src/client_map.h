@@ -14,6 +14,15 @@ using namespace SDL2pp;
 
 typedef enum {FONDO, OBSTACULO, PISO, ARMA} TipoElementoMapa;
 
+struct Mapa{
+    int alto_mapa_max;
+    int ancho_mapa_max;
+    std::vector<struct ElementoMapa> elementos;
+
+    Mapa(int alto = 0, int ancho = 0)
+        : alto_mapa_max(alto), ancho_mapa_max(ancho) {}
+};
+
 struct ElementoMapa{
     std::shared_ptr<Texture> texture;
     SDL_Rect dst;
@@ -25,12 +34,12 @@ private:
     const std::string& map_str;
     Renderer& renderer;
     std::unordered_map<std::string, std::shared_ptr<Texture>> cache;
-    std::vector<ElementoMapa> elementos;
+    struct Mapa mapa;
     std::shared_ptr<Texture> cargarTextura(const char* path);
 
 public:
     explicit ClientMap(const std::string& map_str, Renderer& renderer);
-    std::vector<ElementoMapa> parsearMapa();
+    struct Mapa parsearMapa();
     ClientMap(const ClientMap&) = delete;
     ClientMap& operator=(const ClientMap&) = delete;
     ClientMap(ClientMap&&) = default;

@@ -12,12 +12,10 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
-        jugador->establecer_skin(PHEONIX); // Asignar skin por defecto a los Terroristas
-        equipo_tt.push_back(jugador);
+        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
     } else {
         jugador->establecer_equipo(CT);
-        jugador->establecer_skin(SEAL_FORCE); // Asignar skin por defecto a los Contra Terroristas
-        equipo_ct.push_back(jugador);
+        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
     }
     ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);
@@ -105,7 +103,7 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
     }
     if (jugador_colisiones_con_mapa(nuevo_x, nuevo_y)) {
         // Si hay colisión, no se actualizan las coordenadas
-        return;
+       return;
     }
     jugador->setX(nuevo_x);
     jugador->setY(nuevo_y);
@@ -207,6 +205,9 @@ bool GameLoop::jugar_ronda() {
                                 std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
                             }
                         }
+                        break;
+                    case SELECCIONAR_SKIN:
+                        jugador->set_skin_tipo(comando.skin);
                         break;
                     default:
                         break;

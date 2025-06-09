@@ -96,6 +96,12 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             skt.recvall(&compra, sizeof(compra));
             comando.compra = static_cast<enum Compra>(compra);
             break;
+        case PREFIJO_SELECCIONAR_SKIN:
+            comando.tipo = SELECCIONAR_SKIN;
+            uint8_t skin;
+            skt.recvall(&skin, sizeof(skin));
+            comando.skin = static_cast<enum SkinTipos>(skin);
+            break;
         default:
             break;
     }
@@ -165,4 +171,38 @@ std::string ServerProtocol::recibir_path_mapa() {
     skt.recvall(buffer.data(), largo);
     std::string path_mapa(buffer.begin(), buffer.end());
     return path_mapa;
+}
+
+void ServerProtocol::enviar_mapa(const std::string& yaml_serializado){
+    uint32_t tam = yaml_serializado.size();
+    uint8_t header[4] = {
+        static_cast<uint8_t>((tam >> 24) & 0xFF),
+        static_cast<uint8_t>((tam >> 16) & 0xFF),
+        static_cast<uint8_t>((tam >> 8) & 0xFF),
+        static_cast<uint8_t>(tam & 0xFF)
+    };
+    skt.sendall(header, 4);
+    skt.sendall((uint8_t*)yaml_serializado.data(), yaml_serializado.size());
+}
+
+void ServerProtocol::enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas) {
+    uint8_t cantidad = mapas.size();
+    skt.sendall(&cantidad, 1);  // Enviamos la cantidad de pares (mapa, imagen)
+
+    for (const auto& par : mapas) {
+        const std::string& nombre_mapa = par.first;
+        const std::string& imagen_miniatura = par.second;
+
+        // Enviar nombre del mapa
+        uint16_t largo_nombre = nombre_mapa.size();
+        uint16_t largo_nombre_red = htons(largo_nombre);
+        skt.sendall(&largo_nombre_red, sizeof(largo_nombre_red));
+        skt.sendall((uint8_t*)nombre_mapa.data(), largo_nombre);
+
+        // Enviar nombre de la miniatura
+        uint16_t largo_img = imagen_miniatura.size();
+        uint16_t largo_img_red = htons(largo_img);
+        skt.sendall(&largo_img_red, sizeof(largo_img_red));
+        skt.sendall((uint8_t*)imagen_miniatura.data(), largo_img);
+    }
 }

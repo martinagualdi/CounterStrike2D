@@ -17,24 +17,24 @@
 #define OFFSET_NOMBRE_ARMAS 40
 #define ANCHO_CS2D 96
 #define ALTO_CS2D 40
-#define OFFSET_MERCADO 100
+#define OFFSET_TRANSPARENTE 100
 #define ESPACIO_ENTRE_ITEMS 20
 #define OFFSET_SALDO 2.1
-#define CANT_ITEMS_MERCADO 6
-#define CANT_SPRITESHEETS_PLAYER 4
+#define CANT_ARMAS_MERCADO 3
+#define CANT_SKINS_PLAYER 4
 
-Dibujador::Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa> elementos, EventHandler& handler, Queue<Snapshot>& cola_recibidor) : 
+Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHandler& handler, Queue<Snapshot>& cola_recibidor) : 
     client_id(id),
     renderer(renderer),
     eventHandler(handler),
     cola_recibidor(cola_recibidor),
-    elementos(elementos),
+    mapa(mapa),
     parseador(),
     snapshot(),
     fuente("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_GRANDE),
     fuenteChica("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_CHICA),
     amarillo(Color(255, 255, 0)),
-    fondo_mercado([&renderer]() {
+    fondo_transparente([&renderer]() {
         SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
         Surface surface(rawSurface);
         Uint32 negroConAlpha = SDL_MapRGBA(surface.Get()->format, 0, 0, 0, 180);
@@ -95,7 +95,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa>
     }()),
     ct_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
-        for (int i = 1; i <= CANT_SPRITESHEETS_PLAYER; ++i) {
+        for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
             std::string path = "client_src/gfx/player/ct" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
@@ -103,12 +103,15 @@ Dibujador::Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa>
     }()),
     tt_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
-        for (int i = 1; i <= CANT_SPRITESHEETS_PLAYER; ++i) {
+        for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
             std::string path = "client_src/gfx/player/t" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
         return textures;
     }()),
+    textos_skin(),
+    ct_nombres(),
+    tt_nombres(),
     sprite_arma(parseador.obtener_sprite_arma()),
     sprite_bala(parseador.obtener_sprite_bala()),
     sprite_sight(parseador.obtener_sprite_sight()),
@@ -117,7 +120,22 @@ Dibujador::Dibujador(const int id, Renderer& renderer, std::vector<ElementoMapa>
     sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
     sprites_numeros_hud(parseador.obtener_sprites_numeros_hud())
     {
+        inicializar_textos();
     }
+
+void Dibujador::inicializar_textos() {
+    textos_skin.emplace_back(renderer, fuente.RenderText_Blended("Seleccione el skin del personaje", amarillo));
+    ct_nombres.emplace_back(renderer, fuente.RenderText_Blended("[1] Seal Force", amarillo));
+    ct_nombres.emplace_back(renderer, fuente.RenderText_Blended("[2] German GSG-9", amarillo));
+    ct_nombres.emplace_back(renderer, fuente.RenderText_Blended("[3] UK SAS", amarillo));
+    ct_nombres.emplace_back(renderer, fuente.RenderText_Blended("[4] French GIGN", amarillo));
+    tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[1] Pheonix", amarillo));
+    tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[2] L337 Krew", amarillo));
+    tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[3] Artic Avenger", amarillo));
+    tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[4] Guerrilla", amarillo));
+    
+}
+
 
 float Dibujador::convertir_angulo(float angulo){
     return 360.0f - angulo + DESFASE_ANGULO;
@@ -148,7 +166,8 @@ void Dibujador::dibujar_jugadores() {
     
         enum SkinTipos skin = jugador.skin_tipo;
         enum ArmaEnMano arma = jugador.arma_en_mano;
-        dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin, arma);
+        enum Equipo equipo = jugador.equipo;
+        dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin, arma, equipo);
         dibujar_arma(x_pixel, y_pixel, angulo_sdl, arma);
     }
 }
@@ -170,21 +189,22 @@ void Dibujador::dibujar_balas() {
     }
 }
 
-void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin, enum ArmaEnMano arma) {
-
+void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin, enum ArmaEnMano arma, enum Equipo equipo) {
 
     SDL_FRect dst {x - TAM_PLAYER / 2, y - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
     SDL_Rect sprite;
+    std::vector<Texture>& players = (equipo == CT) ? ct_players : tt_players;
+
     if(arma == CUCHILLO)
         sprite = sprites_player[MANO_IZQ_CUCHILLO];
+    else if(arma == BOMBA_TT)
+        sprite = sprites_player[DOS_MANOS];
     else
         sprite = sprites_player[ARMADO];
 
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
-    if (skin < PHEONIX) // CT players
-        SDL_RenderCopyExF(renderer.Get(), ct_players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
-    else // TT players
-        SDL_RenderCopyExF(renderer.Get(), tt_players[skin-3].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    SDL_RenderCopyExF(renderer.Get(), players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
+    
 }
 
 void Dibujador::dibujar_pies(float x, float y, float angulo) {
@@ -308,12 +328,12 @@ Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
 
 void Dibujador::dibujar_mercado() {
 
-    int anchoCuadro = ANCHO_MIN - OFFSET_MERCADO;
-    int altoCuadro = ALTO_MIN - OFFSET_MERCADO;
+    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
+    int altoCuadro = ALTO_MIN - OFFSET_TRANSPARENTE;
     int x = (ANCHO_MIN - anchoCuadro) / 2;
     int y = (ALTO_MIN - altoCuadro) / 2;
 
-    renderer.Copy(fondo_mercado, NullOpt, Rect(x, y, anchoCuadro, altoCuadro));
+    renderer.Copy(fondo_transparente, NullOpt, Rect(x, y, anchoCuadro, altoCuadro));
     renderer.Copy(cs2d, NullOpt, Rect(x + OFFSET_CS2D, y + OFFSET_CS2D, ANCHO_CS2D, ALTO_CS2D));
     Texture comprarArmas(renderer, fuente.RenderText_Blended("Comprar Armas", amarillo));
     renderer.Copy(comprarArmas, NullOpt, Rect(x + 130, y + 10,  comprarArmas.GetWidth(), comprarArmas.GetHeight()));
@@ -327,19 +347,14 @@ void Dibujador::dibujar_mercado() {
     Texture salir(renderer, fuente.RenderText_Blended("[ESC] Salir", amarillo));
 
     int alto_total = 0;
-    for (int i = 0; i < CANT_ITEMS_MERCADO; i++) {
-        if (i == 3) {
-            alto_total += primaria.GetHeight();
-        } else if (i == 4) {
-            alto_total += secundaria.GetHeight();
-        } else if (i == 5){
-            alto_total += salir.GetHeight();
-        } else {
-            int alto_texto = textos[i].GetHeight();
-            int alto_imagen = armas_mercado[i].GetHeight();
-            alto_total += std::max(alto_texto, alto_imagen);
-        }
-        if (i != CANT_ITEMS_MERCADO - 1) {
+    alto_total += primaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
+    alto_total += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
+    alto_total += salir.GetHeight() + ESPACIO_ENTRE_ITEMS;
+    for (int i = 0; i < CANT_ARMAS_MERCADO; i++) {
+        int alto_texto = textos[i].GetHeight();
+        int alto_imagen = armas_mercado[i].GetHeight();
+        alto_total += std::max(alto_texto, alto_imagen);
+        if (i != CANT_ARMAS_MERCADO - 1) {
             alto_total += ESPACIO_ENTRE_ITEMS;
         }
     }
@@ -347,27 +362,7 @@ void Dibujador::dibujar_mercado() {
     int y_inicial = (ALTO_MIN - alto_total) / 2;
     int y_pos = y_inicial;
 
-    for (int i = 0; i < CANT_ITEMS_MERCADO; i++) {
-        if (i == 3) {
-            SDL_Rect dst_primaria{x + OFFSET_NOMBRE_ARMAS, y_pos, primaria.GetWidth(), primaria.GetHeight()};
-            renderer.Copy(primaria, NullOpt, dst_primaria);
-            y_pos += primaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
-            continue;
-        }
-
-        if (i == 4) {
-            SDL_Rect dst_secundaria{x + OFFSET_NOMBRE_ARMAS, y_pos, secundaria.GetWidth(), secundaria.GetHeight()};
-            renderer.Copy(secundaria, NullOpt, dst_secundaria);
-            y_pos += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
-            continue;
-        }
-
-        if (i == 5) {
-            SDL_Rect dst_salir{x + OFFSET_NOMBRE_ARMAS, y_pos, salir.GetWidth(), salir.GetHeight()};
-            renderer.Copy(salir, NullOpt, dst_salir);
-            y_pos += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
-            continue;
-        }
+    for (int i = 0; i < CANT_ARMAS_MERCADO; i++) {
 
         SDL_Rect dst_texto = {x + OFFSET_NOMBRE_ARMAS, y_pos, textos[i].GetWidth(), textos[i].GetHeight()};
         renderer.Copy(textos[i], NullOpt, dst_texto);
@@ -384,6 +379,20 @@ void Dibujador::dibujar_mercado() {
         int alto_arma = dst_arma.h;
         y_pos += std::max(alto_texto, alto_arma) + ESPACIO_ENTRE_ITEMS;
     }
+
+    SDL_Rect dst_primaria{x + OFFSET_NOMBRE_ARMAS, y_pos, primaria.GetWidth(), primaria.GetHeight()};
+    renderer.Copy(primaria, NullOpt, dst_primaria);
+    y_pos += primaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
+
+    SDL_Rect dst_secundaria{x + OFFSET_NOMBRE_ARMAS, y_pos, secundaria.GetWidth(), secundaria.GetHeight()};
+    renderer.Copy(secundaria, NullOpt, dst_secundaria);
+    y_pos += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
+
+    SDL_Rect dst_salir{x + OFFSET_NOMBRE_ARMAS, y_pos, salir.GetWidth(), salir.GetHeight()};
+    renderer.Copy(salir, NullOpt, dst_salir);
+    y_pos += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
+
+
 }
 
 void Dibujador::dibujar_mapa() {
@@ -391,14 +400,14 @@ void Dibujador::dibujar_mapa() {
     float centro_x = ANCHO_MIN / 2.0f;
     float centro_y = ALTO_MIN / 2.0f;
 
-    for (const ElementoMapa& elemento : elementos) {
+    for (const ElementoMapa& elemento : mapa.elementos) {
         if(elemento.tipo == FONDO){
             dibujar_fondo(elemento);
         }
-        else if(elemento.tipo == OBSTACULO){
+        else if(elemento.tipo == OBSTACULO || elemento.tipo == PISO){
 
             float pantalla_x = elemento.dst.x - jugador_principal->pos_x + centro_x;
-            float pantalla_y = elemento.dst.y - 1920 +jugador_principal->pos_y + centro_y - 64; // YA ESTA EN COORDENADA SDL
+            float pantalla_y = elemento.dst.y - mapa.alto_mapa_max +jugador_principal->pos_y + centro_y - 64; // YA ESTA EN COORDENADA SDL
 
             if (pantalla_x + elemento.dst.w >= 0 && pantalla_x <= ANCHO_MIN &&
                 pantalla_y + elemento.dst.h >= 0 && pantalla_y <= ALTO_MIN) {
@@ -406,6 +415,50 @@ void Dibujador::dibujar_mapa() {
             }
 
         }
+    }
+}
+
+void Dibujador::dibujar_seleccionar_skin() {
+    
+    bool es_tt = snapshot.getJugadorPorId(client_id)->equipo;
+    std::vector<Texture>& nombres = es_tt ? tt_nombres : ct_nombres;
+    std::vector<Texture>& players = es_tt ? tt_players : ct_players;
+
+    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
+    int altoCuadro = ALTO_MIN - OFFSET_TRANSPARENTE;
+    int x = (ANCHO_MIN - anchoCuadro) / 2;
+    int y = (ALTO_MIN - altoCuadro) / 2;
+
+    renderer.Copy(fondo_transparente, NullOpt, Rect(x, y, anchoCuadro, altoCuadro));
+    renderer.Copy(cs2d, NullOpt, Rect(x + OFFSET_CS2D, y + OFFSET_CS2D, ANCHO_CS2D, ALTO_CS2D));
+    renderer.Copy(textos_skin[0], NullOpt, Rect(x + 130, y + 10,  textos_skin[0].GetWidth(), textos_skin[0].GetHeight()));
+
+    int alto_total = 0;
+    for (int i = 0; i < CANT_SKINS_PLAYER; i++) {
+        int alto_texto = nombres[i].GetHeight();
+        int alto_imagen = static_cast<int>(TAM_PLAYER * 1.5);
+        alto_total += std::max(alto_texto, alto_imagen);
+        if (i != CANT_SKINS_PLAYER - 1) {
+            alto_total += ESPACIO_ENTRE_ITEMS;
+        }
+    }
+
+    int x_inicial = x + OFFSET_NOMBRE_ARMAS;
+    int y_inicial = (ALTO_MIN - alto_total) / 2;
+    int y_pos = y_inicial + 30;
+
+    for(int i = 0; i < CANT_SKINS_PLAYER; i++){
+        Rect dst_nombre(x_inicial, y_pos, nombres[i].GetWidth(), nombres[i].GetHeight());
+        renderer.Copy(nombres[i], NullOpt, dst_nombre);
+
+        int tam_skin = static_cast<int>(TAM_PLAYER * 1.5);
+        Rect dst_skin(ANCHO_MIN / 2 + ANCHO_MIN/4, y_pos, tam_skin, tam_skin);
+        renderer.Copy(players[i], sprites_player[DOS_MANOS], dst_skin);
+
+        int alto_texto = nombres[i].GetHeight();
+        int alto_skin = tam_skin;
+        y_pos += std::max(alto_texto, alto_skin) + ESPACIO_ENTRE_ITEMS;
+
     }
 }
 
@@ -424,6 +477,8 @@ void Dibujador::renderizar()
     dibujar_hud();
     if(eventHandler.mercadoAbierto())
         dibujar_mercado();
+    if(!eventHandler.skinSeleccionado())
+        dibujar_seleccionar_skin();
     renderer.Present();
 }
 

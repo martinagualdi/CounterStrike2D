@@ -33,7 +33,7 @@ class GameLoop : public Thread {
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
     bool jugar_ronda();
-    bool se_termino_ronda();
+    enum Equipo se_termino_ronda();
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);

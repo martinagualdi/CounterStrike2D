@@ -22,8 +22,10 @@ class Jugador {
     int dinero;
     enum Equipo equipo_actual;
     enum SkinTipos skin_tipo;
-    bool vivo = true;
-    bool moviendose = false;
+    bool vivo;
+    bool moviendose;
+    bool disparando;
+    bool plantando_bomba;
     enum Movimiento movimiento_actual = DETENER;
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
@@ -32,7 +34,9 @@ class Jugador {
 
   public:  
 
-    explicit Jugador(int id) : id(id), x(150), y(150), angulo(0), vida(100), dinero(500), equipo_actual(), skin_tipo(), vivo(true), arma_principal(nullptr),arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+    explicit Jugador(int id) : id(id), x(150), y(150), angulo(0), vida(100), dinero(500), equipo_actual(), 
+        skin_tipo(), vivo(true), moviendose(false), disparando(false), plantando_bomba(false), arma_principal(nullptr), 
+        arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
 
 
 
@@ -84,6 +88,7 @@ class Jugador {
 
     bool disparar() {
         /* HARCODEADO PAEA PROBAR DISPARO */
+        disparando = true;
         if (arma_en_mano->accion(0.0f) > 0)
             return true;
         return false;
@@ -211,6 +216,18 @@ class Jugador {
         } else {
             return BOMBA_TT;
         }
+    }
+
+    bool esta_disparando() const {
+        return disparando;
+    }
+
+    void dejar_de_disparar() {
+        disparando = false;
+    }
+
+    bool esta_plantando_bomba() const {
+        return plantando_bomba;
     }
 
     void reiniciar() {

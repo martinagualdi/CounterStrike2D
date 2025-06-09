@@ -114,10 +114,6 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)){
         jugador->cambiar_estado_moviendose(); 
     }
-    /*if (jugador->esta_moviendose())
-        std::cout << "ESTA MOVIENDOSE " << std::endl;
-    else
-        std::cout << "NO ESTA MOVIENDOSE " << std::endl;*/
 }
 
 Jugador *GameLoop::findJugador(int id_jugador_buscado) {
@@ -129,12 +125,12 @@ Jugador *GameLoop::findJugador(int id_jugador_buscado) {
     return nullptr;
 }
 
-bool GameLoop::se_termino_ronda() {
+enum Equipo GameLoop::se_termino_ronda() {
     // Verificar si todos los jugadores de un equipo han muerto
     bool ct_vivos = false;
     bool tt_vivos = false;
     if (equipo_ct.empty() || equipo_tt.empty()) {
-        return false; // Si no hay jugadores en uno de los equipos, la ronda no ha terminado
+        return NONE; // Si no hay jugadores en uno de los equipos, la ronda no ha terminado
     }
     for (Jugador *jugador : jugadores) {
         if (jugador->esta_vivo()) {
@@ -152,27 +148,32 @@ bool GameLoop::se_termino_ronda() {
     if (!ct_vivos || !tt_vivos) {
         std::cout << "Ronda terminada. Equipo ganador: " 
                   << (ct_vivos ? "CT" : "TT") << std::endl;
-        if (ct_vivos) 
+        if (ct_vivos) { 
             rondas_ganadas_ct++;
-        else 
+            return CT;
+        } else {
             rondas_ganadas_tt++;
-        std::cout << "Rondas ganadas CT: " << rondas_ganadas_ct 
-                  << ", Rondas ganadas TT: " << rondas_ganadas_tt << std::endl;
-        return true; 
+            return TT;
+        }
     }
     /*
     HACE FALTA IMPLEMENTAR LA LOGICA DE LA BOMBA
     CON EL TIEMPO DE LA MISMA
     HACE FALTA IMPLEMENTAR LA LOGICA DE FINALIZAR PARTIDA POR TIEMPO
     */
-    return false; 
+   return NONE;
 }
 
 bool GameLoop::jugar_ronda() {
     bool en_juego = true;
     std::cout << "Iniciando ronda " << ronda_actual << std::endl;
+    auto t_inicio = std::chrono::steady_clock::now();
     while (activo && en_juego) {
         try {
+            for(Jugador *j: jugadores) {
+                if (!j->esta_vivo() || !j->esta_disparando()) continue; 
+                j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
+            }
             ComandoDTO comando;
             while (queue_comandos.try_pop(comando)) {
                 Jugador* jugador = findJugador(comando.id_jugador);
@@ -226,21 +227,24 @@ bool GameLoop::jugar_ronda() {
                 }
                 i++;
             }
-            Snapshot snapshot(jugadores, balas_disparadas);
+            enum Equipo eq_ganador = se_termino_ronda();
+            if (eq_ganador != NONE) {
+                // Reiniciar la ronda
+                for (Jugador *jugador : jugadores) {
+                    jugador->reiniciar();
+                }
+                balas_disparadas.clear();
+                ronda_actual++;
+                en_juego = false; // Terminar el bucle de juego
+            }
+            auto t_actual = std::chrono::steady_clock::now();
+            auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
+            Snapshot snapshot(jugadores, balas_disparadas, t_transcurrido, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             
         } catch (const ClosedQueue &) {
             return false;
-        }
-        if (se_termino_ronda()){
-            // Reiniciar la ronda
-            for (Jugador *jugador : jugadores) {
-                jugador->reiniciar();
-            }
-            balas_disparadas.clear();
-            ronda_actual++;
-            en_juego = false; // Terminar el bucle de juego
         }
     }
     return true;

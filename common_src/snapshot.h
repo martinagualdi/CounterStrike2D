@@ -20,6 +20,8 @@ struct InfoJugador {
     enum ArmaEnMano arma_en_mano;
     bool esta_vivo;
     bool esta_moviendose;
+    bool esta_disparando;
+    bool esta_plantando_bomba;
 };
 
 struct InfoMunicion {
@@ -32,10 +34,12 @@ struct InfoMunicion {
 struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
+    int tiempo_transcurrido;
+    enum Equipo equipo_ganador;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
-    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas) /*: balas_disparadas(balas_disparadas)*/{
+    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, auto& t_transcurrido, enum Equipo& equipo_ganador) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
@@ -49,6 +53,8 @@ struct Snapshot {
             info_jugador.arma_en_mano = jugador_ptr->get_codigo_arma_en_mano();
             info_jugador.esta_vivo = jugador_ptr->esta_vivo();
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
+            info_jugador.esta_disparando = jugador_ptr->esta_disparando();
+            info_jugador.esta_plantando_bomba = jugador_ptr->esta_plantando_bomba();
 
             info_jugadores.push_back(info_jugador);
         }
@@ -61,7 +67,10 @@ struct Snapshot {
 
             balas_disparadas.push_back(info_municion);
         }
+        tiempo_transcurrido = t_transcurrido;
+        equipo_ganador = equipo_ganador;
     }
+
 
     InfoJugador* getJugadorPorId(int client_id) {
         for (auto& jugador : info_jugadores) {

@@ -13,7 +13,8 @@ enum ArmaEnMano {
 
 enum Equipo {
     CT,
-    TT
+    TT,
+    NONE
 };
 
 enum SkinTipos {

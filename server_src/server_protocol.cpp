@@ -25,7 +25,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         return false;
     }
     std::vector<uint8_t> buffer;
-    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size() * 19));
+    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size() * 21));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[1]);
     for (const InfoJugador& j : snapshot.info_jugadores) {
@@ -43,6 +43,10 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_vivo); // Enviar si el jugador está vivo
         uint8_t esta_moviendose = j.esta_moviendose ? 0x01 : 0x00;
         buffer.push_back(esta_moviendose); // Enviar si el jugador está moviéndose
+        uint8_t esta_disparando = j.esta_disparando ? 0x01 : 0x00;
+        buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
+        uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
+        buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * 11));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
@@ -53,6 +57,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint32_t(buffer, static_cast<uint32_t>(bala.pos_y * 100));
         push_back_uint16_t(buffer, static_cast<uint16_t>(bala.angulo_disparo * 100));
     }
+    push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_transcurrido)); //Enviar tiempo transcurrido
+    buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }

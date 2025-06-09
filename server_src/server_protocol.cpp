@@ -90,6 +90,12 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             skt.recvall(&compra, sizeof(compra));
             comando.compra = static_cast<enum Compra>(compra);
             break;
+        case PREFIJO_SELECCIONAR_SKIN:
+            comando.tipo = SELECCIONAR_SKIN;
+            uint8_t skin;
+            skt.recvall(&skin, sizeof(skin));
+            comando.skin = static_cast<enum SkinTipos>(skin);
+            break;
         default:
             break;
     }

@@ -10,6 +10,7 @@ EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, const int client_id
     cola_enviador(cola_enviador),
     client_id(client_id),
     mercado_abierto(false),
+    skin_seleccionado(false),
     teclas_validas({
         SDL_SCANCODE_W,
         SDL_SCANCODE_S,
@@ -157,6 +158,10 @@ bool EventHandler::mercadoAbierto() const {
     return mercado_abierto;
 }
 
+bool EventHandler::skinSeleccionado() const {
+    return skin_seleccionado;
+}
+
 void EventHandler::convertir_coordenadas(float &x, float &y) {
     x = x;
     y = ALTO_MIN - y;
@@ -192,6 +197,45 @@ void EventHandler::procesarMouse(const SDL_Event &event)
     
 }
 
+void EventHandler::procesarSkin(const SDL_Event &event) {
+
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
+
+        ComandoDTO comando = {};
+        comando.tipo = SELECCIONAR_SKIN;
+
+        switch(event.key.keysym.scancode){
+            case SDL_SCANCODE_1:
+            case SDL_SCANCODE_KP_1:
+                comando.skin = SKIN1;
+                cola_enviador.try_push(comando);
+                skin_seleccionado = true;
+                break;
+            case SDL_SCANCODE_2:
+            case SDL_SCANCODE_KP_2:
+                comando.skin = SKIN2;
+                cola_enviador.try_push(comando);
+                skin_seleccionado = true;
+                break;
+            case SDL_SCANCODE_3:
+            case SDL_SCANCODE_KP_3:
+                comando.skin = SKIN3;
+                cola_enviador.try_push(comando);
+                skin_seleccionado = true;
+                break;
+            case SDL_SCANCODE_4:
+            case SDL_SCANCODE_KP_4:
+                comando.skin = SKIN4;
+                cola_enviador.try_push(comando);
+                skin_seleccionado = true;
+                break;       
+            default:
+                break;
+        }
+    }
+
+}
+
 void EventHandler::manejarEventos(bool &jugador_activo)
 {
     SDL_Event event;
@@ -202,11 +246,13 @@ void EventHandler::manejarEventos(bool &jugador_activo)
             return;
         }
 
-        procesarCompra(event);
-
-        if(!mercado_abierto){
-            procesarMouse(event);
-            procesarMovimiento(event);
+        procesarSkin(event);
+        if(skin_seleccionado){  
+            procesarCompra(event);
+            if(!mercado_abierto){
+                procesarMouse(event);
+                procesarMovimiento(event);
+            }
         }
     }
 }

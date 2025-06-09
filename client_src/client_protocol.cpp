@@ -37,6 +37,10 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
       mensaje.push_back(PREFIJO_COMPRAR);
       mensaje.push_back(static_cast<uint8_t>(comando.compra));
    }
+   else if(comando.tipo == SELECCIONAR_SKIN){
+      mensaje.push_back(PREFIJO_SELECCIONAR_SKIN);
+      mensaje.push_back(static_cast<uint8_t>(comando.skin));
+   }
 
 }
 

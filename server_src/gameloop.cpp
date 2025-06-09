@@ -11,10 +11,10 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
-        jugador->establecer_skin(PHEONIX); // Asignar skin por defecto a los Terroristas
+        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
     } else {
         jugador->establecer_equipo(CT);
-        jugador->establecer_skin(SEAL_FORCE); // Asignar skin por defecto a los Contra Terroristas
+        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
     }
     ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);
@@ -102,7 +102,7 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
     }
     if (jugador_colisiones_con_mapa(nuevo_x, nuevo_y)) {
         // Si hay colisión, no se actualizan las coordenadas
-        return;
+       return;
     }
     jugador->setX(nuevo_x);
     jugador->setY(nuevo_y);
@@ -111,10 +111,6 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         || (jugador->esta_moviendose() && jugador->getMovimiento() == DETENER)){
         jugador->cambiar_estado_moviendose(); 
     }
-    /*if (jugador->esta_moviendose())
-        std::cout << "ESTA MOVIENDOSE " << std::endl;
-    else
-        std::cout << "NO ESTA MOVIENDOSE " << std::endl;*/
 }
 
 Jugador *GameLoop::findJugador(int id_jugador_buscado) {
@@ -162,6 +158,9 @@ void GameLoop::run() {
                                 std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
                             }
                         }
+                        break;
+                    case SELECCIONAR_SKIN:
+                        jugador->set_skin_tipo(comando.skin);
                         break;
                     default:
                         break;

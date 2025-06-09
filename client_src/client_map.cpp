@@ -4,25 +4,22 @@ ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) :
     map_str(map_str),
     renderer(renderer),
     cache(), 
-    elementos()
+    mapa(0, 0)
     {}
 
-std::vector<ElementoMapa> ClientMap::parsearMapa() {
+struct Mapa ClientMap::parsearMapa() {
     YAML::Node data = YAML::Load(map_str);
 
-    // Cargar fondo
+    if (data["ancho_max_mapa"]) mapa.ancho_mapa_max = data["ancho_max_mapa"].as<int>();
+    if (data["alto_max_mapa"]) mapa.alto_mapa_max = data["alto_max_mapa"].as<int>();
+
     std::string pathStr = data["fondo"].as<std::string>();
     const char* path_fondo = pathStr.c_str();
     std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
-    SDL_Rect rect {0, 0, 1920, 1920}; // O bien usá ancho_max_mapa/alto_max_mapa si querés escalar
+    SDL_Rect rect {0, 0, mapa.ancho_mapa_max, mapa.alto_mapa_max};
     TipoElementoMapa tipo = FONDO;
-    elementos.emplace_back(ElementoMapa{tex, rect, tipo});
+    mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
 
-    // Guardar dimensiones del mapa
-    if (data["ancho_max_mapa"]) ancho_max_mapa = data["ancho_max_mapa"].as<int>();
-    if (data["alto_max_mapa"]) alto_max_mapa = data["alto_max_mapa"].as<int>();
-
-    // Cargar elementos
     for (const auto& nodo : data["elementos"]) {
         if (!nodo["imagen"]) continue;
 
@@ -43,10 +40,10 @@ std::vector<ElementoMapa> ClientMap::parsearMapa() {
         else if (tipo_str == "arma") tipo = ARMA;
         else continue;
 
-        elementos.emplace_back(ElementoMapa{tex, rect, tipo});
+        mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
 
-    return elementos;
+    return mapa;
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {

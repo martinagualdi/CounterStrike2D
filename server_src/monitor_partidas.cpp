@@ -1,8 +1,8 @@
 #include "monitor_partidas.h"
 
-int MonitorPartidas::crear_partida(int player_id, Queue<Snapshot>& queue_enviadora, std::string yaml_path) {
+int MonitorPartidas::crear_partida(int player_id, std::string creador_username, Queue<Snapshot>& queue_enviadora, std::string yaml_path) {
     std::lock_guard<std::mutex> lock(mtx);
-    partidas[id_para_partidas] = std::make_unique<Partida>(id_para_partidas, yaml_path);
+    partidas[id_para_partidas] = std::make_unique<Partida>(creador_username, id_para_partidas, yaml_path);
     partidas[id_para_partidas]->agregar_jugador(player_id, queue_enviadora);
     id_para_partidas++;
     return id_para_partidas - 1;
@@ -11,10 +11,8 @@ int MonitorPartidas::crear_partida(int player_id, Queue<Snapshot>& queue_enviado
 bool MonitorPartidas::unirse_a_partida(int id_partida, int player_id, Queue<Snapshot>& queue_enviadora) {
     std::lock_guard<std::mutex> lock(mtx);
     auto it = partidas.find(id_partida);
-    if (it != partidas.end()) {
-        it->second->agregar_jugador(player_id, queue_enviadora);
-        return true;
-    }
+    if (it != partidas.end()) 
+        return it->second->agregar_jugador(player_id, queue_enviadora);
     return false;
 }
 
@@ -22,7 +20,7 @@ std::vector<std::string> MonitorPartidas::listar_partidas() {
     std::lock_guard<std::mutex> lock(mtx);
     std::vector<std::string> lista_partidas;
     for (const auto& partida : partidas) {
-        std::string nueva_partida = "Id: " + std::to_string(partida.first) + "\n";
+        std::string nueva_partida = "Id: " + std::to_string(partida.first) + "  ||  Creada por: " + partida.second->get_creador() + "\n";
         lista_partidas.push_back(nueva_partida);
     }
     return lista_partidas;

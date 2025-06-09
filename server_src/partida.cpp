@@ -1,16 +1,22 @@
 #include "partida.h"
 
-Partida::Partida(const int codigo, std::string yaml_partida) :
+Partida::Partida(std::string creador_username, const int codigo, std::string yaml_partida) :
     codigo_partida(codigo),
+    creador(creador_username),
     queue_comandos(),
     jugadores_queues(),
-    gameloop(queue_comandos, jugadores_queues, yaml_partida) {
+    gameloop(queue_comandos, jugadores_queues, yaml_partida),
+    cant_jugadores(0) {
         gameloop.start();
 }
 
-void Partida::agregar_jugador(int id, Queue<Snapshot>& queue_enviadora) {
+bool Partida::agregar_jugador(int id, Queue<Snapshot>& queue_enviadora) {
+    if (cant_jugadores == 10) 
+        return false;
     jugadores_queues.agregar_queue(queue_enviadora, id);
     gameloop.agregar_jugador_a_partida(id);
+    cant_jugadores++;
+    return true;
 }
 
 std::string Partida::obtener_mapa() {

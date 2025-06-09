@@ -56,11 +56,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / 19; // Cada jugador ocupa 17 bytes
+   size_t num_jugadores = largo_jugadores / 21; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
-      uint8_t buffer[19];
-      socket.recvall(buffer, 19);
+      uint8_t buffer[21];
+      socket.recvall(buffer, 21);
       InfoJugador info_jugador;
       info_jugador.id = static_cast<int>(buffer[0]);
       info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
@@ -73,6 +73,8 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.skin_tipo = static_cast<enum SkinTipos>(buffer[16]); // Enviar el skin del jugador
       info_jugador.esta_vivo = (buffer[17] == 0x01);
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
+      info_jugador.esta_disparando = (buffer[19] == 0x01);
+      info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
@@ -91,6 +93,12 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.balas_disparadas.push_back(info_municion);
       num_balas--;
    }
+   uint16_t tiempo_transcurrido;
+   socket.recvall(&tiempo_transcurrido, sizeof(tiempo_transcurrido));
+   snapshot.tiempo_transcurrido = static_cast<int>(ntohs(tiempo_transcurrido));
+   uint8_t equipo_ganador;
+   socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
+   snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 
    return snapshot;
 }
 
@@ -101,9 +109,14 @@ int ProtocoloCliente::recibirID() {
    return id_jugador;
 }
 
-void ProtocoloCliente::enviar_crear_partida() {
+void ProtocoloCliente::enviar_crear_partida(std::string username) {
    uint8_t comando = PREFIJO_CREAR_PARTIDA;
-   if (!socket.sendall(&comando, sizeof(comando))) {
+   uint16_t largo = static_cast<uint16_t>(username.size());
+   std::vector<uint8_t> buffer;
+   buffer.push_back(comando);
+   push_back_uint16(buffer, largo);
+   buffer.insert(buffer.end(), username.begin(), username.end());
+   if (!socket.sendall(buffer.data(), buffer.size())) {
       throw std::runtime_error("Error al enviar el comando de crear partida");
    }
 }

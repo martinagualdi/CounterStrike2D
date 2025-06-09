@@ -11,7 +11,7 @@
 
 
 LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& username)
-    : QDialog(nullptr), protocolo(protocolo) {
+    : QDialog(nullptr), protocolo(protocolo), username(username) {
 
     this->resize(900, 700); // Tamaño más grande para parecerse a la imagen
 
@@ -92,7 +92,8 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
 }
 
 void LobbyWindow::onCrearClicked() {
-    protocolo.enviar_crear_partida();
+    //std::cout << "Creando partida para: " << username << std::endl;
+    protocolo.enviar_crear_partida(username);
 
     std::vector<std::pair<std::string, std::string>> mapas_disponibles = protocolo.recibir_lista_mapas();
     if (mapas_disponibles.empty()) {
@@ -159,11 +160,13 @@ void LobbyWindow::onUnirseClicked() {
         popup.exec();
         return;
     }
-    QString last = partes.last();
-    bool ok;
-    int id = last.toInt(&ok);
-    if (!ok) {
-        MensajePopup popup("Error", "ID no válido: " + last, this);
+    int id;
+    QRegularExpression re("Id:\\s*(\\d+)");
+    QRegularExpressionMatch match = re.match(texto);
+    if (match.hasMatch()) {
+        id = match.captured(1).toInt();
+    } else {
+        MensajePopup popup("Error", "No se pudo extraer el ID de la partida.", this);
         popup.exec();
         return;
     }

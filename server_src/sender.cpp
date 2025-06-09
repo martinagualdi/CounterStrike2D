@@ -4,7 +4,7 @@
 
 Sender::Sender(ServerProtocol &protocol, Queue<Snapshot> &q, std::atomic<bool> &is_alive, int player_id)
     : protocol(protocol), queue_enviadora(q), is_alive(is_alive), player_id(player_id) {
-        std::cout << "Sender creado para el jugador " << player_id << std::endl;
+        //std::cout << "Sender creado para el jugador " << player_id << std::endl;
         protocol.enviarID(player_id);
     }
 

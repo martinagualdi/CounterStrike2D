@@ -27,6 +27,8 @@ private slots:
 
 private:
     ProtocoloCliente& protocolo;
+    std::string username;
+
     QPushButton* crearButton;
     QPushButton* listarButton;
     QPushButton* unirseButton;

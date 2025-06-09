@@ -13,9 +13,11 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
+        equipo_tt.push_back(jugador);
     } else {
         jugador->establecer_equipo(CT);
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
+        equipo_ct.push_back(jugador);
     }
     ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);

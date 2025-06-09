@@ -399,13 +399,11 @@ void Dibujador::dibujar_mapa() {
     InfoJugador* jugador_principal = snapshot.getJugadorPorId(client_id);
     float centro_x = ANCHO_MIN / 2.0f;
     float centro_y = ALTO_MIN / 2.0f;
-
     for (const ElementoMapa& elemento : mapa.elementos) {
         if(elemento.tipo == FONDO){
             dibujar_fondo(elemento);
         }
         else if(elemento.tipo == OBSTACULO || elemento.tipo == PISO){
-
             float pantalla_x = elemento.dst.x - jugador_principal->pos_x + centro_x;
             float pantalla_y = elemento.dst.y - mapa.alto_mapa_max +jugador_principal->pos_y + centro_y - 64; // YA ESTA EN COORDENADA SDL
 
@@ -413,7 +411,6 @@ void Dibujador::dibujar_mapa() {
                 pantalla_y + elemento.dst.h >= 0 && pantalla_y <= ALTO_MIN) {
                 renderer.Copy(*elemento.texture, NullOpt, Rect(pantalla_x, pantalla_y, elemento.dst.w, elemento.dst.h));
             }
-
         }
     }
 }
@@ -479,6 +476,7 @@ void Dibujador::renderizar()
         dibujar_mercado();
     if(!eventHandler.skinSeleccionado())
         dibujar_seleccionar_skin();
+
     renderer.Present();
 }
 

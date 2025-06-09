@@ -23,17 +23,6 @@ void Client::iniciar() {
     LobbyWindow lobby(protocolo, username);
     int result = lobby.exec();
     if (result == QDialog::Accepted) {
-        /*std::vector<std::string> mapas_disponibles;
-        mapas_disponibles = protocolo.recibir_lista_mapas();
-        std::cout << "Mapas disponibles:\n";
-        for (size_t i = 0; i < mapas_disponibles.size(); ++i) {
-            std::cout << "  " << (i + 1) << ". " << mapas_disponibles[i] << "\n";
-        }
-
-        std::cout << "Enviar path del mapa a usar: ";
-        std::string respuesta;
-        getline(std::cin, respuesta);
-        protocolo.enviar_mensaje(respuesta);*/
         std::string mapa_inicial = protocolo.recibir_mapa();
         hilo_enviador.start();
         hilo_recibidor.start();
@@ -49,7 +38,7 @@ void Client::iniciar() {
 
         int ms_per_frame = 1000 / FPS;
         while(clienteActivo){
-            auto t1 = std::chrono::steady_clock::now();            
+            auto t1 = std::chrono::steady_clock::now();       
             eventHandler.manejarEventos(clienteActivo);
             dibujador.renderizar();
             auto t2 = std::chrono::steady_clock::now();

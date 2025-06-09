@@ -23,6 +23,10 @@ class GameLoop : public Thread {
     int ronda_actual;
     std::vector<Jugador *> equipo_ct;
     std::vector<Jugador *> equipo_tt;
+    int rondas_ganadas_ct;
+    int rondas_ganadas_tt;
+    std::atomic<bool> bomba_plantada;
+
 
     bool jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y);
     bool bala_golpea_jugador(const Municion &bala);

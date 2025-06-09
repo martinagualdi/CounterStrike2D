@@ -5,7 +5,8 @@
 
 GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
-      activo(true), balas_disparadas(), ultimo_unido_ct(false), mapa(yaml_partida), ronda_actual(1), equipo_ct(), equipo_tt() {}
+      activo(true), balas_disparadas(), ultimo_unido_ct(false), mapa(yaml_partida), ronda_actual(1), equipo_ct(), equipo_tt(), rondas_ganadas_ct(0),
+      rondas_ganadas_tt(0), bomba_plantada(false) {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
@@ -151,9 +152,20 @@ bool GameLoop::se_termino_ronda() {
     if (!ct_vivos || !tt_vivos) {
         std::cout << "Ronda terminada. Equipo ganador: " 
                   << (ct_vivos ? "CT" : "TT") << std::endl;
-        return true; // La ronda ha terminado
+        if (ct_vivos) 
+            rondas_ganadas_ct++;
+        else 
+            rondas_ganadas_tt++;
+        std::cout << "Rondas ganadas CT: " << rondas_ganadas_ct 
+                  << ", Rondas ganadas TT: " << rondas_ganadas_tt << std::endl;
+        return true; 
     }
-    return false; // La ronda sigue en juego
+    /*
+    HACE FALTA IMPLEMENTAR LA LOGICA DE LA BOMBA
+    CON EL TIEMPO DE LA MISMA
+    HACE FALTA IMPLEMENTAR LA LOGICA DE FINALIZAR PARTIDA POR TIEMPO
+    */
+    return false; 
 }
 
 bool GameLoop::jugar_ronda() {

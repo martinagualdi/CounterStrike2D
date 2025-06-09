@@ -246,14 +246,16 @@ void EventHandler::manejarEventos(bool &jugador_activo)
             return;
         }
 
-        procesarSkin(event);
-        if(skin_seleccionado){  
+        if(!skin_seleccionado)
+            procesarSkin(event);
+        else{
             procesarCompra(event);
             if(!mercado_abierto){
                 procesarMouse(event);
                 procesarMovimiento(event);
             }
         }
+        
     }
 }
 

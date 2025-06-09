@@ -271,7 +271,7 @@ void MainWindow::guardarMapa() {
     QString thumbPath = fileName;
     thumbPath.replace(".yaml", ".jpg");
 
-    QImage thumbnail = topWidget->generarMiniatura();  // Debes implementar este método en TopWidget
+    QImage thumbnail = topWidget->generarMiniatura();
     if (!thumbnail.save(thumbPath, "JPG")) {
         qWarning() << "No se pudo guardar la miniatura del mapa.";
     }

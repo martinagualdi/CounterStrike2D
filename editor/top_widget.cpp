@@ -507,7 +507,7 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
 
         auto* imagenItem = new QGraphicsPixmapItem(pix);
         imagenItem->setPos(pos);
-        imagenItem->setZValue(0.5);
+        imagenItem->setZValue(2);
         scene()->addItem(imagenItem);
     }
 }

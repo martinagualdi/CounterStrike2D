@@ -23,8 +23,7 @@ void Client::iniciar() {
     LobbyWindow lobby(protocolo, username);
     int result = lobby.exec();
     if (result == QDialog::Accepted) {
-        /*HAY QUE HACER ESTO EN QT COMO PARTE DEL LOBBY*/
-        std::vector<std::string> mapas_disponibles;
+        /*std::vector<std::string> mapas_disponibles;
         mapas_disponibles = protocolo.recibir_lista_mapas();
         std::cout << "Mapas disponibles:\n";
         for (size_t i = 0; i < mapas_disponibles.size(); ++i) {
@@ -34,9 +33,8 @@ void Client::iniciar() {
         std::cout << "Enviar path del mapa a usar: ";
         std::string respuesta;
         getline(std::cin, respuesta);
-        protocolo.enviar_mensaje(respuesta);
+        protocolo.enviar_mensaje(respuesta);*/
         std::string mapa_inicial = protocolo.recibir_mapa();
-        /*HAY QUE HACER ESTO EN QT COMO PARTE DEL LOBBY*/
         hilo_enviador.start();
         hilo_recibidor.start();
         

@@ -242,7 +242,7 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-       |QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
+        QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
         if (rutaRelativa.startsWith('/'))
             rutaRelativa.remove(0, 1);
         out << "  - imagen: " << rutaRelativa << "\n";
@@ -264,6 +264,18 @@ void MainWindow::guardarMapa() {
     }
 
     file.close();
+
+    // ============================
+    // GUARDAR MINIATURA .JPG
+    // ============================
+    QString thumbPath = fileName;
+    thumbPath.replace(".yaml", ".jpg");
+
+    QImage thumbnail = topWidget->generarMiniatura();  // Debes implementar este método en TopWidget
+    if (!thumbnail.save(thumbPath, "JPG")) {
+        qWarning() << "No se pudo guardar la miniatura del mapa.";
+    }
+    
     QApplication::quit();
 }
 

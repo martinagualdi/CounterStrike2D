@@ -2,6 +2,7 @@
 #include <cmath>
 
 #define VELOCIDAD 0.3
+#define CINCO_MINUTOS 300 
 
 GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
@@ -239,7 +240,8 @@ bool GameLoop::jugar_ronda() {
             }
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
-            Snapshot snapshot(jugadores, balas_disparadas, t_transcurrido, eq_ganador);
+            int t_restante = CINCO_MINUTOS - t_transcurrido;
+            Snapshot snapshot(jugadores, balas_disparadas, t_restante, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             

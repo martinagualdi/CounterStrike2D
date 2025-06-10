@@ -34,12 +34,12 @@ struct InfoMunicion {
 struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
-    int tiempo_transcurrido;
+    int tiempo_restante;
     enum Equipo equipo_ganador;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
-    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, auto& t_transcurrido, enum Equipo& equipo_ganador) {
+    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, auto& t_restante, enum Equipo& equipo_ganador) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
@@ -67,7 +67,7 @@ struct Snapshot {
 
             balas_disparadas.push_back(info_municion);
         }
-        tiempo_transcurrido = t_transcurrido;
+        tiempo_restante = t_restante;
         equipo_ganador = equipo_ganador;
     }
 

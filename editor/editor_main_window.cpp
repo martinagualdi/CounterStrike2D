@@ -237,6 +237,8 @@ void MainWindow::guardarMapa() {
     if (fondoPath.startsWith('/'))
         fondoPath.remove(0, 1);
     out << "fondo: " << fondoPath << "\n";
+    out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
+    out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
     out << "elementos:\n";
 
     auto elementos = topWidget->getElementos();

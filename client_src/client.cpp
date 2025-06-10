@@ -5,6 +5,9 @@
 #include <QApplication>
 
 #include "lobby_window.h"
+#include "client_sonido.h"
+#include "client_dibujador.h"
+#include "client_event_handler.h"
 
 #define CS2D_TITLE "Counter Strike 2D"
 #define ANCHO_MIN 960
@@ -27,7 +30,7 @@ void Client::iniciar() {
         hilo_enviador.start();
         hilo_recibidor.start();
         
-        SDL sdl(SDL_INIT_VIDEO);
+        SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
         SDLTTF ttf;
         SDL_ShowCursor(SDL_DISABLE);
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
@@ -35,12 +38,25 @@ void Client::iniciar() {
         ClientMap mapa(mapa_inicial, renderer);
         EventHandler eventHandler(cola_enviador, cliente_id);
         Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(), eventHandler, cola_recibidor);
+        Sonido sonido;
 
         int ms_per_frame = 1000 / FPS;
         while(clienteActivo){
-            auto t1 = std::chrono::steady_clock::now();       
+            auto t1 = std::chrono::steady_clock::now();    
+
+            Snapshot snapshotActual;
+            std::vector<Snapshot> snapshots;
+            while (cola_recibidor.try_pop(snapshotActual)) {
+                snapshots.push_back(snapshotActual);
+            }
+            for (auto& s : snapshots) {
+                sonido.reproducirSonidos(s);
+            }
+            if (!snapshots.empty())
+                dibujador.renderizar(snapshots.back());
+        
             eventHandler.manejarEventos(clienteActivo);
-            dibujador.renderizar();
+    
             auto t2 = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
             if (elapsed < ms_per_frame) {

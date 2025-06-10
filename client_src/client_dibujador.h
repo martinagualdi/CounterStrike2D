@@ -73,10 +73,11 @@ private:
     void dibujar_mercado();
     void dibujar_mapa();
     void dibujar_seleccionar_skin();
+    
 public:
     explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 
                 EventHandler& handler, Queue<Snapshot>& cola_recibidor);
-    void renderizar();
+    void renderizar(Snapshot& snapshot);
     Dibujador(const Dibujador&) = delete;
     Dibujador& operator=(const Dibujador&) = delete;
     Dibujador(Dibujador&&) = default;

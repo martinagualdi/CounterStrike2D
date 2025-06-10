@@ -5,6 +5,7 @@ target_sources(client
     client_protocol.cpp
     client_receiver.cpp
     client_sender.cpp
+    client_sonido.cpp
     client_parseador.cpp
     client.cpp
     client_main.cpp
@@ -19,6 +20,7 @@ target_sources(client
     client_protocol.h
     client_receiver.h
     client_sender.h
+    client_sonido.h
     client.h
     client_parseador.h
     client_dibujador.h

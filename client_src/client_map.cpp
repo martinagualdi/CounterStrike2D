@@ -29,7 +29,7 @@ struct Mapa ClientMap::parsearMapa() {
 
         SDL_Rect rect;
         rect.x = nodo["x"].as<int>();
-        rect.y = nodo["y"].as<int>();
+        rect.y = nodo["y"].as<int>() - mapa.alto_mapa_max;
         rect.w = nodo["ancho"].as<int>();
         rect.h = nodo["alto"].as<int>();
 

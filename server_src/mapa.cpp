@@ -56,7 +56,7 @@ Mapa::Mapa(std::string yamlPath) {
 Area Mapa::definir_inicio(const int x, const int y, const int ancho, const int alto) {
     Area inicio;
     inicio.x = x;
-    inicio.y = alto_mapa - y; // Invertir la coordenada Y
+    inicio.y = alto_mapa - y - alto; // Invertir la coordenada Y
     inicio.ancho = ancho;
     inicio.alto = alto;
     return inicio;
@@ -112,15 +112,15 @@ std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
     Area area_inicio;
     if (es_tt) 
         area_inicio = inicio_tt;
-    else 
+    else
         area_inicio = inicio_ct;
 
     // std::cout << "Area inicio: x=" << area_inicio.x << " y=" << area_inicio.y
     //           << " ancho=" << area_inicio.ancho << " alto=" << area_inicio.alto << std::endl;
 
 
-    std::uniform_real_distribution<float> dist_x(area_inicio.x, area_inicio.x + area_inicio.ancho);
-    std::uniform_real_distribution<float> dist_y(area_inicio.y, area_inicio.y + area_inicio.alto);
+    std::uniform_real_distribution<float> dist_x(area_inicio.x - 20, area_inicio.x + area_inicio.ancho + 20);
+    std::uniform_real_distribution<float> dist_y(area_inicio.y + 20, area_inicio.y - area_inicio.alto - 20);
 
     float x = dist_x(gen);
     float y = dist_y(gen);

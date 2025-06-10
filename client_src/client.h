@@ -3,9 +3,7 @@
 
 #include "client_protocol.h"
 #include "client_sender.h"
-#include "client_event_handler.h"
 #include "client_receiver.h"
-#include "client_dibujador.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/queue.h"
 #include "../common_src/socket.h"

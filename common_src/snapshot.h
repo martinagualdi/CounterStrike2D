@@ -79,12 +79,6 @@ struct Snapshot {
         }
         return nullptr;
     }
-
-    void actualizar_snapshot(const Snapshot &otro) {
-        info_jugadores.clear();
-        info_jugadores.insert(info_jugadores.end(), otro.info_jugadores.begin(),
-                              otro.info_jugadores.end());
-    }
 };
 
 #endif

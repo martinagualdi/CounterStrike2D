@@ -6,7 +6,6 @@
 
 ProtocoloCliente::ProtocoloCliente(const char *hostname, const char *servname) :socket(Socket(hostname, servname)) {}
 
-
 void ProtocoloCliente::push_back_uint16(std::vector<uint8_t>& message, uint16_t value) {
     value = htons(value);
     message.push_back(reinterpret_cast<uint8_t*>(&value)[0]);
@@ -159,12 +158,14 @@ void ProtocoloCliente::enviar_mensaje(const std::string& mensaje) {
 }
 
 std::string ProtocoloCliente::recibir_mapa() {
-   uint8_t header[4];
-   socket.recvall(header, 4);
-   uint32_t tam = (header[0] << 24) | (header[1] << 16) | (header[2] << 8) | header[3];
+   uint32_t length;
+   socket.recvall(&length, sizeof(length));
+   length = ntohl(length);
 
-   std::vector<uint8_t> buffer(tam);
-   socket.recvall(buffer.data(), tam);
+   std::vector<uint8_t> buffer(length);
+   if(!socket.recvall(buffer.data(), length)){
+      throw std::runtime_error("Error al recibir el mapa.");
+   }
    std::string yaml_serializado(buffer.begin(), buffer.end());
 
    return yaml_serializado;

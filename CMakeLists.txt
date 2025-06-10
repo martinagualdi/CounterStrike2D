@@ -99,7 +99,7 @@ if(TALLER_CLIENT OR TALLER_EDITOR)
     )
 
     set(SDL2PP_WITH_TTF ON CACHE BOOL "" FORCE)
-
+    set(SDL2PP_WITH_MIXER ON CACHE BOOL "" FORCE)
     FetchContent_Declare(
         libSDL2pp
         OVERRIDE_FIND_PACKAGE
@@ -140,7 +140,7 @@ if(TALLER_CLIENT)
     target_include_directories(client PRIVATE ${libSDL2pp_SOURCE_DIR})
 
     # Link the taller_common lib target
-    target_link_libraries(client taller_common SDL2pp::SDL2pp SDL2_image SDL2_ttf)
+    target_link_libraries(client taller_common SDL2pp::SDL2pp SDL2_image SDL2_ttf SDL2_mixer)
 
     target_link_libraries(client Qt6::Widgets)
     target_link_libraries(client Qt6::Multimedia)
@@ -174,7 +174,7 @@ if(TALLER_EDITOR)
     add_executable(taller_editor)
 
     # Make them depend on taller_common lib
-    add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
+    #add_dependencies(taller_editor taller_common SDL2pp::SDL2pp)
 
     # Add source files and enable warnings
     # HEY!! TODO XXX: add more subfolders here

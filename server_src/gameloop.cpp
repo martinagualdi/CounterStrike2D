@@ -53,33 +53,48 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
     switch (jugador->getMovimiento()) {
         case ARRIBA:
             nuevo_y += VELOCIDAD;
+            if (mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case ABAJO:
             nuevo_y -= VELOCIDAD;
+            if (nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case IZQUIERDA:
             nuevo_x -= VELOCIDAD;
+            if (nuevo_x < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DERECHA:
             nuevo_x += VELOCIDAD;
+            if (mapa.limite_ancho() < nuevo_x) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_SUP_IZQ:
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
+            if (nuevo_x < 0 || mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_SUP_DER:
             nuevo_x += velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
+            if (mapa.limite_ancho() < nuevo_x || mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_INF_IZQ:
             nuevo_x -= velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
+            if (nuevo_x < 0 || nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_INF_DER:
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
+            if (mapa.limite_ancho() < nuevo_x || nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
-
         case DETENER:
             break;
     }

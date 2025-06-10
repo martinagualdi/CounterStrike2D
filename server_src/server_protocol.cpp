@@ -60,7 +60,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint32_t(buffer, static_cast<uint32_t>(bala.pos_y * 100));
         push_back_uint16_t(buffer, static_cast<uint16_t>(bala.angulo_disparo * 100));
     }
-    push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_transcurrido)); //Enviar tiempo transcurrido
+    push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_restante)); //Enviar tiempo restante
     buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
     skt.sendall(buffer.data(), buffer.size());
     return true;

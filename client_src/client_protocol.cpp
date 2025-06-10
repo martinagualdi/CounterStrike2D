@@ -94,7 +94,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    }
    uint16_t tiempo_transcurrido;
    socket.recvall(&tiempo_transcurrido, sizeof(tiempo_transcurrido));
-   snapshot.tiempo_transcurrido = static_cast<int>(ntohs(tiempo_transcurrido));
+   snapshot.tiempo_restante = static_cast<int>(ntohs(tiempo_transcurrido));
    uint8_t equipo_ganador;
    socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
    snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 

@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <cstddef>
-#include "jugador.h"
-#include "municion.h"
+#include "../server_src/jugador.h"
+#include "../server_src/municion.h"
 
 /*Structs para enviar la informacion necesaria para dibujar el juevo en "client"*/
 
@@ -79,10 +79,6 @@ struct Snapshot {
         }
         return nullptr;
     }
-
-    //Snapshot(std::vector<Jugador> &jugadores) : info_jugadores(jugadores) {}
-
-    //Snapshot(std::vector<Jugador> &jugadores, std::vector<Municion> &balas_disparadas) : info_jugadores(jugadores), balas_disparadas(balas_disparadas) {}
 
     void actualizar_snapshot(const Snapshot &otro) {
         info_jugadores.clear();

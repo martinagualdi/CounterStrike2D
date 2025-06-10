@@ -4,11 +4,11 @@
 #include "../common_src/comando_dto.h"
 #include "../common_src/thread.h"
 #include "../common_src/queue.h"
-#include "../common_src/jugador.h"
 #include "../common_src/snapshot.h"
+#include "jugador.h"
 #include "lista_queues.h"
-#include "../common_src/municion.h"
-#include "../common_src/mapa.h"
+#include "municion.h"
+#include "mapa.h"
 
 
 class GameLoop : public Thread {

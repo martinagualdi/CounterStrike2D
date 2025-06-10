@@ -39,10 +39,6 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala) {
         if (pos_x >= min_pos_x_jugador && pos_x <= max_pos_x_jugador &&
             pos_y >= min_pos_y_jugador && pos_y <= max_pos_y_jugador) {
             jugador->recibir_danio(10);
-            
-            /*std::cout << "Jugador de ID: " << jugador->getId() << " ha sido impactado por la bala del jugador de ID: " 
-                << bala.quien_disparo() << " || ";
-            std::cout << "Vida restante del jugador: " << jugador->get_vida() << std::endl;*/
             return true;
         }
     }
@@ -56,46 +52,30 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
     float nuevo_y = jugador->getY();
     switch (jugador->getMovimiento()) {
         case ARRIBA:
-            //jugador->setY(jugador->getY() + VELOCIDAD);
             nuevo_y += VELOCIDAD;
             break;
         case ABAJO:
-            // float y = jugador->getY() - VELOCIDAD;
-            // if(y > 0)
-            //     jugador->setY(y);
             nuevo_y -= VELOCIDAD;
             break;
         case IZQUIERDA:
-            // float x = jugador->getX() - VELOCIDAD;
-            // if(x > 0)
-            //     jugador->setX(x);
             nuevo_x -= VELOCIDAD;
             break;
         case DERECHA:
-            //jugador->setX(jugador->getX() + VELOCIDAD);
             nuevo_x += VELOCIDAD;
             break;
         case DIAGONAL_SUP_IZQ:
-            // jugador->setX(jugador->getX() - velocidad_diagonal);
-            // jugador->setY(jugador->getY() + velocidad_diagonal);
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             break;
         case DIAGONAL_SUP_DER:
-            // jugador->setX(jugador->getX() + velocidad_diagonal);
-            // jugador->setY(jugador->getY() + velocidad_diagonal);
             nuevo_x += velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             break;
         case DIAGONAL_INF_IZQ:
-            // jugador->setX(jugador->getX() - velocidad_diagonal);
-            // jugador->setY(jugador->getY() - velocidad_diagonal);
             nuevo_x -= velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             break;
         case DIAGONAL_INF_DER:
-            // jugador->setX(jugador->getX() + velocidad_diagonal);
-            // jugador->setY(jugador->getY() - velocidad_diagonal);
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             break;

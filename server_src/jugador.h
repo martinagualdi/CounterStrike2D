@@ -80,6 +80,8 @@ class Jugador {
 
     enum ArmaEnMano get_codigo_arma_en_mano();
 
+    Arma* get_arma_actual() const;
+
     void definir_spawn(float x, float y);
 
     void reiniciar();

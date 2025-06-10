@@ -22,6 +22,7 @@ struct InfoJugador {
     bool esta_moviendose;
     bool esta_disparando;
     bool esta_plantando_bomba;
+    int balas;
 };
 
 struct InfoMunicion {
@@ -55,6 +56,7 @@ struct Snapshot {
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
             info_jugador.esta_disparando = jugador_ptr->esta_disparando();
             info_jugador.esta_plantando_bomba = jugador_ptr->esta_plantando_bomba();
+            info_jugador.balas = jugador_ptr->get_arma_actual()->getBalas();
 
             info_jugadores.push_back(info_jugador);
         }

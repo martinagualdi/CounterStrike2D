@@ -4,6 +4,9 @@
 #include <iostream>
 #include <arpa/inet.h>
 
+#define BYTES_JUGADORES 21
+#define BYTES_BALAS 11
+
 void ServerProtocol::push_back_uint16_t(std::vector<uint8_t> &buffer, uint16_t value) {
     value = htons(value);
     buffer.push_back(reinterpret_cast<uint8_t*>(&value)[0]);
@@ -25,7 +28,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         return false;
     }
     std::vector<uint8_t> buffer;
-    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size() * 21));
+    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size() * BYTES_JUGADORES));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[1]);
     for (const InfoJugador& j : snapshot.info_jugadores) {
@@ -48,7 +51,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
     }
-    uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * 11));
+    uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[1]);
     for (const InfoMunicion& bala : snapshot.balas_disparadas) {
@@ -117,30 +120,23 @@ bool ServerProtocol::enviarID(int id_jugador) {
 
 std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
     uint8_t codigo;
-    //std::cout << "Esperando comando..." << std::endl;
     skt.recvall(&codigo, sizeof(codigo));
     std::vector<std::string> comando;
     if (codigo == PREFIJO_CREAR_PARTIDA) {
-        /* Caso: Crear partida */
         comando.push_back("crear");
-        //std::cout << "Recibiendo nombre de usuario..." << std::endl;
         uint16_t largo;
         skt.recvall(&largo, sizeof(largo));
         largo = ntohs(largo);
-        //std::cout << "Largo del nombre de usuario: " << largo << std::endl;
         std::vector<uint8_t> buffer(largo);
         skt.recvall(buffer.data(), largo);
         std::string username(buffer.begin(), buffer.end());
         comando.push_back(username);
-        //std::cout << "Creando partida..." << std::endl;
     }else if (codigo == PREFIJO_UNIRSE_PARTIDA) {
-        /* Caso: Unirse a partida */
         comando.push_back("unirse");
         uint16_t id_partida;
         skt.recvall(&id_partida, sizeof(id_partida));
         comando.push_back(std::to_string(ntohs(id_partida)));
     } else if(codigo == PREFIJO_LISTAR) {
-        /* Caso: Listar partidas */
         comando.push_back("listar");
     }
     return comando;

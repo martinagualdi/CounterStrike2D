@@ -4,12 +4,8 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
-    municion.cpp
-    jugador.cpp
-    mapa.cpp
     PUBLIC
     comando_dto.h
-    jugador.h
     liberror.h
     prefijos_protocolo.h
     queue.h
@@ -18,14 +14,4 @@ target_sources(taller_common
     snapshot.h
     socket.h
     thread.h
-    arma.h
-    armaDeFuego.h
-    awp.h
-    m3.h
-    ak47.h
-    glock.h
-    cuchillo.h
-    bomba.h
-    municion.h
-    mapa.h
     )

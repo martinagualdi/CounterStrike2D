@@ -49,10 +49,6 @@ void ClientHandler::comunicacion_del_lobby() {
         try {
             std::vector<std::string> comando_inicial = protocolo.recibir_inicio_juego();
             if (comando_inicial[0] == "crear") {
-                /*
-                Aca iria la logica de elegir el mapa, que se debe recibir via socket el yaml del mapa
-                y se debe crear un objeto Mapa que se envie al monitor de partidas y ahi al gameloop de la partida.
-                */
                 std::vector<std::pair<std::string, std::string>>  mapas_disponibles = listar_mapas_disponibles();
                 protocolo.enviar_lista_mapas(mapas_disponibles);
                 std::string path = protocolo.recibir_path_mapa(); 
@@ -68,9 +64,6 @@ void ClientHandler::comunicacion_del_lobby() {
                 partida_id = std::stoi(comando_inicial[1]);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocolo.enviar_mapa(yaml_serializado);
-                /*
-                Aca iria la logica del mapa ya debe estar dentro del gameloop porque no la estas creando.
-                */
                 break;
             } else {
                 std::vector<std::string> lista_partidas = monitor_partidas.listar_partidas();

@@ -11,8 +11,10 @@ target_sources(server
     receiver.cpp
     sender.cpp
     server.cpp
-    processor.cpp
     partida.cpp
+    jugador.cpp
+    mapa.cpp
+    municion.cpp
     PUBLIC
     # .h files
     acceptor.h
@@ -22,9 +24,20 @@ target_sources(server
     mensaje_dto.h
     monitor_partidas.h
     partida.h
-    processor.h
     receiver.h
     sender.h
     server_protocol.h
     server.h
+    jugador.h
+    mapa.h
+    municion.h
+    ak47.h
+    arma.h
+    armaDeFuego.h
+    awp.h
+    bomba.h
+    cuchillo.h
+    glock.h
+    m3.h
+    
     )

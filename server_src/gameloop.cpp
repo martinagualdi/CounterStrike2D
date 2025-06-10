@@ -2,6 +2,7 @@
 #include <cmath>
 
 #define VELOCIDAD 0.3
+#define CINCO_MINUTOS 300 
 
 GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida)
     : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
@@ -19,6 +20,8 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
         equipo_ct.push_back(jugador);
     }
+    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(ultimo_unido_ct);
+    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]); // Posición inicial por defecto
     ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);
 }
@@ -39,10 +42,6 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala) {
         if (pos_x >= min_pos_x_jugador && pos_x <= max_pos_x_jugador &&
             pos_y >= min_pos_y_jugador && pos_y <= max_pos_y_jugador) {
             jugador->recibir_danio(10);
-            
-            /*std::cout << "Jugador de ID: " << jugador->getId() << " ha sido impactado por la bala del jugador de ID: " 
-                << bala.quien_disparo() << " || ";
-            std::cout << "Vida restante del jugador: " << jugador->get_vida() << std::endl;*/
             return true;
         }
     }
@@ -56,50 +55,49 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
     float nuevo_y = jugador->getY();
     switch (jugador->getMovimiento()) {
         case ARRIBA:
-            //jugador->setY(jugador->getY() + VELOCIDAD);
             nuevo_y += VELOCIDAD;
+            if (mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case ABAJO:
-            // float y = jugador->getY() - VELOCIDAD;
-            // if(y > 0)
-            //     jugador->setY(y);
             nuevo_y -= VELOCIDAD;
+            if (nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case IZQUIERDA:
-            // float x = jugador->getX() - VELOCIDAD;
-            // if(x > 0)
-            //     jugador->setX(x);
             nuevo_x -= VELOCIDAD;
+            if (nuevo_x < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DERECHA:
-            //jugador->setX(jugador->getX() + VELOCIDAD);
             nuevo_x += VELOCIDAD;
+            if (mapa.limite_ancho() < nuevo_x) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_SUP_IZQ:
-            // jugador->setX(jugador->getX() - velocidad_diagonal);
-            // jugador->setY(jugador->getY() + velocidad_diagonal);
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
+            if (nuevo_x < 0 || mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_SUP_DER:
-            // jugador->setX(jugador->getX() + velocidad_diagonal);
-            // jugador->setY(jugador->getY() + velocidad_diagonal);
             nuevo_x += velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
+            if (mapa.limite_ancho() < nuevo_x || mapa.limite_alto() < nuevo_y) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_INF_IZQ:
-            // jugador->setX(jugador->getX() - velocidad_diagonal);
-            // jugador->setY(jugador->getY() - velocidad_diagonal);
             nuevo_x -= velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
+            if (nuevo_x < 0 || nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
         case DIAGONAL_INF_DER:
-            // jugador->setX(jugador->getX() + velocidad_diagonal);
-            // jugador->setY(jugador->getY() - velocidad_diagonal);
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
+            if (mapa.limite_ancho() < nuevo_x || nuevo_y < 0) 
+                return; // Evitar que el jugador se mueva fuera del mapa
             break;
-
         case DETENER:
             break;
     }
@@ -242,7 +240,8 @@ bool GameLoop::jugar_ronda() {
             }
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
-            Snapshot snapshot(jugadores, balas_disparadas, t_transcurrido, eq_ganador);
+            int t_restante = CINCO_MINUTOS - t_transcurrido;
+            Snapshot snapshot(jugadores, balas_disparadas, t_restante, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             

@@ -39,8 +39,6 @@ void Acceptor::run() {
 
 void Acceptor::eliminar_cliente(ClientHandler *client) {
     client->cortar_conexion();
-    //int id = client->get_id();
-    //queues_clientes.eliminar_queue(id);
     delete client;
 }
 
@@ -63,7 +61,6 @@ Acceptor::~Acceptor() {
         eliminar_cliente(c);
     }
     clients.clear();
-    //queue_recibidora.close();
     skt.shutdown(RW_CLOSE);
     skt.close();
     this->join();

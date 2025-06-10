@@ -7,7 +7,6 @@
 
 #include "mensaje_dto.h"
 #include "../common_src/socket.h"
-#include "processor.h"
 #include "acceptor.h"
 #include "lista_queues.h"
 #include "../common_src/queue.h"

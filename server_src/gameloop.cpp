@@ -41,7 +41,12 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala) {
         float min_pos_y_jugador = jugador->getY() - 20;
         if (pos_x >= min_pos_x_jugador && pos_x <= max_pos_x_jugador &&
             pos_y >= min_pos_y_jugador && pos_y <= max_pos_y_jugador) {
-            jugador->recibir_danio(10);
+            int id_tirador = bala.quien_disparo();
+            Jugador *jugador_tirador = findJugador(id_tirador);    
+            float dx = jugador->getX() - jugador_tirador->getX();
+            float dy = jugador->getY() - jugador_tirador->getY();
+            float distancia = std::sqrt(dx * dx + dy * dy);
+            jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
             return true;
         }
     }
@@ -185,7 +190,23 @@ bool GameLoop::jugar_ronda() {
                         break;
                     case DISPARO:
                         std::cout << "Angulo recibido: " << comando.angulo << std::endl;
-                        if (jugador->disparar() ){
+                        if (jugador->disparar()){
+                            if (jugador->get_codigo_arma_en_mano() == M3){
+                                for (int i = 0; i < 3; i++) {
+                                    Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo + (i - 1) * 5);
+                                    balas_disparadas.push_back(bala_disparada);
+                                }
+                                break;
+                            }
+                            if (jugador->get_codigo_arma_en_mano() == AK_47) {
+                                Ak47 *ak47 = dynamic_cast<Ak47 *>(jugador->get_arma_actual());
+                                // Solo inicia la ráfaga si no hay una en curso y puede disparar
+                                if (!ak47->hay_rafaga()) {
+                                    ak47->agregarMunicion(1); // Disparar disminuye la municion sin hacer acción, entonces debo agregar una bala
+                                    ak47->iniciar_rafaga(comando.angulo, comando.id_jugador);
+                                }
+                                break;
+                            }
                             Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
                             balas_disparadas.push_back(bala_disparada);
                         }
@@ -215,6 +236,26 @@ bool GameLoop::jugar_ronda() {
             }
 
             for (Jugador *jugador : jugadores) {
+                if (jugador->get_codigo_arma_en_mano() == AK_47) {
+                    Ak47 *ak47 = dynamic_cast<Ak47 *>(jugador->get_arma_actual());
+                    if (ak47->hay_rafaga()) {
+                        auto ahora = std::chrono::steady_clock::now();
+                        auto& proximo = ak47->get_proximo_disparo_rafaga();
+                        if (ahora >= proximo) {
+
+                            Municion bala_disparada(
+                                ak47->get_id_jugador_rafaga(),
+                                jugador->getX(),
+                                jugador->getY(),
+                                ak47->get_ultimo_angulo_rafaga()
+                            );
+                            balas_disparadas.push_back(bala_disparada);
+
+                            ak47->tick_rafaga();
+                            proximo = ahora + std::chrono::milliseconds(80); // 80ms entre balas
+                        }
+                    }
+                }
                 ejecutar_movimiento(jugador);
             }
             size_t i = 0;

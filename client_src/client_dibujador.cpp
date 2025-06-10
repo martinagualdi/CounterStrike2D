@@ -315,7 +315,7 @@ void Dibujador::dibujar_hud() {
     
     dibujar_salud(snapshot.getJugadorPorId(client_id)->vida);
     dibujar_tiempo();
-    dibujar_balas_hud(30);
+    dibujar_balas_hud(snapshot.getJugadorPorId(client_id)->balas);
     dibujar_saldo(snapshot.getJugadorPorId(client_id)->dinero);
 }
 
@@ -339,9 +339,9 @@ void Dibujador::dibujar_mercado() {
     renderer.Copy(comprarArmas, NullOpt, Rect(x + 130, y + 10,  comprarArmas.GetWidth(), comprarArmas.GetHeight()));
     
     std::vector <Texture> textos;
-    textos.push_back(crearTextoArma("[1] AK-47       ", 100));
+    textos.push_back(crearTextoArma("[1] AK-47       ", 150));
     textos.push_back(crearTextoArma("[2] M3             ", 100));
-    textos.push_back(crearTextoArma("[3] AWP          ", 100));
+    textos.push_back(crearTextoArma("[3] AWP          ", 200));
     Texture primaria(renderer, fuente.RenderText_Blended("[,] Balas de arma primaria", amarillo));
     Texture secundaria(renderer, fuente.RenderText_Blended("[.] Balas de arma secundaria", amarillo));
     Texture salir(renderer, fuente.RenderText_Blended("[ESC] Salir", amarillo));

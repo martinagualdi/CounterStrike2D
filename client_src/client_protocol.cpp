@@ -55,11 +55,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / 21; 
+   size_t num_jugadores = largo_jugadores / 22; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
-      uint8_t buffer[21];
-      socket.recvall(buffer, 21);
+      uint8_t buffer[22];
+      socket.recvall(buffer, 22);
       InfoJugador info_jugador;
       info_jugador.id = static_cast<int>(buffer[0]);
       info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
@@ -74,6 +74,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
       info_jugador.esta_disparando = (buffer[19] == 0x01);
       info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
+      info_jugador.balas = static_cast<int>(buffer[21]); // Enviar la cantidad de balas del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }

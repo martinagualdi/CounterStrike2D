@@ -50,6 +50,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
+        uint8_t balas = static_cast<uint8_t>(j.balas);
+        buffer.push_back(balas); // Enviar la cantidad de balas del jugador
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);

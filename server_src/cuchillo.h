@@ -3,7 +3,8 @@
 class Cuchillo : public Arma {
 public:
     // Valores Hardcodeados hasta tener YAML
-    Cuchillo() : Arma("Cuchillo", 1.0f, 1.0f, 15, 35, false) {}
+    Cuchillo() : Arma("Cuchillo", 1.0f, 1.0f, 15, 35, false,500) {}
+
     int accion(float distancia) override {
         if (distancia <= alcance) {
             std::random_device rd; std::mt19937 gen(rd());
@@ -11,6 +12,16 @@ public:
             return dis(gen);
         }
         return 0;
+    }
+    int getBalas() override { return 1; } // El cuchillo no tiene balas, pero se usa para el HUD
+    bool puedeAccionar()  override {
+        auto ahora = std::chrono::steady_clock::now();
+        auto tiempo_transcurrido = std::chrono::duration_cast<std::chrono::milliseconds>(ahora - ultima_accion);
+        if (tiempo_transcurrido.count() >= cadencia_accion_ms ){
+            ultima_accion = std::chrono::steady_clock::now();
+            return true;
+        }
+        return false;
     }
 
     

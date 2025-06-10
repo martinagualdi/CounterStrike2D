@@ -17,6 +17,8 @@ class Jugador {
     int id;
     float x;
     float y;
+    float spawn_x;
+    float spawn_y;
     float angulo;
     int vida;
     int dinero;
@@ -77,6 +79,8 @@ class Jugador {
     bool comprarBalas(enum Compra tipo_bala);
 
     enum ArmaEnMano get_codigo_arma_en_mano();
+
+    void definir_spawn(float x, float y);
 
     void reiniciar();
     

@@ -106,10 +106,17 @@ enum ArmaEnMano Jugador::get_codigo_arma_en_mano() {
     }
 }
 
+void Jugador::definir_spawn(float x, float y) {
+    this->x = x;
+    this->y = y;
+    this->spawn_x = x;
+    this->spawn_y = y;
+}
+
 void Jugador::reiniciar() {
     /*HARDCODEADO, REDEFINIR CON YAML DE CONFIG*/
-    x = 1000;
-    y = 1000;
+    x = spawn_x;
+    y = spawn_y;
     angulo = 0;
     vida = 100;
     dinero = 500;

@@ -19,6 +19,8 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
         equipo_ct.push_back(jugador);
     }
+    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(ultimo_unido_ct);
+    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]); // Posición inicial por defecto
     ultimo_unido_ct = !ultimo_unido_ct; 
     jugadores.push_back(jugador);
 }

@@ -43,6 +43,7 @@ public:
     bool bala_colision_contra_pared(float pos_x, float pos_y);
     int limite_alto() const { return alto_mapa; }
     int limite_ancho() const { return ancho_mapa; }
+    std::vector<float> dar_posiciones_iniciales(bool es_tt);
 
 };
 

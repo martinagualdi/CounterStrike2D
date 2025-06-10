@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <random>
 
 Mapa::Mapa(std::string yamlPath) {
     YAML::Node data = YAML::LoadFile(yamlPath);
@@ -24,23 +25,28 @@ Mapa::Mapa(std::string yamlPath) {
             tipo = PISO;
         } else if(tipo_str == "arma"){
             tipo = PISO;
-        } else if (tipo_str == "inicio_ct") {
-            tipo = PISO; 
-            inicio_ct = definir_inicio(elemento.area.x, elemento.area.y, elemento.area.ancho, elemento.area.alto);
-        } else if (tipo_str == "inicio_tt"){
-            tipo = PISO; 
-            inicio_tt = definir_inicio(elemento.area.x, elemento.area.y, elemento.area.ancho, elemento.area.alto);
-        } else if (tipo_str == "zona_bombas") {
-            tipo = PISO;
-            if (!zona_bombas_definida) {
-                zona_bombas.zona_bombas_a = definir_inicio(elemento.area.x, elemento.area.y, elemento.area.ancho, elemento.area.alto);
-                zona_bombas_definida = true;
-            }else {
-                zona_bombas.zona_bombas_b = definir_inicio(elemento.area.x, elemento.area.y, elemento.area.ancho, elemento.area.alto);
-            }
         }
         elemento.tipo = tipo;
         elementos.push_back(elemento);
+    }
+    for (const auto &nodo : data["zonas"]) {
+        std::string tipo_str = nodo["tipo"].as<std::string>();
+        int x = nodo["x"].as<int>();
+        int y = nodo["y"].as<int>();
+        int ancho = nodo["ancho"].as<int>();
+        int alto = nodo["alto"].as<int>();
+        if (tipo_str == "inicio_ct") {
+            inicio_ct = definir_inicio(x, y, ancho, alto);
+        } else if (tipo_str == "inicio_tt"){
+            inicio_tt = definir_inicio(x, y, ancho, alto);
+        } else if (tipo_str == "zona_bombas") {
+            if (!zona_bombas_definida) {
+                zona_bombas.zona_bombas_a = definir_inicio(x, y, ancho, alto);
+                zona_bombas_definida = true;
+            }else {
+                zona_bombas.zona_bombas_b = definir_inicio(x, y, ancho, alto);
+            }
+        }
     }
     std::stringstream dto;
     dto << data;
@@ -97,4 +103,28 @@ bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
         }
     }
     return false;
+}
+
+std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    Area area_inicio;
+    if (es_tt) 
+        area_inicio = inicio_tt;
+    else 
+        area_inicio = inicio_ct;
+
+    // std::cout << "Area inicio: x=" << area_inicio.x << " y=" << area_inicio.y
+    //           << " ancho=" << area_inicio.ancho << " alto=" << area_inicio.alto << std::endl;
+
+
+    std::uniform_real_distribution<float> dist_x(area_inicio.x, area_inicio.x + area_inicio.ancho);
+    std::uniform_real_distribution<float> dist_y(area_inicio.y, area_inicio.y + area_inicio.alto);
+
+    float x = dist_x(gen);
+    float y = dist_y(gen);
+    std::cout << "Posición inicial: (" << x << ", " << y << ")" << std::endl;
+    std::vector<float> posicion_inicial{x, y};
+    return posicion_inicial;
 }

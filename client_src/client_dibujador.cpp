@@ -163,7 +163,7 @@ void Dibujador::dibujar_jugadores() {
         
         float angulo_sdl = convertir_angulo(jugador.angulo);
         
-        if(jugador.vida < 20){
+        if(!jugador.esta_vivo){
             dibujar_muerto(x_pixel, y_pixel);
             continue;
         }

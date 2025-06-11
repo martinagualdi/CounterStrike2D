@@ -12,8 +12,7 @@ class Bomba : public Arma {
 public:
     // Valores Hardcodeados hasta tener YAML
     Bomba()
-        : Arma("Bomba", 1.0f, 40.0f, 0, 100, false), activada(false), desactivada(false), detonada(false), tiempo_para_detonar(40) {}
-
+: Arma("Bomba", 1.0f, 40.0f, 0, 100, false,1), activada(false), desactivada(false), detonada(false), tiempo_para_detonar(40) {}
     int accion(float distancia) override {
         detonada = true;
         // Daño máximo a 0 metros, disminuye linealmente hasta 0 a 500 unidades
@@ -31,9 +30,12 @@ public:
         //Iniciar temporizador de detonacion
         activada = true; }
     bool estaActivada() const { return activada; }
-
+    int getBalas() override { return 1; } // La bomba no tiene balas, pero se usa para el HUD
     
     bool estaDetonada() const { return detonada; }
+    bool puedeAccionar() override {
+        return !detonada && !desactivada; // La bomba puede ser activada si no ha sido detonada ni desactivada
+    }
 
     int getTiempoParaDetonar() const { return tiempo_para_detonar; }
 };

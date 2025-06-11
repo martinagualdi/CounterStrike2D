@@ -7,25 +7,30 @@ class m3 : public ArmaDeFuego {
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    m3() : ArmaDeFuego("M3", 0.7f, 15.0f, 20, 70, false,100) {}
+     m3() : ArmaDeFuego("M3", 0.7f, 180.0f, 5, 80, false,100,875) {}
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
-        municion_actual--;
-        float factor_precision = precision - (distancia / alcance) * 0.7f;
-        if (factor_precision < 0.1f) factor_precision = 0.1f;
+        if (distancia > alcance) return 0;
         std::random_device rd; std::mt19937 gen(rd());
         std::uniform_real_distribution<> hit(0.0, 1.0);
-        int pellets = 6;
-        int total_danio = 0;
-        for (int i = 0; i < pellets; ++i) {
-            if (hit(gen) <= factor_precision) {
-                std::uniform_int_distribution<> dis(min_danio, max_danio);
-                int danio = dis(gen) / pellets;
-                // Daño disminuye mucho con la distancia
-                danio -= static_cast<int>(danio * (distancia / alcance));
-                total_danio += (danio > 0 ? danio : 1);
+        if (hit(gen) <= precision) {
+            int danio = static_cast<int>(max_danio * (alcance / (distancia * distancia)) * 0.5f);
+            if (danio < min_danio) {
+                danio = min_danio; 
             }
+            return danio > max_danio ? max_danio : danio;
         }
-        return total_danio;
+        return min_danio;
+    }
+
+     bool puedeAccionar()  override {
+        auto ahora = std::chrono::steady_clock::now();
+        auto tiempo_transcurrido = std::chrono::duration_cast<std::chrono::milliseconds>(ahora - ultima_accion);
+        if (tiempo_transcurrido.count() >= cadencia_accion_ms && municion_actual > 0){
+            municion_actual--;
+            ultima_accion = std::chrono::steady_clock::now();
+            return true;
+        }
+        return false;
     }
 };

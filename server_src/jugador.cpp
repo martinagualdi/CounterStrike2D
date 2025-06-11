@@ -1,11 +1,9 @@
 #include "jugador.h"
 
-bool Jugador::disparar() {
-    /* HARCODEADO PAEA PROBAR DISPARO */
+
+void Jugador::disparar() {
     disparando = true;
-    if (arma_en_mano->accion(0.0f) > 0)
-        return true;
-    return false;
+    
 }
 
 void Jugador::recibir_danio(int danio) { 
@@ -14,6 +12,10 @@ void Jugador::recibir_danio(int danio) {
         vida = 0;
         vivo = false;
     }
+}
+
+Arma* Jugador::get_arma_actual() const {
+    return arma_en_mano;
 }
 
 std::string Jugador::get_nombre_arma_en_mano() {
@@ -93,14 +95,14 @@ bool Jugador::comprarBalas(enum Compra tipo_bala) {
     switch (tipo_bala) {
         case BALAS_PRIMARIA:
             if (dinero >= 5){
-                arma_principal->setMunicion(10);
+                arma_principal->agregarMunicion(10);
                 dinero -= 5;
                 return true;
             }
             break;
         case BALAS_SECUNDARIA:
             if (dinero >= 2){
-                arma_secundaria->setMunicion(10);
+                arma_secundaria->agregarMunicion(10);
                 dinero -= 2;
                 return true;
             }

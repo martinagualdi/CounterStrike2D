@@ -5,17 +5,27 @@ class Awp : public ArmaDeFuego {
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    Awp() : ArmaDeFuego("AWP", 0.7f, 35.0f, 50, 100, false,25) {}
-    int accion(float /*distancia*/) override {
+    Awp() : ArmaDeFuego("AWP", 0.6f, 2500.0f, 100, 100, false,25,1470) {}
+    int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
-        municion_actual--;
+        if (distancia > alcance) return 0; 
         std::random_device rd; std::mt19937 gen(rd());
         std::uniform_real_distribution<> hit(0.0, 1.0);
         if (hit(gen) <= precision) {
-            std::uniform_int_distribution<> dis(min_danio, max_danio);
-            return dis(gen);
+            return max_danio;
         }
         return 0;
+    }
+
+    bool puedeAccionar()  override {
+        auto ahora = std::chrono::steady_clock::now();
+        auto tiempo_transcurrido = std::chrono::duration_cast<std::chrono::milliseconds>(ahora - ultima_accion);
+        if (tiempo_transcurrido.count() >= cadencia_accion_ms && municion_actual > 0){
+            municion_actual--;
+            ultima_accion = std::chrono::steady_clock::now();
+            return true;
+        }
+        return false;
     }
 
 };

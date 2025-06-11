@@ -92,9 +92,9 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.balas_disparadas.push_back(info_municion);
       num_balas--;
    }
-   uint16_t tiempo_transcurrido;
-   socket.recvall(&tiempo_transcurrido, sizeof(tiempo_transcurrido));
-   snapshot.tiempo_restante = static_cast<int>(ntohs(tiempo_transcurrido));
+   uint16_t tiempo_restante;
+   socket.recvall(&tiempo_restante, sizeof(tiempo_restante));
+   snapshot.tiempo_restante = static_cast<int>(ntohs(tiempo_restante));
    uint8_t equipo_ganador;
    socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
    snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 
@@ -174,13 +174,13 @@ std::string ProtocoloCliente::recibir_mapa() {
 
 std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista_mapas() {
     uint8_t cantidad = 0;
-    socket.recvall(&cantidad, 1);
+    socket.recvall(&cantidad, sizeof(cantidad));
 
     std::vector<std::pair<std::string, std::string>> resultado;
     for (uint8_t i = 0; i < cantidad; ++i) {
         // Recibir nombre del mapa
         uint16_t len_nombre = 0;
-        socket.recvall(&len_nombre, 2);
+        socket.recvall(&len_nombre, sizeof(len_nombre));
         len_nombre = ntohs(len_nombre);
 
         std::string nombre_mapa(len_nombre, '\0');
@@ -188,7 +188,7 @@ std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista
 
         // Recibir nombre de la imagen
         uint16_t len_img = 0;
-        socket.recvall(&len_img, 2);
+        socket.recvall(&len_img, sizeof(len_img));
         len_img = ntohs(len_img);
 
         std::string nombre_img(len_img, '\0');

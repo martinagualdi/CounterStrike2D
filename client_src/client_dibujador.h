@@ -34,6 +34,7 @@ private:
     Texture cs2d;
     Texture dropped_bomb;
     Texture player_legs;
+    Texture muerto;
     Texture simbolos_hud;
     Texture numeros_hud;
     Texture sight;
@@ -52,18 +53,20 @@ private:
     std::vector<SDL_Rect> sprites_simbolos_hud;
     std::vector<SDL_Rect> sprites_numeros_hud;
     std::vector<int> separar_digitos(int n);
+    std::vector<int> separar_digitos_tiempo(int n);
     void inicializar_textos();
     float convertir_angulo(float angulo);
     void convertir_a_pantalla(float pos_x, float pos_y, float& pantalla_x, float& pantalla_y);
     void convertir_coordenadas(float &x, float &y);
     Texture crearTextoArma(std::string nombre, int precio);
     void dibujar_salud(int salud);
-    void dibujar_saldo(int saldo);
+    void dibujar_saldo(int saldo, bool arma_con_balas);
     void dibujar_balas_hud(int balas);
-    void dibujar_tiempo();
+    void dibujar_tiempo(int tiempo_restante);
     void dibujar_jugadores();
     void dibujar_fondo(const ElementoMapa& elemento);
     void dibujar_balas();
+    void dibujar_muerto(int x_pixel, int y_pixel);
     void dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin,
              enum ArmaEnMano arma, enum Equipo equipo);
     void dibujar_pies(float x, float y, float angulo);

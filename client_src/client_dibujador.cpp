@@ -45,6 +45,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     cs2d(Texture(renderer, Surface(IMG_Load("client_src/gfx/gametitle.png")))),
     dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),  
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
+    muerto(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/muerto.png")))),
     simbolos_hud([&renderer]() {
         Surface s(IMG_Load("client_src/gfx/hud_symbols.bmp"));
         s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
@@ -162,6 +163,11 @@ void Dibujador::dibujar_jugadores() {
         
         float angulo_sdl = convertir_angulo(jugador.angulo);
         
+        if(jugador.vida < 20){
+            dibujar_muerto(x_pixel, y_pixel);
+            continue;
+        }
+
         if(jugador.esta_moviendose)
             dibujar_pies(x_pixel, y_pixel, angulo_sdl);
     
@@ -171,6 +177,11 @@ void Dibujador::dibujar_jugadores() {
         dibujar_cuerpo(x_pixel, y_pixel, angulo_sdl, skin, arma, equipo);
         dibujar_arma(x_pixel, y_pixel, angulo_sdl, arma);
     }
+}
+
+void Dibujador::dibujar_muerto(int x_pixel, int y_pixel) {
+    Rect dst(x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER);
+    renderer.Copy(muerto, NullOpt, dst);
 }
 
 void Dibujador::dibujar_fondo(const ElementoMapa& elemento){
@@ -249,6 +260,28 @@ std::vector<int> Dibujador::separar_digitos(int n) {
     return digitos;
 }
 
+std::vector<int> Dibujador::separar_digitos_tiempo(int n) {
+
+    std::vector<int> digitos;
+
+    bool agregar_cero = n < 10 ? true : false;
+
+    if (n == 0) {
+        digitos.push_back(0);
+    }
+
+    while (n > 0) {
+        int digito = n % 10;
+        digitos.insert(digitos.begin(), digito);
+        n /= 10;
+    }
+
+    if(agregar_cero) digitos.insert(digitos.begin(), 0);    
+
+    return digitos;
+}
+
+
 void Dibujador::dibujar_salud(int salud) {
 
     std::vector<int> digitos_salud = separar_digitos(salud);
@@ -267,30 +300,66 @@ void Dibujador::dibujar_salud(int salud) {
 
 }
 
-void Dibujador::dibujar_tiempo() {
+void Dibujador::dibujar_tiempo(int tiempo_restante) {
 
-    Rect sprite_tiempo(sprites_simbolos_hud[TIEMPO]);
-    Rect tiempo_dst((ANCHO_MIN / 2) - OFFSET_TIEMPO, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
-    renderer.Copy(simbolos_hud, sprite_tiempo, tiempo_dst);
+    Rect sprite_reloj(sprites_simbolos_hud[TIEMPO]);
+    Rect reloj_dst((ANCHO_MIN / 2) - OFFSET_TIEMPO, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
+    renderer.Copy(simbolos_hud, sprite_reloj, reloj_dst);
+    
+    int minutos = tiempo_restante / 60;
+    int segundos = tiempo_restante % 60;
+    
+    std::vector<int> digitos_minutos = separar_digitos_tiempo(minutos);
+    std::vector<int> digitos_segundos = separar_digitos_tiempo(segundos);
 
-    //Falta el tiempo
+    int pos_x = ANCHO_MIN / 2 - OFFSET_TIEMPO + TAM_SIMBOLOS_HUD;
+
+    Rect tiempo_dst;
+    tiempo_dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    tiempo_dst.SetW(ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD));
+    tiempo_dst.SetH(TAM_SIMBOLOS_HUD);
+
+    for(int i = 0; i < (int)digitos_minutos.size(); i++){
+        tiempo_dst.SetX(pos_x);
+        Rect sprite_digito = sprites_numeros_hud[digitos_minutos[i]];
+        renderer.Copy(numeros_hud, sprite_digito, tiempo_dst);
+        pos_x += (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)); // desplazamiento
+    }
+
+    Rect dos_puntos_dst(pos_x, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
+    renderer.Copy(numeros_hud, sprites_numeros_hud[DOS_PUNTOS], dos_puntos_dst);
+    pos_x += ANCHO_NUMEROS_HUD / 3;
+    
+    for(int i = 0; i < (int)digitos_segundos.size(); i++){
+        tiempo_dst.SetX(pos_x);
+        Rect sprite_digito = sprites_numeros_hud[digitos_segundos[i]];
+        renderer.Copy(numeros_hud, sprite_digito, tiempo_dst);
+        pos_x += (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD));
+    }
+
 }
 
-void Dibujador::dibujar_saldo(int saldo) {
+void Dibujador::dibujar_saldo(int saldo, bool arma_con_balas) {
 
     std::vector<int> digitos_dinero = separar_digitos(saldo);
     int cant_digitos_dinero = static_cast<int>(digitos_dinero.size());
-    int x;
+    int x, y;
+    
+    if(arma_con_balas)
+        y = ALTO_MIN - OFFSET_SALDO * TAM_SIMBOLOS_HUD;
+    else
+        y = ALTO_MIN - TAM_SIMBOLOS_HUD;
+
     for(int i = 0; i < cant_digitos_dinero; i++){
         Rect sprite_digito(sprites_numeros_hud[digitos_dinero[cant_digitos_dinero - i - 1]]);
         x = ANCHO_MIN - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
-        Rect dst(x , ALTO_MIN - OFFSET_SALDO * TAM_SIMBOLOS_HUD, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
+        Rect dst(x , y, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
         renderer.Copy(numeros_hud, sprite_digito, dst);
     }
     Rect sprite_saldo(sprites_simbolos_hud[SALDO]);
     sprite_saldo.x++; // Sale la linea del sprite de al lado si no
     x -= TAM_SIMBOLOS_HUD; 
-    Rect dst(x, ALTO_MIN - OFFSET_SALDO * TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
+    Rect dst(x, y, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprite_saldo, dst);
 
 }
@@ -303,7 +372,10 @@ void Dibujador::dibujar_balas_hud(int balas) {
     for (int i = 0; i < cant_digitos_balas; i++){
         Rect sprite_digito(sprites_numeros_hud[digitos_balas[cant_digitos_balas - i - 1]]);
         int x = ANCHO_MIN - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
-        Rect dst(x, ALTO_MIN - TAM_SIMBOLOS_HUD, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
+        int y = ALTO_MIN - TAM_SIMBOLOS_HUD;
+        int w = ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD);
+        int h = TAM_SIMBOLOS_HUD;
+        Rect dst(x, y, w, h);
         renderer.Copy(numeros_hud, sprite_digito, dst);
     }
 
@@ -311,18 +383,22 @@ void Dibujador::dibujar_balas_hud(int balas) {
 
 void Dibujador::dibujar_hud() {
     
-    dibujar_salud(snapshot.getJugadorPorId(client_id)->vida);
-    dibujar_tiempo();
-    dibujar_balas_hud(snapshot.getJugadorPorId(client_id)->balas);
-    dibujar_saldo(snapshot.getJugadorPorId(client_id)->dinero);
-}
+    const InfoJugador* j = snapshot.getJugadorPorId(client_id);
 
+    dibujar_salud(j->vida);
+    dibujar_tiempo(snapshot.tiempo_restante);
+    if(j->arma_en_mano != CUCHILLO){
+        dibujar_balas_hud(j->balas);
+        dibujar_saldo(j->dinero, true);
+    }
+    else dibujar_saldo(j->dinero, false);
+
+}
 
 Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
     std::string texto = nombre + "$" + std::to_string(precio);
     return Texture(renderer, fuente.RenderText_Blended(texto, amarillo));
 }
-
 
 void Dibujador::dibujar_mercado() {
 
@@ -389,7 +465,6 @@ void Dibujador::dibujar_mercado() {
     Rect dst_salir(x + OFFSET_NOMBRE_ARMAS, y_pos, salir.GetWidth(), salir.GetHeight());
     renderer.Copy(salir, NullOpt, dst_salir);
     y_pos += secundaria.GetHeight() + ESPACIO_ENTRE_ITEMS;
-
 
 }
 

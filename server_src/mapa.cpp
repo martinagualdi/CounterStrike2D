@@ -119,9 +119,11 @@ std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
     //           << " ancho=" << area_inicio.ancho << " alto=" << area_inicio.alto << std::endl;
 
 
-    std::uniform_real_distribution<float> dist_x(area_inicio.x - 20, area_inicio.x + area_inicio.ancho + 20);
-    std::uniform_real_distribution<float> dist_y(area_inicio.y + 20, area_inicio.y - area_inicio.alto - 20);
-
+    std::uniform_real_distribution<float> dist_x(area_inicio.x + 20, area_inicio.x + area_inicio.ancho - 20);
+    std::uniform_real_distribution<float> dist_y(area_inicio.y + 20, area_inicio.y + area_inicio.alto - 20) ;
+    std::cout << "Generando posición inicial aleatoria en el área: "
+              << "x=[" << area_inicio.x << ", " << area_inicio.x + area_inicio.ancho << "] "
+              << "y=[" << area_inicio.y << ", " << area_inicio.y + area_inicio.alto << "]" << std::endl;
     float x = dist_x(gen);
     float y = dist_y(gen);
     std::cout << "Posición inicial: (" << x << ", " << y << ")" << std::endl;

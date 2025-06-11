@@ -190,8 +190,9 @@ bool GameLoop::jugar_ronda() {
                         break;
                     case DISPARO:
                         std::cout << "Angulo recibido: " << comando.angulo << std::endl;
-                        if (jugador->disparar()){
+                        if (jugador->puede_disparar()){
                             if (jugador->get_codigo_arma_en_mano() == M3){
+                                jugador->disparar();
                                 for (int i = 0; i < 3; i++) {
                                     Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo + (i - 1) * 5);
                                     balas_disparadas.push_back(bala_disparada);
@@ -207,6 +208,7 @@ bool GameLoop::jugar_ronda() {
                                 }
                                 break;
                             }
+                            jugador->disparar();
                             Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
                             balas_disparadas.push_back(bala_disparada);
                         }
@@ -242,7 +244,7 @@ bool GameLoop::jugar_ronda() {
                         auto ahora = std::chrono::steady_clock::now();
                         auto& proximo = ak47->get_proximo_disparo_rafaga();
                         if (ahora >= proximo) {
-
+                            jugador->disparar();
                             Municion bala_disparada(
                                 ak47->get_id_jugador_rafaga(),
                                 jugador->getX(),

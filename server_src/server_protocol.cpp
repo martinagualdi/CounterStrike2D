@@ -4,7 +4,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BYTES_JUGADORES 21
+#define BYTES_JUGADORES 22
 #define BYTES_BALAS 11
 
 void ServerProtocol::push_back_uint16_t(std::vector<uint8_t> &buffer, uint16_t value) {

@@ -1,7 +1,9 @@
 #include "jugador.h"
 
-bool Jugador::disparar() {
-    return arma_en_mano->puedeAccionar();
+
+void Jugador::disparar() {
+    disparando = true;
+    
 }
 
 void Jugador::recibir_danio(int danio) { 

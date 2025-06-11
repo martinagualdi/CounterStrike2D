@@ -62,9 +62,10 @@ class Jugador {
     bool esta_disparando() const {  return disparando; }
     void dejar_de_disparar() { disparando = false; }
     bool esta_plantando_bomba() const { return plantando_bomba; }
+    bool puede_disparar() const { return arma_en_mano->puedeAccionar(); }
 
     // Logicas
-    bool disparar();
+    void disparar();
 
     void recibir_danio(int danio);
 

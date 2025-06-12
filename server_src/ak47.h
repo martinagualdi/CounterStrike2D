@@ -2,7 +2,7 @@
 
 class Ak47 : public ArmaDeFuego {
     private:
-    int rafaga_restante =3;
+    int rafaga_restante = 3;
     std::chrono::steady_clock::time_point proximo_disparo_rafaga;
     bool rafaga_activa = false;
     float ultimo_angulo_rafaga = 0.0f;
@@ -11,7 +11,16 @@ class Ak47 : public ArmaDeFuego {
 
 public:
     // Valores Hardcodeados hasta tener YAML
-    Ak47(): ArmaDeFuego("AK-47", 0.8f, 1000.0f, 2, 20, true,100,200){}
+    Ak47(): ArmaDeFuego(
+        "AK-47", 
+        Configuracion::get<float>("precision_ak47"), 
+        1000.0f, 
+        Configuracion::get<int>("danio_min_ak47"), 
+        Configuracion::get<int>("danio_max_ak47"), 
+        true,
+        Configuracion::get<int>("balas_ak47"),
+        Configuracion::get<int>("balas_max_ak47"),
+        200){}
 
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;

@@ -2,12 +2,30 @@
 #include <cmath>
 
 #define VELOCIDAD 0.3
-#define CINCO_MINUTOS 300 
 
-GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida)
-    : queue_comandos(queue_comandos), queues_jugadores(queues_jugadores), jugadores(),
-      activo(true), balas_disparadas(), ultimo_unido_ct(false), mapa(yaml_partida), ronda_actual(1), equipo_ct(), equipo_tt(), rondas_ganadas_ct(0),
-      rondas_ganadas_tt(0), bomba_plantada(false) {}
+GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida):
+    queue_comandos(queue_comandos), 
+    queues_jugadores(queues_jugadores), 
+    jugadores(),
+    cant_max_jugadores(Configuracion::get<int>("cantidad_max_jugadores")),
+    cant_min_ct(Configuracion::get<int>("cantidad_min_ct")),
+    cant_max_ct(Configuracion::get<int>("cantidad_max_ct")),
+    cant_min_tt(Configuracion::get<int>("cantidad_min_tt")),
+    cant_max_tt(Configuracion::get<int>("cantidad_max_tt")),
+    activo(true), 
+    balas_disparadas(), 
+    ultimo_unido_ct(false), 
+    mapa(yaml_partida),
+    tiempo_max_ronda(Configuracion::get<int>("tiempo_por_ronda")),
+    tiempo_max_comprar(Configuracion::get<int>("tiempo_max_para_comprar")),
+    ronda_actual(1), 
+    cant_rondas(Configuracion::get<int>("ronda_por_partida")),
+    rondas_por_equipo(Configuracion::get<int>("rondas_por_bando")),
+    equipo_ct(), 
+    equipo_tt(), 
+    rondas_ganadas_ct(0),
+    rondas_ganadas_tt(0), 
+    bomba_plantada(false) {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
@@ -221,7 +239,7 @@ bool GameLoop::jugar_ronda() {
                     case COMPRAR:
                         if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                             if (!jugador->comprarBalas(comando.compra)) {
-                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas." << std::endl;
+                                std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas o no tiene arma principal." << std::endl;
                             }
                         } else {
                             if (!jugador->comprarArma(comando.compra)) {
@@ -283,7 +301,7 @@ bool GameLoop::jugar_ronda() {
             }
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
-            int t_restante = CINCO_MINUTOS - t_transcurrido;
+            int t_restante = tiempo_max_ronda - t_transcurrido;
             Snapshot snapshot(jugadores, balas_disparadas, t_restante, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));

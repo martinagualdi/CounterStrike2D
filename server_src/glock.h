@@ -4,7 +4,19 @@ class Glock : public ArmaDeFuego {
     
 public:
     // Valores Hardcodeados hasta tener YAML
-    Glock() : ArmaDeFuego("Glock", 0.9f, 500.0f, 5, 30, false,50,150) {}
+    // Glock() : ArmaDeFuego("Glock", 0.9f, 500.0f, 5, 30, false,50,150) {}
+    
+    Glock() : ArmaDeFuego(
+        "Glock", 
+        Configuracion::get<float>("precision_glock"), 
+        500.0f, 
+        Configuracion::get<int>("danio_min_glock"), 
+        Configuracion::get<int>("danio_max_glock"), 
+        false,
+        Configuracion::get<int>("balas_glock"),
+        Configuracion::get<int>("balas_max_glock"),
+        150) {}
+    
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         if (distancia > alcance) return 0; // Si la distancia es mayor que el alcance, no hace daño

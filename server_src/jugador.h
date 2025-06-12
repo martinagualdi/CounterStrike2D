@@ -36,9 +36,23 @@ class Jugador {
 
   public:  
 
-    explicit Jugador(int id) : id(id), x(1000), y(1000), angulo(0), vida(100), dinero(500), equipo_actual(), 
-        skin_tipo(), vivo(true), moviendose(false), disparando(false), plantando_bomba(false), arma_principal(nullptr), 
-        arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+    explicit Jugador(int id) : 
+      id(id), 
+      x(0), 
+      y(0), 
+      angulo(0), 
+      vida(Configuracion::get<int>("vida_inicial")), 
+      dinero(Configuracion::get<int>("dinero_inicial")), 
+      equipo_actual(), 
+      skin_tipo(), 
+      vivo(true), 
+      moviendose(false), 
+      disparando(false), 
+      plantando_bomba(false), 
+      arma_principal(nullptr), 
+      arma_secundaria(new Glock()), 
+      cuchillo(new Cuchillo()), 
+      arma_en_mano(arma_secundaria.get()) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }

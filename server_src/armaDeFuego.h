@@ -11,9 +11,9 @@ protected:
     const int municion_max;
 
 public:
-ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_danio, int max_danio, bool es_automatica, int municion_max, int cadencia)
+ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_danio, int max_danio, bool es_automatica, int municion_inicial, int municion_max, int cadencia)
     : Arma(nombre, precision, alcance, min_danio, max_danio, es_automatica, cadencia),
-      municion_actual(municion_max), municion_max(municion_max){}
+      municion_actual(municion_inicial), municion_max(municion_max){}
 
     virtual ~ArmaDeFuego() = default;
 

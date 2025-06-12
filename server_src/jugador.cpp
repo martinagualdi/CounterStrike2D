@@ -38,48 +38,35 @@ void Jugador::cambiar_arma_en_mano() {
 }
 
 bool Jugador::comprarArma(enum Compra arma) {
+    std::string str_arma = (arma == C_AK47) ? "ak47" : (arma == C_M3) ? "m3" : "awp";
+    std::string str_precio = "precio_" + str_arma;
+    int precio = Configuracion::get<int>(str_precio);
     switch (arma) {
         case C_AK47:
-            if (dinero >= 150) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "AK-47"){
                     arma_principal = std::make_unique<Ak47>();
-                    dinero -= 150;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
                     return true;
-                } else if(arma_principal->getNombre() != "AK-47"){
-                    arma_principal = std::make_unique<Ak47>();
-                    dinero -= 150;
-                    arma_en_mano = arma_principal.get();
-                    return true;
-                }
+                } 
             }
             break;
         case C_M3:
-            if (dinero >= 100) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "M3"){
                     arma_principal = std::make_unique<m3>();
-                    dinero -= 100;
-                    arma_en_mano = arma_principal.get();
-                    return true;
-                } else if(arma_principal->getNombre() != "M3"){
-                    arma_principal = std::make_unique<m3>();
-                    dinero -= 100;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
                     return true;
                 }                
             }
             break;
         case C_AWP:
-            if (dinero >= 200) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "AWP"){
                     arma_principal = std::make_unique<Awp>();
-                    dinero -= 200;
-                    arma_en_mano = arma_principal.get();
-                    return true;
-                }
-                else if(arma_principal->getNombre() != "AWP"){
-                    arma_principal = std::make_unique<Awp>();
-                    dinero -= 200;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
                     return true;
                 }
@@ -92,18 +79,21 @@ bool Jugador::comprarArma(enum Compra arma) {
 }
 
 bool Jugador::comprarBalas(enum Compra tipo_bala) {
+    std::string str_tipo = (tipo_bala == BALAS_PRIMARIA) ? "principal" : "secundaria";
+    std::string str_precio = "precio_municion_" + str_tipo;
+    int precio = Configuracion::get<int>(str_precio);
     switch (tipo_bala) {
         case BALAS_PRIMARIA:
-            if (dinero >= 5){
+            if (dinero >= precio && arma_principal){
                 arma_principal->agregarMunicion(10);
-                dinero -= 5;
+                dinero -= precio;
                 return true;
             }
             break;
         case BALAS_SECUNDARIA:
-            if (dinero >= 2){
+            if (dinero >= precio){
                 arma_secundaria->agregarMunicion(10);
-                dinero -= 2;
+                dinero -= precio;
                 return true;
             }
             break;

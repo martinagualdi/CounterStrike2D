@@ -3,7 +3,16 @@
 class Cuchillo : public Arma {
 public:
     // Valores Hardcodeados hasta tener YAML
-    Cuchillo() : Arma("Cuchillo", 1.0f, 1.0f, 15, 35, false,500) {}
+    //Cuchillo() : Arma("Cuchillo", 1.0f, 1.0f, 15, 35, false,500) {}
+
+    Cuchillo() : Arma(
+        "Cuchillo", 
+        Configuracion::get<float>("precision_cuchillo"), 
+        1.0f, 
+        Configuracion::get<int>("danio_min_cuchillo"), 
+        Configuracion::get<int>("danio_max_cuchillo"), 
+        false,
+        500) {}
 
     int accion(float distancia) override {
         if (distancia <= alcance) {

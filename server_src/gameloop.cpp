@@ -198,10 +198,11 @@ enum Equipo GameLoop::se_termino_ronda() {
    return NONE;
 }
 
-void GameLoop::chequear_estados_disparando(){
+void GameLoop::chequear_estados_jugadores(){
     for(Jugador *j: jugadores) {
-        if (!j->esta_vivo() || !j->esta_disparando()) continue; 
-        j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
+        j->reiniciar_compras();
+        if (j->esta_disparando())
+            j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
     }
 }
 
@@ -369,7 +370,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
     auto t_inicio = std::chrono::steady_clock::now();
     while (activo && en_juego) {
         try {
-            chequear_estados_disparando();
+            chequear_estados_jugadores();
             if (!esperando)
                 chequear_si_pueden_comprar(t_inicio);
             ejecucion_comandos_recibidos();

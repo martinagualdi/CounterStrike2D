@@ -46,7 +46,7 @@ class GameLoop : public Thread {
     bool jugar_ronda(bool esperando);
     enum Equipo se_termino_ronda();
     bool esperando_jugadores();
-    void chequear_estados_disparando();
+    void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();

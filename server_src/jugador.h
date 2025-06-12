@@ -29,6 +29,8 @@ class Jugador {
     bool disparando;
     bool plantando_bomba;
     bool puede_comprar;
+    bool acaba_de_comprar_arma;
+    bool acaba_de_comprar_balas;
     enum Movimiento movimiento_actual = DETENER;
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
@@ -52,7 +54,9 @@ class Jugador {
       moviendose(false), 
       disparando(false), 
       plantando_bomba(false),
-      puede_comprar(true), 
+      puede_comprar(true),
+      acaba_de_comprar_arma(false),
+      acaba_de_comprar_balas(false), 
       arma_principal(nullptr), 
       arma_secundaria(new Glock()), 
       cuchillo(new Cuchillo()), 
@@ -85,6 +89,10 @@ class Jugador {
     bool puede_disparar() const { return arma_en_mano->puedeAccionar(); }
     bool puede_comprar_ahora() { return puede_comprar; }
     void en_posicion_de_compra(bool puede_o_no) {puede_comprar = puede_o_no; }
+    bool compro_arma_ahora() const { return acaba_de_comprar_arma; }
+    bool compro_balas_ahora() const { return acaba_de_comprar_balas; }
+    int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
+    int get_eliminaciones_totales() const { return eliminaciones_totales; }
 
     // Logicas
     void disparar();
@@ -106,6 +114,8 @@ class Jugador {
     Arma* get_arma_actual() const;
 
     void sumar_eliminacion();
+
+    void reiniciar_compras();
 
     void finalizar_ronda();
 

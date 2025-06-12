@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 23
+#define BYTES_JUGADORES 27
 #define BYTES_BALAS 11
 #define RW_CLOSE 2
 
@@ -56,7 +56,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / BYTES_JUGADORES; // Cada jugador ocupa 23 bytes
+   size_t num_jugadores = largo_jugadores / BYTES_JUGADORES; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
       uint8_t buffer[BYTES_JUGADORES];
@@ -76,7 +76,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_disparando = (buffer[19] == 0x01);
       info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
       info_jugador.puede_comprar_ya = (buffer[21] == 0x01); // Enviar si el jugador puede comprar ya
-      info_jugador.balas = static_cast<int>(buffer[22]); // Enviar la cantidad de balas del jugador
+      info_jugador.acaba_de_comprar_arma = (buffer[22] == 0x01); // Enviar si el jugador acaba de comprar arma
+      info_jugador.acaba_de_comprar_balas = (buffer[23] == 0x01); // Enviar si el jugador acaba de comprar balas
+      info_jugador.balas = static_cast<int>(buffer[24]); // Enviar la cantidad de balas del jugador
+      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[25]); // Enviar las eliminaciones de esta ronda
+      info_jugador.eliminaciones_totales = static_cast<int>(buffer[26]); // Enviar las eliminaciones totales del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }

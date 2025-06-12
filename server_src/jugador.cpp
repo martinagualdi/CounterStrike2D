@@ -51,6 +51,7 @@ bool Jugador::comprarArma(enum Compra arma) {
                     arma_principal = std::make_unique<Ak47>();
                     dinero -= precio;
                     arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true; 
                     return true;
                 } 
             }
@@ -61,6 +62,7 @@ bool Jugador::comprarArma(enum Compra arma) {
                     arma_principal = std::make_unique<m3>();
                     dinero -= precio;
                     arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true;
                     return true;
                 }                
             }
@@ -71,6 +73,7 @@ bool Jugador::comprarArma(enum Compra arma) {
                     arma_principal = std::make_unique<Awp>();
                     dinero -= precio;
                     arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true;
                     return true;
                 }
             }
@@ -90,6 +93,7 @@ bool Jugador::comprarBalas(enum Compra tipo_bala) {
             if (dinero >= precio && arma_principal){
                 arma_principal->agregarMunicion(10);
                 dinero -= precio;
+                acaba_de_comprar_balas = true;
                 return true;
             }
             break;
@@ -97,6 +101,7 @@ bool Jugador::comprarBalas(enum Compra tipo_bala) {
             if (dinero >= precio){
                 arma_secundaria->agregarMunicion(10);
                 dinero -= precio;
+                acaba_de_comprar_balas = true;
                 return true;
             }
             break;
@@ -126,6 +131,13 @@ enum ArmaEnMano Jugador::get_codigo_arma_en_mano() {
 void Jugador::sumar_eliminacion() {
     eliminaciones_esta_ronda++;
     eliminaciones_totales++;
+}
+
+void Jugador::reiniciar_compras() {
+    if (acaba_de_comprar_arma)
+        acaba_de_comprar_arma = false;
+    if (acaba_de_comprar_balas)
+        acaba_de_comprar_balas = false;
 }
 
 void Jugador::finalizar_ronda() {

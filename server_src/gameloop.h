@@ -36,13 +36,20 @@ class GameLoop : public Thread {
     int rondas_ganadas_tt;
     std::atomic<bool> bomba_plantada;
 
-
+    void volver_jugadores_a_spawn();
     bool jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y);
-    bool bala_golpea_jugador(const Municion &bala);
+    bool bala_golpea_jugador(const Municion &bala, bool esperando);
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
-    bool jugar_ronda();
+    bool jugar_ronda(bool esperando);
     enum Equipo se_termino_ronda();
+    bool esperando_jugadores();
+    void chequear_estados_disparando();
+    void ejecucion_comandos_recibidos();
+    void disparar_rafagas_restantes();
+    void chequear_colisiones(bool esperando);
+    void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego);
+    void chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego);
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);

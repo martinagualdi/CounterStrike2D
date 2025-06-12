@@ -4,7 +4,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BYTES_JUGADORES 22
+#define BYTES_JUGADORES 23
 #define BYTES_BALAS 11
 
 void ServerProtocol::push_back_uint16_t(std::vector<uint8_t> &buffer, uint16_t value) {
@@ -50,6 +50,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
+        uint8_t puede_comprar_ya = j.puede_comprar_ya ? 0x01 : 0x00;
+        buffer.push_back(puede_comprar_ya); // Enviar si el jugador puede comprar ya
         uint8_t balas = static_cast<uint8_t>(j.balas);
         buffer.push_back(balas); // Enviar la cantidad de balas del jugador
     }

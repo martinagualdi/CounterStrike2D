@@ -11,7 +11,7 @@ rondas_por_bando: 5
 
 #segundos
 tiempo_por_ronda: 300
-tiempo_max_para_comprar: 15 
+tiempo_max_para_comprar: 30
 tiempo_para_activar_bomba: 10
 tiempo_pare_que_explote_bomba: 30
 

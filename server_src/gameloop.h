@@ -27,6 +27,7 @@ class GameLoop : public Thread {
     Mapa mapa;
     int tiempo_max_ronda;
     int tiempo_max_comprar;
+    std::atomic<bool> algun_jugador_puede_comprar;
     int ronda_actual;
     int cant_rondas;
     int rondas_por_equipo;
@@ -46,6 +47,7 @@ class GameLoop : public Thread {
     enum Equipo se_termino_ronda();
     bool esperando_jugadores();
     void chequear_estados_disparando();
+    void chequear_si_pueden_comprar(auto t_inicio);
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);

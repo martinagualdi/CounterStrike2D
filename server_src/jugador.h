@@ -28,6 +28,7 @@ class Jugador {
     bool moviendose;
     bool disparando;
     bool plantando_bomba;
+    bool puede_comprar;
     enum Movimiento movimiento_actual = DETENER;
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
@@ -50,7 +51,8 @@ class Jugador {
       vivo(true), 
       moviendose(false), 
       disparando(false), 
-      plantando_bomba(false), 
+      plantando_bomba(false),
+      puede_comprar(true), 
       arma_principal(nullptr), 
       arma_secundaria(new Glock()), 
       cuchillo(new Cuchillo()), 
@@ -81,6 +83,8 @@ class Jugador {
     void dejar_de_disparar() { disparando = false; }
     bool esta_plantando_bomba() const { return plantando_bomba; }
     bool puede_disparar() const { return arma_en_mano->puedeAccionar(); }
+    bool puede_comprar_ahora() { return puede_comprar; }
+    void en_posicion_de_compra(bool puede_o_no) {puede_comprar = puede_o_no; }
 
     // Logicas
     void disparar();

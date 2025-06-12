@@ -130,3 +130,14 @@ std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
     std::vector<float> posicion_inicial{x, y};
     return posicion_inicial;
 }
+
+bool Mapa::en_posicion_de_compra(float pos_x, float pos_y, enum Equipo equipo) {
+    Area zona_compra = (equipo == CT) ? inicio_ct : inicio_tt;
+    float max_pos_x_zona = zona_compra.x + zona_compra.ancho;
+    float min_pos_x_zona = zona_compra.x;
+    float max_pos_y_zona = zona_compra.y + zona_compra.alto;
+    float min_pos_y_zona = zona_compra.y;
+
+    return (pos_x >= min_pos_x_zona && pos_x <= max_pos_x_zona &&
+            pos_y >= min_pos_y_zona && pos_y <= max_pos_y_zona);
+}

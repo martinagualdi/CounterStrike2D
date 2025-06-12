@@ -18,6 +18,7 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     mapa(yaml_partida),
     tiempo_max_ronda(Configuracion::get<int>("tiempo_por_ronda")),
     tiempo_max_comprar(Configuracion::get<int>("tiempo_max_para_comprar")),
+    algun_jugador_puede_comprar(false),
     ronda_actual(0), 
     cant_rondas(Configuracion::get<int>("ronda_por_partida")),
     rondas_por_equipo(Configuracion::get<int>("rondas_por_bando")),
@@ -181,8 +182,6 @@ enum Equipo GameLoop::se_termino_ronda() {
     }
 
     if (!ct_vivos || !tt_vivos) {
-        std::cout << "Ronda terminada. Equipo ganador: " 
-                  << (ct_vivos ? "CT" : "TT") << std::endl;
         if (ct_vivos) { 
             rondas_ganadas_ct++;
             return CT;
@@ -203,6 +202,33 @@ void GameLoop::chequear_estados_disparando(){
     for(Jugador *j: jugadores) {
         if (!j->esta_vivo() || !j->esta_disparando()) continue; 
         j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
+    }
+}
+
+void GameLoop::chequear_si_pueden_comprar(auto t_inicio) {
+    auto t_ahora = std::chrono::steady_clock::now();
+    auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_ahora - t_inicio).count();
+    if (t_transcurrido <= tiempo_max_comprar) {
+        size_t cantidad = 0;
+        for (Jugador *jugador : jugadores) {
+            if (mapa.en_posicion_de_compra(jugador->getX(), jugador->getY(), jugador->get_equipo())) {
+                jugador->en_posicion_de_compra(true);
+                cantidad++;
+                if (!algun_jugador_puede_comprar)
+                    algun_jugador_puede_comprar = true; // Al menos un jugador puede comprar
+            } else {
+                jugador->en_posicion_de_compra(false);
+            }
+        }
+        if (cantidad == 0) 
+            algun_jugador_puede_comprar = false; // Si no hay jugadores en posición de compra, ninguno puede comprar
+    } else {
+        if (algun_jugador_puede_comprar) {
+            for (Jugador *jugador : jugadores) {
+                jugador->en_posicion_de_compra(false); // Desactivar la compra para todos los jugadores
+            }
+            algun_jugador_puede_comprar = false; // Ningún jugador puede comprar
+        }
     }
 }
 
@@ -249,6 +275,10 @@ void GameLoop::ejecucion_comandos_recibidos() {
                             << jugador->get_nombre_arma_en_mano() << std::endl;
                 break;
             case COMPRAR:
+                if (!jugador->puede_comprar_ahora()) {
+                    std::cout << "Jugador de ID: " << jugador->getId() << " no puede comprar en este momento." << std::endl;
+                    break;; // Si el jugador no puede comprar, no se procesa el comando
+                }
                 if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                     if (!jugador->comprarBalas(comando.compra)) {
                         std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas o no tiene arma principal." << std::endl;
@@ -340,6 +370,8 @@ bool GameLoop::jugar_ronda(bool esperando) {
     while (activo && en_juego) {
         try {
             chequear_estados_disparando();
+            if (!esperando)
+                chequear_si_pueden_comprar(t_inicio);
             ejecucion_comandos_recibidos();
             disparar_rafagas_restantes();
             chequear_colisiones(esperando);

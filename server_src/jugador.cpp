@@ -5,7 +5,6 @@
 
 void Jugador::disparar() {
     disparando = true;
-    
 }
 
 void Jugador::recibir_danio(int danio) { 

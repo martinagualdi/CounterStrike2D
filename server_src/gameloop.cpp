@@ -50,6 +50,12 @@ void GameLoop::volver_jugadores_a_spawn() {
     }
 }
 
+void GameLoop::cargar_dinero_por_eliminaciones() {
+    for (Jugador *jugador : jugadores) {
+        jugador->finalizar_ronda();
+    }
+}
+
 bool GameLoop::jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y) {
     return mapa.jugador_colision_contra_pared(nuevo_x, nuevo_y);
 }
@@ -70,8 +76,11 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
             float dx = jugador->getX() - jugador_tirador->getX();
             float dy = jugador->getY() - jugador_tirador->getY();
             float distancia = std::sqrt(dx * dx + dy * dy);
-            if (!esperando)
+            if (!esperando) {
                 jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
+                if (!jugador->esta_vivo())
+                    jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
+            }
             return true;
         }
     }
@@ -79,7 +88,6 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
 }
 
 void GameLoop::ejecutar_movimiento(Jugador *jugador) {
-
     float velocidad_diagonal = VELOCIDAD / std::sqrt(2.0f);
     float nuevo_x = jugador->getX();
     float nuevo_y = jugador->getY();
@@ -149,7 +157,6 @@ Jugador *GameLoop::findJugador(int id_jugador_buscado) {
         if(j->getId() == id_jugador_buscado)
             return j;
     }
-
     return nullptr;
 }
 
@@ -305,6 +312,7 @@ void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) 
     if (eq_ganador != NONE) {
         // Reiniciar la ronda
         volver_jugadores_a_spawn();
+        cargar_dinero_por_eliminaciones();
         balas_disparadas.clear();
         ronda_actual++;
         en_juego = false; // Terminar el bucle de juego

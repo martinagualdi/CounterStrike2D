@@ -37,6 +37,7 @@ class GameLoop : public Thread {
     std::atomic<bool> bomba_plantada;
 
     void volver_jugadores_a_spawn();
+    void cargar_dinero_por_eliminaciones();
     bool jugador_colisiones_con_mapa(float nuevo_x, float nuevo_y);
     bool bala_golpea_jugador(const Municion &bala, bool esperando);
     void ejecutar_movimiento(Jugador *jugador);

@@ -33,6 +33,8 @@ class Jugador {
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
     std::unique_ptr<Cuchillo> cuchillo;
     Arma* arma_en_mano;
+    int eliminaciones_esta_ronda;
+    int eliminaciones_totales;
 
   public:  
 
@@ -52,7 +54,9 @@ class Jugador {
       arma_principal(nullptr), 
       arma_secundaria(new Glock()), 
       cuchillo(new Cuchillo()), 
-      arma_en_mano(arma_secundaria.get()) {}
+      arma_en_mano(arma_secundaria.get()),
+      eliminaciones_esta_ronda(0),
+      eliminaciones_totales(0) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
@@ -71,7 +75,7 @@ class Jugador {
     void establecer_skin(enum SkinTipos skin) { this->skin_tipo = skin; }
     enum SkinTipos get_skin_tipo() const { return skin_tipo; }
     void set_skin_tipo(enum SkinTipos skin) { this->skin_tipo = skin; }
-    bool esta_vivo() const { return vivo; }
+    bool esta_vivo() { return vivo; }
     bool esta_moviendose() const { return moviendose == true; }
     bool esta_disparando() const {  return disparando; }
     void dejar_de_disparar() { disparando = false; }
@@ -96,6 +100,10 @@ class Jugador {
     enum ArmaEnMano get_codigo_arma_en_mano();
 
     Arma* get_arma_actual() const;
+
+    void sumar_eliminacion();
+
+    void finalizar_ronda();
 
     void definir_spawn(float x, float y);
 

@@ -1,5 +1,7 @@
 #include "jugador.h"
 
+#include <iostream>
+
 
 void Jugador::disparar() {
     disparando = true;
@@ -7,10 +9,12 @@ void Jugador::disparar() {
 }
 
 void Jugador::recibir_danio(int danio) { 
+    std::cout << "[recibir_danio] Antes: vida=" << vida << ", danio=" << danio << std::endl;
     vida -= danio; 
     if (vida <= 0) {
         vida = 0;
         vivo = false;
+        std::cout << "Jugador " << id << " ha muerto." << std::endl;
     }
 }
 
@@ -120,6 +124,16 @@ enum ArmaEnMano Jugador::get_codigo_arma_en_mano() {
     }
 }
 
+void Jugador::sumar_eliminacion() {
+    eliminaciones_esta_ronda++;
+    eliminaciones_totales++;
+}
+
+void Jugador::finalizar_ronda() {
+    dinero += Configuracion::get<int>("dinero_por_eliminacion") * eliminaciones_esta_ronda;
+    eliminaciones_esta_ronda = 0;
+}
+
 void Jugador::definir_spawn(float x, float y) {
     this->x = x;
     this->y = y;
@@ -133,7 +147,6 @@ void Jugador::reiniciar() {
     y = spawn_y;
     angulo = 0;
     vida = 100;
-    dinero = 500;
     vivo = true;
     moviendose = false;
     movimiento_actual = DETENER;

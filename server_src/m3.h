@@ -7,7 +7,19 @@ class m3 : public ArmaDeFuego {
 
 public:
     // Valores Hardcodeados hasta tener YAML
-     m3() : ArmaDeFuego("M3", 0.7f, 180.0f, 5, 80, false,100,875) {}
+    // m3() : ArmaDeFuego("M3", 0.7f, 180.0f, 5, 80, false,100,875) {}
+    
+    m3() : ArmaDeFuego(
+        "M3", 
+        Configuracion::get<float>("precision_m3"), 
+        180.0f, 
+        Configuracion::get<int>("danio_min_m3"), 
+        Configuracion::get<int>("danio_max_m3"), 
+        false,
+        Configuracion::get<int>("balas_m3"),
+        Configuracion::get<int>("balas_max_m3"),
+        875) {}
+
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         if (distancia > alcance) return 0;

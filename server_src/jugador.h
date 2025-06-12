@@ -28,17 +28,41 @@ class Jugador {
     bool moviendose;
     bool disparando;
     bool plantando_bomba;
+    bool puede_comprar;
+    bool acaba_de_comprar_arma;
+    bool acaba_de_comprar_balas;
     enum Movimiento movimiento_actual = DETENER;
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
     std::unique_ptr<Cuchillo> cuchillo;
     Arma* arma_en_mano;
+    int eliminaciones_esta_ronda;
+    int eliminaciones_totales;
 
   public:  
 
-    explicit Jugador(int id) : id(id), x(1000), y(1000), angulo(0), vida(100), dinero(500), equipo_actual(), 
-        skin_tipo(), vivo(true), moviendose(false), disparando(false), plantando_bomba(false), arma_principal(nullptr), 
-        arma_secundaria(new Glock()), cuchillo(new Cuchillo()), arma_en_mano(arma_secundaria.get()) {}
+    explicit Jugador(int id) : 
+      id(id), 
+      x(0), 
+      y(0), 
+      angulo(0), 
+      vida(Configuracion::get<int>("vida_inicial")), 
+      dinero(Configuracion::get<int>("dinero_inicial")), 
+      equipo_actual(), 
+      skin_tipo(), 
+      vivo(true), 
+      moviendose(false), 
+      disparando(false), 
+      plantando_bomba(false),
+      puede_comprar(true),
+      acaba_de_comprar_arma(false),
+      acaba_de_comprar_balas(false), 
+      arma_principal(nullptr), 
+      arma_secundaria(new Glock()), 
+      cuchillo(new Cuchillo()), 
+      arma_en_mano(arma_secundaria.get()),
+      eliminaciones_esta_ronda(0),
+      eliminaciones_totales(0) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
@@ -57,12 +81,18 @@ class Jugador {
     void establecer_skin(enum SkinTipos skin) { this->skin_tipo = skin; }
     enum SkinTipos get_skin_tipo() const { return skin_tipo; }
     void set_skin_tipo(enum SkinTipos skin) { this->skin_tipo = skin; }
-    bool esta_vivo() const { return vivo; }
+    bool esta_vivo() { return vivo; }
     bool esta_moviendose() const { return moviendose == true; }
     bool esta_disparando() const {  return disparando; }
     void dejar_de_disparar() { disparando = false; }
     bool esta_plantando_bomba() const { return plantando_bomba; }
     bool puede_disparar() const { return arma_en_mano->puedeAccionar(); }
+    bool puede_comprar_ahora() { return puede_comprar; }
+    void en_posicion_de_compra(bool puede_o_no) {puede_comprar = puede_o_no; }
+    bool compro_arma_ahora() const { return acaba_de_comprar_arma; }
+    bool compro_balas_ahora() const { return acaba_de_comprar_balas; }
+    int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
+    int get_eliminaciones_totales() const { return eliminaciones_totales; }
 
     // Logicas
     void disparar();
@@ -82,6 +112,12 @@ class Jugador {
     enum ArmaEnMano get_codigo_arma_en_mano();
 
     Arma* get_arma_actual() const;
+
+    void sumar_eliminacion();
+
+    void reiniciar_compras();
+
+    void finalizar_ronda();
 
     void definir_spawn(float x, float y);
 

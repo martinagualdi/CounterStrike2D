@@ -4,7 +4,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BYTES_JUGADORES 22
+#define BYTES_JUGADORES 27
 #define BYTES_BALAS 11
 
 void ServerProtocol::push_back_uint16_t(std::vector<uint8_t> &buffer, uint16_t value) {
@@ -50,8 +50,18 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
+        uint8_t puede_comprar_ya = j.puede_comprar_ya ? 0x01 : 0x00;
+        buffer.push_back(puede_comprar_ya); // Enviar si el jugador puede comprar ya
+        uint8_t acaba_de_comprar_arma = j.acaba_de_comprar_arma ? 0x01 : 0x00;
+        buffer.push_back(acaba_de_comprar_arma); // Enviar si el jugador acaba de comprar arma
+        uint8_t acaba_de_comprar_balas = j.acaba_de_comprar_balas ? 0x01 : 0x00;
+        buffer.push_back(acaba_de_comprar_balas); // Enviar si el jugador acaba de comprar balas
         uint8_t balas = static_cast<uint8_t>(j.balas);
         buffer.push_back(balas); // Enviar la cantidad de balas del jugador
+        uint8_t eliminaciones_esta_ronda = static_cast<uint8_t>(j.eliminaciones_esta_ronda);
+        buffer.push_back(eliminaciones_esta_ronda); // Enviar las eliminaciones de esta ronda
+        uint8_t eliminaciones_totales = static_cast<uint8_t>(j.eliminaciones_totales);
+        buffer.push_back(eliminaciones_totales); // Enviar las eliminaciones totales del jugador
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <yaml-cpp/yaml.h>
+#include "../common_src/enums_jugador.h"
 
 typedef enum {FONDO, OBSTACULO, PISO, ARMA, INICIO_CT, INICIO_TT, ZONA_BOMBAS} TipoElementoMapa;
 
@@ -44,7 +45,7 @@ public:
     int limite_alto() const { return alto_mapa; }
     int limite_ancho() const { return ancho_mapa; }
     std::vector<float> dar_posiciones_iniciales(bool es_tt);
-
+    bool en_posicion_de_compra(float pos_x, float pos_y, enum Equipo equipo);
 };
 
 #endif

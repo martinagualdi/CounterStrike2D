@@ -1,16 +1,19 @@
 #include "jugador.h"
 
+#include <iostream>
+
 
 void Jugador::disparar() {
     disparando = true;
-    
 }
 
 void Jugador::recibir_danio(int danio) { 
+    std::cout << "[recibir_danio] Antes: vida=" << vida << ", danio=" << danio << std::endl;
     vida -= danio; 
     if (vida <= 0) {
         vida = 0;
         vivo = false;
+        std::cout << "Jugador " << id << " ha muerto." << std::endl;
     }
 }
 
@@ -38,49 +41,39 @@ void Jugador::cambiar_arma_en_mano() {
 }
 
 bool Jugador::comprarArma(enum Compra arma) {
+    std::string str_arma = (arma == C_AK47) ? "ak47" : (arma == C_M3) ? "m3" : "awp";
+    std::string str_precio = "precio_" + str_arma;
+    int precio = Configuracion::get<int>(str_precio);
     switch (arma) {
         case C_AK47:
-            if (dinero >= 150) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "AK-47"){
                     arma_principal = std::make_unique<Ak47>();
-                    dinero -= 150;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true; 
                     return true;
-                } else if(arma_principal->getNombre() != "AK-47"){
-                    arma_principal = std::make_unique<Ak47>();
-                    dinero -= 150;
-                    arma_en_mano = arma_principal.get();
-                    return true;
-                }
+                } 
             }
             break;
         case C_M3:
-            if (dinero >= 100) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "M3"){
                     arma_principal = std::make_unique<m3>();
-                    dinero -= 100;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
-                    return true;
-                } else if(arma_principal->getNombre() != "M3"){
-                    arma_principal = std::make_unique<m3>();
-                    dinero -= 100;
-                    arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true;
                     return true;
                 }                
             }
             break;
         case C_AWP:
-            if (dinero >= 200) {
-                if(!arma_principal){
+            if (dinero >= precio) {
+                if(!arma_principal || arma_principal->getNombre() != "AWP"){
                     arma_principal = std::make_unique<Awp>();
-                    dinero -= 200;
+                    dinero -= precio;
                     arma_en_mano = arma_principal.get();
-                    return true;
-                }
-                else if(arma_principal->getNombre() != "AWP"){
-                    arma_principal = std::make_unique<Awp>();
-                    dinero -= 200;
-                    arma_en_mano = arma_principal.get();
+                    acaba_de_comprar_arma = true;
                     return true;
                 }
             }
@@ -92,18 +85,23 @@ bool Jugador::comprarArma(enum Compra arma) {
 }
 
 bool Jugador::comprarBalas(enum Compra tipo_bala) {
+    std::string str_tipo = (tipo_bala == BALAS_PRIMARIA) ? "principal" : "secundaria";
+    std::string str_precio = "precio_municion_" + str_tipo;
+    int precio = Configuracion::get<int>(str_precio);
     switch (tipo_bala) {
         case BALAS_PRIMARIA:
-            if (dinero >= 5){
+            if (dinero >= precio && arma_principal){
                 arma_principal->agregarMunicion(10);
-                dinero -= 5;
+                dinero -= precio;
+                acaba_de_comprar_balas = true;
                 return true;
             }
             break;
         case BALAS_SECUNDARIA:
-            if (dinero >= 2){
+            if (dinero >= precio){
                 arma_secundaria->agregarMunicion(10);
-                dinero -= 2;
+                dinero -= precio;
+                acaba_de_comprar_balas = true;
                 return true;
             }
             break;
@@ -130,6 +128,23 @@ enum ArmaEnMano Jugador::get_codigo_arma_en_mano() {
     }
 }
 
+void Jugador::sumar_eliminacion() {
+    eliminaciones_esta_ronda++;
+    eliminaciones_totales++;
+}
+
+void Jugador::reiniciar_compras() {
+    if (acaba_de_comprar_arma)
+        acaba_de_comprar_arma = false;
+    if (acaba_de_comprar_balas)
+        acaba_de_comprar_balas = false;
+}
+
+void Jugador::finalizar_ronda() {
+    dinero += Configuracion::get<int>("dinero_por_eliminacion") * eliminaciones_esta_ronda;
+    eliminaciones_esta_ronda = 0;
+}
+
 void Jugador::definir_spawn(float x, float y) {
     this->x = x;
     this->y = y;
@@ -143,7 +158,6 @@ void Jugador::reiniciar() {
     y = spawn_y;
     angulo = 0;
     vida = 100;
-    dinero = 500;
     vivo = true;
     moviendose = false;
     movimiento_actual = DETENER;

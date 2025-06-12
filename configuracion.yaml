@@ -1,1 +1,65 @@
 puerto: "8080"
+
+cantidad_max_jugadores: 10
+cantidad_min_ct: 1
+cantidad_max_ct: 5
+cantidad_min_tt: 1
+cantidad_max_tt: 5
+
+ronda_por_partida: 10
+rondas_por_bando: 5
+
+#segundos
+tiempo_por_ronda: 300
+tiempo_max_para_comprar: 30
+tiempo_para_activar_bomba: 10
+tiempo_pare_que_explote_bomba: 30
+
+dinero_inicial: 150
+dinero_por_eliminacion: 50
+
+precio_awp: 200
+precio_ak47: 150
+precio_m3: 100
+precio_municion_principal: 5
+precio_municion_secundaria: 2
+
+vida_inicial: 100
+
+danio_min_cuchillo: 15
+danio_max_cuchillo: 30
+precision_cuchillo: 1.0
+
+danio_min_glock: 5
+danio_max_glock: 30
+precision_glock: 0.9
+balas_glock: 20
+balas_max_glock: 60
+
+danio_min_awp: 100
+danio_max_awp: 100 
+precision_awp: 0.6
+balas_awp: 10
+balas_max_awp: 30
+
+#danio por bala de la rafaga
+danio_min_ak47: 2
+danio_max_ak47: 20
+precision_ak47: 0.8
+balas_ak47: 30
+balas_max_ak47: 90
+
+#danio por perdigon
+danio_min_m3: 5
+danio_max_m3: 80
+precision_m3: 0.7
+balas_m3: 10
+balas_max_m3: 30
+
+angulo_cono_vision: 90
+opacidad: 10
+
+
+
+
+

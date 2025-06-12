@@ -22,7 +22,12 @@ struct InfoJugador {
     bool esta_moviendose;
     bool esta_disparando;
     bool esta_plantando_bomba;
+    bool puede_comprar_ya;
+    bool acaba_de_comprar_arma;
+    bool acaba_de_comprar_balas;
     int balas;
+    int eliminaciones_esta_ronda;
+    int eliminaciones_totales;
 };
 
 struct InfoMunicion {
@@ -56,7 +61,12 @@ struct Snapshot {
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
             info_jugador.esta_disparando = jugador_ptr->esta_disparando();
             info_jugador.esta_plantando_bomba = jugador_ptr->esta_plantando_bomba();
+            info_jugador.puede_comprar_ya = jugador_ptr->puede_comprar_ahora();
+            info_jugador.acaba_de_comprar_arma = jugador_ptr->compro_arma_ahora();
+            info_jugador.acaba_de_comprar_balas = jugador_ptr->compro_balas_ahora();
             info_jugador.balas = jugador_ptr->get_arma_actual()->getBalas();
+            info_jugador.eliminaciones_esta_ronda = jugador_ptr->get_eliminaciones_esta_ronda();
+            info_jugador.eliminaciones_totales = jugador_ptr->get_eliminaciones_totales();
 
             info_jugadores.push_back(info_jugador);
         }

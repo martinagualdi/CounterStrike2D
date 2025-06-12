@@ -5,6 +5,8 @@
 #include <random>
 #include <chrono>
 
+#include "configuracion.h" 
+
 class Arma {
 protected:
     const std::string nombre;

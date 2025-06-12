@@ -6,6 +6,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "server.h"
+#include "configuracion.h"
 
 #define MIN_ARGUMNENTOS_SERVIDOR 2
 #define RET_ERROR 1
@@ -18,15 +19,15 @@ int main(int argc, char *argv[]) {
     try {
         const char *config_file = argv[1];
 
-        YAML::Node config = YAML::LoadFile(config_file);
+        /*YAML::Node config = YAML::LoadFile(config_file);
         if (!config["puerto"]) {
             std::cerr << "Error: el archivo de configuración no contiene 'puerto'\n";
             return RET_ERROR;
-        }
+        }*/
 
-        std::string port = config["puerto"].as<std::string>();
-
-        Server server(port.c_str());
+        //std::string port = config["puerto"].as<std::string>();
+        Configuracion::cargar_path(config_file);
+        Server server((Configuracion::get<std::string>("puerto")).c_str());
         server.start();
 
     } catch (const std::exception &e) {

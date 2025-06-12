@@ -2,6 +2,8 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
+#define BYTES_JUGADORES 27
+#define BYTES_BALAS 11
 #define RW_CLOSE 2
 
 ProtocoloCliente::ProtocoloCliente(const char *hostname, const char *servname) :socket(Socket(hostname, servname)) {}
@@ -54,11 +56,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / 22; 
+   size_t num_jugadores = largo_jugadores / BYTES_JUGADORES; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
-      uint8_t buffer[22];
-      socket.recvall(buffer, 22);
+      uint8_t buffer[BYTES_JUGADORES];
+      socket.recvall(buffer, BYTES_JUGADORES);
       InfoJugador info_jugador;
       info_jugador.id = static_cast<int>(buffer[0]);
       info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
@@ -73,17 +75,22 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
       info_jugador.esta_disparando = (buffer[19] == 0x01);
       info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
-      info_jugador.balas = static_cast<int>(buffer[21]); // Enviar la cantidad de balas del jugador
+      info_jugador.puede_comprar_ya = (buffer[21] == 0x01); // Enviar si el jugador puede comprar ya
+      info_jugador.acaba_de_comprar_arma = (buffer[22] == 0x01); // Enviar si el jugador acaba de comprar arma
+      info_jugador.acaba_de_comprar_balas = (buffer[23] == 0x01); // Enviar si el jugador acaba de comprar balas
+      info_jugador.balas = static_cast<int>(buffer[24]); // Enviar la cantidad de balas del jugador
+      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[25]); // Enviar las eliminaciones de esta ronda
+      info_jugador.eliminaciones_totales = static_cast<int>(buffer[26]); // Enviar las eliminaciones totales del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
    uint16_t largo_balas;
    socket.recvall(&largo_balas, sizeof(largo_balas));
    largo_balas = ntohs(largo_balas);
-   size_t num_balas = largo_balas / 11; // Cada bala ocupa 11 bytes
+   size_t num_balas = largo_balas / BYTES_BALAS; // Cada bala ocupa 11 bytes
    while (num_balas > 0) {
-      uint8_t buffer[11];
-      socket.recvall(buffer, 11);
+      uint8_t buffer[BYTES_BALAS];
+      socket.recvall(buffer, BYTES_BALAS);
       InfoMunicion info_municion;
       info_municion.id_quien_disparo = static_cast<int>(buffer[0]);
       info_municion.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;

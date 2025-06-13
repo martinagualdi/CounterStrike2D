@@ -84,8 +84,11 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint16_t(buffer, static_cast<uint16_t>(arma.municiones)); 
     }
     push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_restante)); //Enviar tiempo restante
+    buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_ct)); // Enviar rondas ganadas CT
+    buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_tt)); // Enviar rondas ganadas TT
+    buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.ronda_actual)); // Enviar ronda actual
+    buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.total_rondas)); // Enviar total de rondas
     buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
-
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }

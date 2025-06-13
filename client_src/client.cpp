@@ -18,7 +18,7 @@ using namespace SDL2pp;
 
 Client::Client(const char *hostname, const char *servname, const char* username) : protocolo(hostname, servname), 
     username(username), cliente_id(-1), clienteActivo(true), cola_enviador(), cola_recibidor(), hilo_enviador(protocolo, cola_enviador),
-    hilo_recibidor(protocolo, cola_recibidor) {}
+    hilo_recibidor(protocolo, cola_recibidor), puede_comprar(true) {}
 
 void Client::iniciar() {
     cliente_id = protocolo.recibirID();
@@ -52,10 +52,12 @@ void Client::iniciar() {
             for (auto& s : snapshots) {
                 sonido.reproducirSonidos(s);
             }
-            if (!snapshots.empty())
-                dibujador.renderizar(snapshots.back());
-        
-            eventHandler.manejarEventos(clienteActivo, snapshots.back());
+            if (!snapshots.empty()) {
+                Snapshot snapshot = snapshots.back();
+                dibujador.renderizar(snapshot);
+                puede_comprar = snapshot.getJugadorPorId(cliente_id)->puede_comprar_ya;
+            }
+            eventHandler.manejarEventos(clienteActivo, puede_comprar);
     
             auto t2 = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();

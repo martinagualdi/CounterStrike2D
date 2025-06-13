@@ -4,6 +4,7 @@
 
 #define BYTES_JUGADORES 27
 #define BYTES_BALAS 11
+#define BYTES_ARMAS 11
 #define RW_CLOSE 2
 
 ProtocoloCliente::ProtocoloCliente(const char *hostname, const char *servname) :socket(Socket(hostname, servname)) {}
@@ -111,6 +112,21 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_municion.angulo_disparo = static_cast<float>(ntohs(*(uint16_t*)&buffer[9])) / 100.0f;
       snapshot.balas_disparadas.push_back(info_municion);
       num_balas--;
+   }
+   uint16_t largo_armas;
+   socket.recvall(&largo_armas, sizeof(largo_armas));
+   largo_armas = ntohs(largo_armas);
+   size_t num_armas = largo_armas / BYTES_ARMAS; // Cada arma ocupa 11 bytes
+   while (num_armas > 0) {
+      uint8_t buffer[BYTES_ARMAS];
+      socket.recvall(buffer, BYTES_ARMAS);
+      InfoArmaEnSuelo info_arma;
+      info_arma.tipo_arma = static_cast<enum ArmaEnMano>(buffer[0]);
+      info_arma.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
+      info_arma.pos_y = static_cast<float>(ntohl(*(uint32_t*)&buffer[5])) / 100.0f;
+      info_arma.municiones = static_cast<int>(ntohs(*(uint16_t*)&buffer[9]));
+      snapshot.armas_sueltas.push_back(info_arma);
+      num_armas--;
    }
    uint16_t tiempo_restante;
    socket.recvall(&tiempo_restante, sizeof(tiempo_restante));

@@ -20,6 +20,7 @@ private:
     Queue<Snapshot> cola_recibidor;
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
+    bool puede_comprar;
     
 public:
 

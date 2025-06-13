@@ -3,10 +3,20 @@
 
 #include <vector>
 #include <cstddef>
+#include <iostream>
 #include "../server_src/jugador.h"
 #include "../server_src/municion.h"
 
 /*Structs para enviar la informacion necesaria para dibujar el juevo en "client"*/
+
+struct ArmaEnSuelo {
+    ArmaDeFuego *arma;
+    float pos_x;
+    float pos_y;
+
+    ArmaEnSuelo(ArmaDeFuego *arma, float pos_x, float pos_y) : arma(arma), pos_x(pos_x), pos_y(pos_y) {}
+    ArmaDeFuego* getArma() const { return arma; }
+};
 
 struct InfoJugador {
     int id;
@@ -37,15 +47,23 @@ struct InfoMunicion {
     float angulo_disparo;
 };
 
+struct InfoArmaEnSuelo {
+    enum ArmaEnMano tipo_arma;
+    float pos_x;
+    float pos_y;
+    int municiones;
+};
+
 struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
+    std::vector<InfoArmaEnSuelo> armas_sueltas;
     int tiempo_restante;
     enum Equipo equipo_ganador;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
-    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, auto& t_restante, enum Equipo& equipo_ganador) {
+    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas, auto& t_restante, enum Equipo equipo_ganador) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
@@ -79,8 +97,17 @@ struct Snapshot {
 
             balas_disparadas.push_back(info_municion);
         }
-        tiempo_restante = t_restante;
-        equipo_ganador = equipo_ganador;
+        for (const auto& arma : armas) {
+            InfoArmaEnSuelo info_arma;
+            info_arma.tipo_arma = arma.getArma()->getCodigoArma();
+            info_arma.pos_x = arma.pos_x;
+            info_arma.pos_y = arma.pos_y;
+            info_arma.municiones = arma.getArma()->getBalas();
+
+            armas_sueltas.push_back(info_arma);
+        }
+        this->tiempo_restante = t_restante;
+        this->equipo_ganador = equipo_ganador;
     }
 
 

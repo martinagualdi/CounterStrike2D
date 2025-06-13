@@ -45,4 +45,8 @@ public:
         }
         return false;
     }
+
+    enum ArmaEnMano getCodigoArma() const override {
+        return M3; // Asumiendo que el M3 es un arma del jugador
+    }
 };

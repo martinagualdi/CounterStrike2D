@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include "configuracion.h" 
+#include "../common_src/enums_jugador.h"
 
 class Arma {
 protected:
@@ -31,6 +32,7 @@ public:
     virtual int getBalas()  =0; 
     virtual std::string getNombre() const { return nombre; }
     virtual bool esAutomatica() const { return es_automatica; }
+    virtual enum ArmaEnMano getCodigoArma() const = 0; 
 
     virtual ~Arma() = default; 
 };

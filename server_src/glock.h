@@ -39,6 +39,9 @@ public:
         } 
         return false;
     }  
-   
+    
+    enum ArmaEnMano getCodigoArma() const override {
+        return GLOCK; // Asumiendo que la Glock es un arma del jugador
+    }
     
 };

@@ -10,7 +10,6 @@
 #include "municion.h"
 #include "mapa.h"
 
-
 class GameLoop : public Thread {
   private:
     Queue<ComandoDTO> &queue_comandos;
@@ -36,6 +35,7 @@ class GameLoop : public Thread {
     int rondas_ganadas_ct;
     int rondas_ganadas_tt;
     std::atomic<bool> bomba_plantada;
+    std::vector<ArmaEnSuelo> armas_en_suelo;
 
     void volver_jugadores_a_spawn();
     void cargar_dinero_por_eliminaciones();

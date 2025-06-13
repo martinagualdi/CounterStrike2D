@@ -6,6 +6,8 @@
 
 #define BYTES_JUGADORES 27
 #define BYTES_BALAS 11
+#define BYTES_ARMAS 11
+
 
 void ServerProtocol::push_back_uint16_t(std::vector<uint8_t> &buffer, uint16_t value) {
     value = htons(value);
@@ -72,8 +74,18 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint32_t(buffer, static_cast<uint32_t>(bala.pos_y * 100));
         push_back_uint16_t(buffer, static_cast<uint16_t>(bala.angulo_disparo * 100));
     }
+    uint16_t largo_armas = htons(static_cast<uint16_t>(snapshot.armas_sueltas.size() * BYTES_ARMAS));
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo_armas)[0]);
+    buffer.push_back(reinterpret_cast<uint8_t*>(&largo_armas)[1]);
+    for (const InfoArmaEnSuelo& arma : snapshot.armas_sueltas) {
+        buffer.push_back(static_cast<uint8_t>(arma.tipo_arma));
+        push_back_uint32_t(buffer, static_cast<uint32_t>(arma.pos_x * 100));
+        push_back_uint32_t(buffer, static_cast<uint32_t>(arma.pos_y * 100));
+        push_back_uint16_t(buffer, static_cast<uint16_t>(arma.municiones)); 
+    }
     push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_restante)); //Enviar tiempo restante
     buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
+
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }
@@ -84,6 +96,9 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
     skt.recvall(&prefijo, sizeof(prefijo));
     
     switch(prefijo){
+        case PREFIJO_DESCONECTAR:
+            comando.tipo = DESCONECTAR;
+            break;
         case PREFIJO_MOVIMIENTO:
             comando.tipo = MOVIMIENTO;
             uint8_t mov;
@@ -116,6 +131,18 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             uint8_t skin;
             skt.recvall(&skin, sizeof(skin));
             comando.skin = static_cast<enum SkinTipos>(skin);
+            break;
+        case PREFIJO_BOMBA:
+            comando.tipo = ACCION_SOBRE_BOMBA;
+            uint8_t estado;
+            skt.recvall(&estado, sizeof(estado));
+            comando.estado_bomba = static_cast<enum EstadoBomba>(estado);
+            break;
+        case PREFIJO_DROPEAR:
+            comando.tipo = DROPEAR;
+            break;
+        case PREFIJO_LEVANTAR:
+            comando.tipo = LEVANTAR;
             break;
         default:
             break;

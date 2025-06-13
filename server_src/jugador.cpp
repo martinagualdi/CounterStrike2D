@@ -152,8 +152,26 @@ void Jugador::definir_spawn(float x, float y) {
     this->spawn_y = y;
 }
 
+ArmaDeFuego* Jugador::soltar_arma_pricipal() {
+    if (arma_principal) {
+        arma_en_mano = arma_secundaria.get(); 
+        ArmaDeFuego* arma = arma_principal.release();
+        return arma;
+    }
+    return nullptr; 
+}
+
+ArmaDeFuego* Jugador::levantar_arma(ArmaDeFuego* arma_del_suelo) {
+    ArmaDeFuego* arma_soltar = nullptr;
+    if (arma_principal) 
+        arma_soltar = arma_principal.release(); 
+    arma_principal.reset(arma_del_suelo);
+    arma_en_mano = arma_principal.get();
+    acaba_de_comprar_arma = true; // Uso el mismo booleano para no sobrecargar la lógica
+    return arma_soltar; 
+}
+
 void Jugador::reiniciar() {
-    /*HARDCODEADO, REDEFINIR CON YAML DE CONFIG*/
     x = spawn_x;
     y = spawn_y;
     angulo = 0;

@@ -17,8 +17,12 @@ struct FootstepState {
 
 class Sonido{
 private:
+    const int client_id;
     Snapshot snapshot;
     Mixer mixer;
+    Chunk pickup;
+    Chunk compra_balas;
+    std::vector<Chunk> equipo_win;
     std::vector<Chunk> disparo_arma;
     std::vector<Chunk> pasos;
     std::unordered_map<int, FootstepState> estadosPasos;
@@ -28,9 +32,12 @@ private:
 
     void reproducirPasos();
     void reproducirDisparos();
+    void reproducirArmaNueva();
+    void reproducirEquipoGanador();
+    void reproducirCompraBalas();
 
 public:
-    Sonido();
+    explicit Sonido(int client_id);
     void reproducirSonidos(Snapshot& snapshot);
     Sonido(const Sonido&) = delete;
     Sonido& operator=(const Sonido&) = delete;

@@ -26,7 +26,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     equipo_tt(), 
     rondas_ganadas_ct(0),
     rondas_ganadas_tt(0), 
-    bomba_plantada(false) {}
+    bomba_plantada(false),
+    armas_en_suelo() {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
@@ -298,6 +299,46 @@ void GameLoop::ejecucion_comandos_recibidos() {
             case SELECCIONAR_SKIN:
                 jugador->set_skin_tipo(comando.skin);
                 break;
+            case DESCONECTAR:
+                // manejar desconexion de un cliente
+                break;
+            case ACCION_SOBRE_BOMBA:
+                if(comando.estado_bomba == ACCIONANDO){
+                    // Posibles casos a manjear:
+                    // * Un TT comenzo a plantar la bomba.
+                    // * Un CT comenzo a desactivar la bomba.
+                } else if(comando.estado_bomba == DETENIDO){
+                    // Posibles casos a manejar:
+                    // * Dejar de accionar si no llego a concretar el plantado/desactivado.
+                    // * Nada si se pudo realizar el plantado/accionado.
+                }
+                break;
+            case DROPEAR: {
+                ArmaDeFuego *arma_suelta = jugador->soltar_arma_pricipal();
+                if (arma_suelta)
+                    armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY())); 
+                break;
+            }
+            case LEVANTAR: {
+                float max_pos_x_jugador = jugador->getX() + 20; 
+                float min_pos_x_jugador = jugador->getX() - 20;
+                float max_pos_y_jugador = jugador->getY() + 20; 
+                float min_pos_y_jugador = jugador->getY() - 20;
+                size_t i = 0;
+                while (i < armas_en_suelo.size()) {
+                    ArmaEnSuelo &arma = armas_en_suelo[i];
+                    if (arma.pos_x >= min_pos_x_jugador && arma.pos_x <= max_pos_x_jugador &&
+                        arma.pos_y >= min_pos_y_jugador && arma.pos_y <= max_pos_y_jugador) {
+                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
+                        ArmaDeFuego *arma_suelta = jugador->levantar_arma(arma.getArma());
+                        if (arma_suelta)
+                            armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));
+                        break; // Salir del bucle una vez que se levanta un arma
+                    }
+                    i++;
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -386,10 +427,11 @@ bool GameLoop::jugar_ronda(bool esperando) {
                 chequear_si_completaron_equipos(eq_ganador, en_juego);
             else
                 chequear_si_equipo_gano(eq_ganador, en_juego);
+            
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
-            Snapshot snapshot(jugadores, balas_disparadas, (esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, (esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (const ClosedQueue &) {

@@ -33,6 +33,8 @@ public:
         return false;
     }
 
-    
+    enum ArmaEnMano getCodigoArma() const override {
+        return CUCHILLO; // Asumiendo que el cuchillo es un arma del jugador
+    }
     
 };

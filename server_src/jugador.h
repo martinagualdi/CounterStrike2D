@@ -119,6 +119,10 @@ class Jugador {
 
     void finalizar_ronda();
 
+    ArmaDeFuego* soltar_arma_pricipal();
+
+    ArmaDeFuego* levantar_arma(ArmaDeFuego* arma_del_suelo);
+
     void definir_spawn(float x, float y);
 
     void reiniciar();

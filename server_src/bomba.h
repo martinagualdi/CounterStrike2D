@@ -38,6 +38,10 @@ public:
     }
 
     int getTiempoParaDetonar() const { return tiempo_para_detonar; }
+
+    enum ArmaEnMano getCodigoArma() const override {
+        return BOMBA_TT; // Asumiendo que la bomba es del equipo terrorista
+    }
 };
 
 #endif

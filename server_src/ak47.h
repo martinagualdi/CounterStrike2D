@@ -67,4 +67,6 @@ public:
     int get_rafaga_restante() const { return rafaga_restante; }
     bool hay_rafaga() const { return rafaga_activa; }
     std::chrono::steady_clock::time_point& get_proximo_disparo_rafaga() { return proximo_disparo_rafaga; }
+
+    enum ArmaEnMano getCodigoArma() const override { return AK_47; }
 };

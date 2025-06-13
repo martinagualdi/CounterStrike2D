@@ -276,10 +276,10 @@ void EventHandler::procesarLevantar(const SDL_Event &event) {
 
 }
 
-void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snaphsot)
+void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
 {
     SDL_Event event;
-    this->puede_comprar = snaphsot.getJugadorPorId(client_id)->puede_comprar_ya;
+    this->puede_comprar = puede_comprar;
 
     if(!puede_comprar && mercado_abierto){
         mercado_abierto = false;

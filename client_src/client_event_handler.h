@@ -29,7 +29,7 @@ private:
 
 public:
     explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
-    void manejarEventos(bool& isRunning, Snapshot& Snapshot);
+    void manejarEventos(bool& isRunning, bool puede_comprar);
     bool mercadoAbierto() const;
     void cerrarMercado();
     bool skinSeleccionado() const;

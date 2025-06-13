@@ -40,4 +40,7 @@ public:
         return false;
     }
 
+    enum ArmaEnMano getCodigoArma() const override {
+        return AWP;
+    }
 };

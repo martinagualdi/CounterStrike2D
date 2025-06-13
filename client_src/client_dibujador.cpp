@@ -5,7 +5,7 @@
 #define TAM_BALA 8
 #define TAM_SIGHT 46
 #define ESCALA_LETRA_GRANDE 0.06
-#define ESCALA_LETRA_CHICA 0.02
+#define ESCALA_LETRA_CHICA 0.03
 #define ESCALA_ANCHO_ARMAS 0.275
 #define ESCALA_ALTO_ARMAS 0.089
 #define TAM_PLAYER 60
@@ -113,6 +113,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     textos_skin(),
     ct_nombres(),
     tt_nombres(),
+    esperando_jugadores(),
     sprite_arma(parseador.obtener_sprite_arma()),
     sprite_bala(parseador.obtener_sprite_bala()),
     sprite_sight(parseador.obtener_sprite_sight()),
@@ -134,6 +135,14 @@ void Dibujador::inicializar_textos() {
     tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[2] L337 Krew", amarillo));
     tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[3] Artic Avenger", amarillo));
     tt_nombres.emplace_back(renderer, fuente.RenderText_Blended("[4] Guerrilla", amarillo));
+
+    std::string base("Esperando jugadores");
+    for (int i = 0; i < 4; i++) {
+        std::string puntos(i, '.');
+        std::string texto = base + puntos;
+        esperando_jugadores.emplace_back(renderer, fuenteChica.RenderText_Blended(texto, amarillo));
+    }
+    
     
 }
 
@@ -383,21 +392,33 @@ void Dibujador::dibujar_balas_hud(int balas) {
 
 void Dibujador::dibujar_hud() {
     
-    const InfoJugador* j = snapshot.getJugadorPorId(client_id);
+    const InfoJugador* jugador_principal = snapshot.getJugadorPorId(client_id);
 
-    dibujar_salud(j->vida);
+    dibujar_salud(jugador_principal->vida);
     dibujar_tiempo(snapshot.tiempo_restante);
-    if(j->arma_en_mano != CUCHILLO){
-        dibujar_balas_hud(j->balas);
-        dibujar_saldo(j->dinero, true);
-    }
-    else dibujar_saldo(j->dinero, false);
+    if(jugador_principal->puede_comprar_ya) dibujar_simbolo_mercado();
+    if(jugador_principal->arma_en_mano != CUCHILLO){
+        dibujar_balas_hud(jugador_principal->balas);
+        dibujar_saldo(jugador_principal->dinero, true);
+    }    
+    else dibujar_saldo(jugador_principal->dinero, false);
 
 }
 
 Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
     std::string texto = nombre + "$" + std::to_string(precio);
     return Texture(renderer, fuente.RenderText_Blended(texto, amarillo));
+}
+
+void Dibujador::dibujar_simbolo_mercado() {
+
+    Rect dst;
+    dst.SetX(static_cast<int>(ANCHO_MIN * 5/8));
+    dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    dst.SetW(TAM_SIMBOLOS_HUD);
+    dst.SetH(TAM_SIMBOLOS_HUD);
+    renderer.Copy(simbolos_hud, sprites_simbolos_hud[MERCADO], dst);
+
 }
 
 void Dibujador::dibujar_mercado() {
@@ -531,6 +552,23 @@ void Dibujador::dibujar_mapa() {
     }
 }
 
+void Dibujador::dibujar_esperando_jugadores() {
+    
+    Uint32 current_ticks = SDL_GetTicks();
+    int i = (current_ticks / 500) % esperando_jugadores.size();
+    
+    int ancho_mensaje = esperando_jugadores[i].GetWidth();
+    int alto_mensaje = esperando_jugadores[i].GetHeight();
+
+    Rect dst;
+    dst.SetX((ANCHO_MIN / 2) -  esperando_jugadores[0].GetWidth() / 2);
+    dst.SetY((ALTO_MIN / 3) -  esperando_jugadores[0].GetWidth() / 2);
+    dst.SetW(ancho_mensaje);
+    dst.SetH(alto_mensaje);
+    renderer.Copy(esperando_jugadores[i], NullOpt, dst);
+
+}
+
 void Dibujador::renderizar(Snapshot& snapshot)
 {
     this->snapshot = snapshot;
@@ -545,6 +583,7 @@ void Dibujador::renderizar(Snapshot& snapshot)
     if(!eventHandler.skinSeleccionado())
         dibujar_seleccionar_skin();
 
+    //dibujar_esperando_jugadores();
     renderer.Present();
 }
 

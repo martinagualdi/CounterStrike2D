@@ -15,8 +15,11 @@ void ProtocoloCliente::push_back_uint16(std::vector<uint8_t>& message, uint16_t 
 }
 
 void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8_t>& mensaje) {
-   
-   if(comando.tipo == MOVIMIENTO){
+
+   if(comando.tipo == DESCONECTAR){
+      mensaje.push_back(PREFIJO_DESCONECTAR);
+   }
+   else if(comando.tipo == MOVIMIENTO){
       mensaje.push_back(PREFIJO_MOVIMIENTO);
       mensaje.push_back(static_cast<uint8_t>(comando.movimiento));
    } 
@@ -40,6 +43,16 @@ void ProtocoloCliente::serializar_comando(ComandoDTO& comando, std::vector<uint8
    else if(comando.tipo == SELECCIONAR_SKIN){
       mensaje.push_back(PREFIJO_SELECCIONAR_SKIN);
       mensaje.push_back(static_cast<uint8_t>(comando.skin));
+   } 
+   else if(comando.tipo == ACCION_SOBRE_BOMBA){
+      mensaje.push_back(PREFIJO_BOMBA);
+      mensaje.push_back(static_cast<uint8_t>(comando.estado_bomba));
+   } 
+   else if(comando.tipo == DROPEAR){
+      mensaje.push_back(PREFIJO_DROPEAR);
+   } 
+   else if(comando.tipo == LEVANTAR){
+      mensaje.push_back(PREFIJO_LEVANTAR);
    }
 
 }

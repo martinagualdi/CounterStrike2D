@@ -10,6 +10,7 @@ EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, const int client_id
     cola_enviador(cola_enviador),
     client_id(client_id),
     mercado_abierto(false),
+    puede_comprar(false),
     skin_seleccionado(false),
     teclas_validas({
         SDL_SCANCODE_W,
@@ -63,10 +64,16 @@ void EventHandler::procesarMovimiento(const SDL_Event &event)
 }
 
 void EventHandler::procesarCompra(const SDL_Event &event) {
+
     if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
         SDL_Scancode sc = event.key.keysym.scancode;
 
-        if(!mercado_abierto){
+        if (sc == SDL_SCANCODE_ESCAPE) {
+            mercado_abierto = false;
+            return;
+        }
+
+        if(!mercado_abierto && puede_comprar){
             if(sc == SDL_SCANCODE_COMMA){
                 ComandoDTO comando;
                 comando.tipo = COMPRAR;
@@ -80,29 +87,21 @@ void EventHandler::procesarCompra(const SDL_Event &event) {
             }
         }
 
-
-        if (sc == SDL_SCANCODE_B) {
-            mercado_abierto = !mercado_abierto;
-
-            if (mercado_abierto) {
+        if (sc == SDL_SCANCODE_B && puede_comprar) {
+            mercado_abierto = true;
                 // Si el mercado se acaba de abrir, detener el movimiento
-                if (!teclas_presionadas.empty()) {
-                    ComandoDTO comando;
-                    comando.tipo = MOVIMIENTO;
-                    comando.movimiento = DETENER;
-                    cola_enviador.try_push(comando);
-                    teclas_presionadas.clear();
-                }
+            if (!teclas_presionadas.empty()) {
+                ComandoDTO comando;
+                comando.tipo = MOVIMIENTO;
+                comando.movimiento = DETENER;
+                cola_enviador.try_push(comando);
+                teclas_presionadas.clear();
             }
-
+            
             return; 
         }
 
         if (mercado_abierto) {
-            if (sc == SDL_SCANCODE_ESCAPE) {
-                mercado_abierto = false;
-                return;
-            }
 
             ComandoDTO comando;
             comando.tipo = COMPRAR;
@@ -156,6 +155,10 @@ float EventHandler::calcularAngulo(float x_personaje, float y_personaje, int x_m
 
 bool EventHandler::mercadoAbierto() const {
     return mercado_abierto;
+}
+
+void EventHandler::cerrarMercado() {
+    this->mercado_abierto = false;
 }
 
 bool EventHandler::skinSeleccionado() const {
@@ -236,15 +239,61 @@ void EventHandler::procesarSkin(const SDL_Event &event) {
 
 }
 
-void EventHandler::manejarEventos(bool &jugador_activo)
+void EventHandler::procesarPlantarBomba(const SDL_Event &event) {
+    if(event.key.keysym.scancode == SDL_SCANCODE_E){
+        ComandoDTO comando = {};
+        comando.tipo = ACCION_SOBRE_BOMBA;
+        if (event.type == SDL_KEYDOWN && !event.key.repeat) {
+            comando.estado_bomba = ACCIONANDO;
+            cola_enviador.try_push(comando);
+        } else if(event.type == SDL_KEYUP){
+            comando.estado_bomba = DETENIDO;
+            cola_enviador.try_push(comando);
+        }
+    }
+}
+
+void EventHandler::procesarDrop(const SDL_Event &event) {
+
+    if(event.type == SDL_KEYDOWN && !event.key.repeat){
+        if(event.key.keysym.scancode == SDL_SCANCODE_G){
+            ComandoDTO comando = {};
+            comando.tipo = DROPEAR;
+            cola_enviador.try_push(comando);
+        }
+    }
+}
+
+void EventHandler::procesarLevantar(const SDL_Event &event) {
+
+    if(event.type == SDL_KEYDOWN && !event.key.repeat){
+        if(event.key.keysym.scancode == SDL_SCANCODE_F){
+            ComandoDTO comando = {};
+            comando.tipo = LEVANTAR;
+            cola_enviador.try_push(comando);
+        }
+    }
+
+}
+
+void EventHandler::manejarEventos(bool &jugador_activo, Snapshot& snaphsot)
 {
     SDL_Event event;
+    this->puede_comprar = snaphsot.getJugadorPorId(client_id)->puede_comprar_ya;
+
+    if(!puede_comprar && mercado_abierto){
+        mercado_abierto = false;
+    }
+
     while(SDL_PollEvent(&event)){
+        
         if(event.type == SDL_QUIT){
-            jugador_activo = false;
-            //cola_enviador.try_push(CMD_EXIT);
+            ComandoDTO comando = {};
+            comando.tipo = DESCONECTAR;
+            cola_enviador.try_push(comando);
+            jugador_activo = false;   
             return;
-        }
+        }        
 
         if(!skin_seleccionado)
             procesarSkin(event);
@@ -253,6 +302,9 @@ void EventHandler::manejarEventos(bool &jugador_activo)
             if(!mercado_abierto){
                 procesarMouse(event);
                 procesarMovimiento(event);
+                procesarPlantarBomba(event);
+                procesarDrop(event);
+                procesarLevantar(event);
             }
         }
         

@@ -12,6 +12,7 @@ private:
     Queue<ComandoDTO>& cola_enviador;
     const int client_id;
     bool mercado_abierto;
+    bool puede_comprar;
     bool skin_seleccionado;
     std::unordered_set<SDL_Scancode> teclas_validas;
     std::unordered_set<SDL_Scancode> teclas_presionadas;
@@ -19,14 +20,18 @@ private:
     void procesarCompra(const SDL_Event& event);
     void procesarMouse(const SDL_Event& event);
     void procesarSkin(const SDL_Event& event);
+    void procesarPlantarBomba(const SDL_Event& event);
+    void procesarDrop(const SDL_Event& event);
+    void procesarLevantar(const SDL_Event& event);
     float procesarPuntero();
     void convertir_coordenadas(float& x, float& y);
     float calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse);
 
 public:
     explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
-    void manejarEventos(bool& isRunning);
+    void manejarEventos(bool& isRunning, Snapshot& Snapshot);
     bool mercadoAbierto() const;
+    void cerrarMercado();
     bool skinSeleccionado() const;
     EventHandler(const EventHandler&) = delete;
     EventHandler& operator=(const EventHandler&) = delete;

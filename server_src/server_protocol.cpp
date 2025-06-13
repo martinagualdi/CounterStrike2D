@@ -84,6 +84,9 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
     skt.recvall(&prefijo, sizeof(prefijo));
     
     switch(prefijo){
+        case PREFIJO_DESCONECTAR:
+            comando.tipo = DESCONECTAR;
+            break;
         case PREFIJO_MOVIMIENTO:
             comando.tipo = MOVIMIENTO;
             uint8_t mov;
@@ -116,6 +119,18 @@ bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
             uint8_t skin;
             skt.recvall(&skin, sizeof(skin));
             comando.skin = static_cast<enum SkinTipos>(skin);
+            break;
+        case PREFIJO_BOMBA:
+            comando.tipo = ACCION_SOBRE_BOMBA;
+            uint8_t estado;
+            skt.recvall(&estado, sizeof(estado));
+            comando.estado_bomba = static_cast<enum EstadoBomba>(estado);
+            break;
+        case PREFIJO_DROPEAR:
+            comando.tipo = DROPEAR;
+            break;
+        case PREFIJO_LEVANTAR:
+            comando.tipo = LEVANTAR;
             break;
         default:
             break;

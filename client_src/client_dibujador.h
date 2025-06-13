@@ -45,6 +45,7 @@ private:
     std::vector<Texture> textos_skin;
     std::vector<Texture> ct_nombres;
     std::vector<Texture> tt_nombres;
+    std::vector<Texture> esperando_jugadores;
     SDL_Rect sprite_arma;
     SDL_Rect sprite_bala;
     SDL_Rect sprite_sight;
@@ -72,9 +73,11 @@ private:
     void dibujar_pies(float x, float y, float angulo);
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
+    void dibujar_simbolo_mercado();
     void dibujar_hud();
     void dibujar_mercado();
     void dibujar_mapa();
+    void dibujar_esperando_jugadores();
     void dibujar_seleccionar_skin();
     
 public:

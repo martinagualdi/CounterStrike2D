@@ -38,7 +38,7 @@ void Client::iniciar() {
         ClientMap mapa(mapa_inicial, renderer);
         EventHandler eventHandler(cola_enviador, cliente_id);
         Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(), eventHandler, cola_recibidor);
-        Sonido sonido;
+        Sonido sonido(cliente_id);
 
         int ms_per_frame = 1000 / FPS;
         while(clienteActivo){
@@ -55,7 +55,7 @@ void Client::iniciar() {
             if (!snapshots.empty())
                 dibujador.renderizar(snapshots.back());
         
-            eventHandler.manejarEventos(clienteActivo);
+            eventHandler.manejarEventos(clienteActivo, snapshots.back());
     
             auto t2 = std::chrono::steady_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();

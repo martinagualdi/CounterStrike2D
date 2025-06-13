@@ -1,17 +1,24 @@
 #include "client_sonido.h"
 
 #include <SDL2/SDL.h>
+#include <iostream>
 
 #define FRECUENCIA 44100
 #define CANALES 2
 #define TAM_BUFFER 2048
 
-Sonido::Sonido() : 
+Sonido::Sonido(const int client_id) : 
+    client_id(client_id),
     snapshot(),
     mixer(FRECUENCIA, MIX_DEFAULT_FORMAT, CANALES, TAM_BUFFER),
+    pickup("client_src/sfx/items/pickup.wav"),
+    compra_balas("client_src/sfx/items/ammo.wav"),
+    equipo_win(),
     disparo_arma(),
     pasos()
-    {      
+    {   
+        equipo_win.emplace_back("client_src/sfx/radio/ctwin.ogg");
+        equipo_win.emplace_back("client_src/sfx/radio/terwin.ogg"); 
         disparo_arma.emplace_back("client_src/sfx/weapons/knife_slash.wav");
         disparo_arma.emplace_back("client_src/sfx/weapons/glock18.wav");
         disparo_arma.emplace_back("client_src/sfx/weapons/ak47.wav");
@@ -43,11 +50,40 @@ void Sonido::reproducirPasos() {
         }
     }
 }
+
 void Sonido::reproducirDisparos() {
 
     for(const InfoJugador& jugador : snapshot.info_jugadores){  
-        if(!jugador.esta_disparando) continue;
-        mixer.PlayChannel(-1, disparo_arma[jugador.arma_en_mano]);
+        if(jugador.esta_disparando)
+            mixer.PlayChannel(-1, disparo_arma[jugador.arma_en_mano]);
+    }
+
+}
+
+void Sonido::reproducirArmaNueva() {
+
+    for(const InfoJugador& jugador : snapshot.info_jugadores){
+        if(jugador.acaba_de_comprar_arma) 
+            mixer.PlayChannel(-1, pickup);
+    }
+
+}
+
+void Sonido::reproducirEquipoGanador() {
+    
+    if(snapshot.equipo_ganador != NONE){
+        mixer.PlayChannel(-1, equipo_win[snapshot.equipo_ganador]);
+    }
+
+}
+
+void Sonido::reproducirCompraBalas() {
+
+    const InfoJugador* j = snapshot.getJugadorPorId(client_id);
+    if(!j) return;
+
+    if(j->acaba_de_comprar_balas){
+        mixer.PlayChannel(-1, compra_balas);
     }
 
 }
@@ -57,7 +93,9 @@ void Sonido::reproducirSonidos(Snapshot& snapshot){
     this->snapshot = snapshot;
     reproducirPasos();
     reproducirDisparos();
-        
+    reproducirArmaNueva();
+    reproducirCompraBalas();
+    //reproducirEquipoGanador();
 
 }
 

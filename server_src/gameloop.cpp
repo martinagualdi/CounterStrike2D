@@ -293,6 +293,26 @@ void GameLoop::ejecucion_comandos_recibidos() {
             case SELECCIONAR_SKIN:
                 jugador->set_skin_tipo(comando.skin);
                 break;
+            case DESCONECTAR:
+                // manejar desconexion de un cliente
+                break;
+            case ACCION_SOBRE_BOMBA:
+                if(comando.estado_bomba == ACCIONANDO){
+                    // Posibles casos a manjear:
+                    // * Un TT comenzo a plantar la bomba.
+                    // * Un CT comenzo a desactivar la bomba.
+                } else if(comando.estado_bomba == DETENIDO){
+                    // Posibles casos a manejar:
+                    // * Dejar de accionar si no llego a concretar el plantado/desactivado.
+                    // * Nada si se pudo realizar el plantado/accionado.
+                }
+                break;
+            case DROPEAR:
+                // logica 
+                break;
+            case LEVANTAR:
+                //logica
+                break;
             default:
                 break;
         }

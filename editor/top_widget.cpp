@@ -108,7 +108,7 @@ void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
 }
 
 QString TopWidget::getFondoPath() const {
-    int idx = fondoPath.indexOf("/editor");
+    int idx = fondoPath.indexOf("/gfx");
     if (idx != -1) {
         return fondoPath.mid(idx);
     }
@@ -509,8 +509,8 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
 
     QString basePath = QCoreApplication::applicationDirPath();
     QString imagenRelativa = (cantidad == 0)
-        ? "/editor/gfx/plantacion_bombas/plantacion1.png"
-        : "/editor/gfx/plantacion_bombas/plantacion2.png";
+        ? "/gfx/plantacion_bombas/plantacion1.png"
+        : "/gfx/plantacion_bombas/plantacion2.png";
     QString imagenAbsoluta = basePath + imagenRelativa;
     
     QPixmap pix(imagenAbsoluta);

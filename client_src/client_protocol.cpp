@@ -67,6 +67,7 @@ void ProtocoloCliente::enviarComando(ComandoDTO comando) {
 }
 
 Snapshot ProtocoloCliente::recibirSnapshot() {
+   /*RECIBO INFOJUGADORES*/
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
@@ -98,6 +99,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
+   /*RECIBO INFOMUNICIONES*/
    uint16_t largo_balas;
    socket.recvall(&largo_balas, sizeof(largo_balas));
    largo_balas = ntohs(largo_balas);
@@ -113,6 +115,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.balas_disparadas.push_back(info_municion);
       num_balas--;
    }
+   /*RECIBO INFOARMASENSUELO*/
    uint16_t largo_armas;
    socket.recvall(&largo_armas, sizeof(largo_armas));
    largo_armas = ntohs(largo_armas);
@@ -128,9 +131,21 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.armas_sueltas.push_back(info_arma);
       num_armas--;
    }
+   /*RECIBO TIEMPO*/
    uint16_t tiempo_restante;
    socket.recvall(&tiempo_restante, sizeof(tiempo_restante));
    snapshot.tiempo_restante = static_cast<int>(ntohs(tiempo_restante));
+   /*RECIBO INFORONDAS*/
+   uint8_t rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, total_rondas;
+   socket.recvall(&rondas_ganadas_ct, sizeof(rondas_ganadas_ct));
+   socket.recvall(&rondas_ganadas_tt, sizeof(rondas_ganadas_tt));
+   socket.recvall(&ronda_actual, sizeof(ronda_actual));
+   socket.recvall(&total_rondas, sizeof(total_rondas));
+   snapshot.rondas_info.rondas_ganadas_ct = static_cast<int>(rondas_ganadas_ct);
+   snapshot.rondas_info.rondas_ganadas_tt = static_cast<int>(rondas_ganadas_tt);
+   snapshot.rondas_info.ronda_actual = static_cast<int>(ronda_actual);
+   snapshot.rondas_info.total_rondas = static_cast<int>(total_rondas);
+   /*RECIBO EQUIPO GANADOR DE LA RONDA ACTUAL SI ES QUE HAY*/
    uint8_t equipo_ganador;
    socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
    snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 

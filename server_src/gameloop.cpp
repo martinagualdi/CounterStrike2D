@@ -246,7 +246,6 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 jugador->setAngulo(comando.angulo);
                 break;
             case DISPARO:
-                std::cout << "Angulo recibido: " << comando.angulo << std::endl;
                 if (jugador->puede_disparar()){
                     if (jugador->get_codigo_arma_en_mano() == M3){
                         jugador->disparar();
@@ -260,12 +259,18 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         Ak47 *ak47 = dynamic_cast<Ak47 *>(jugador->get_arma_actual());
                         // Solo inicia la ráfaga si no hay una en curso y puede disparar
                         if (!ak47->hay_rafaga()) {
-                            ak47->agregarMunicion(1); // Disparar disminuye la municion sin hacer acción, entonces debo agregar una bala
+                            ak47->agregarMunicion(1); 
                             ak47->iniciar_rafaga(comando.angulo, comando.id_jugador);
                         }
                         break;
                     }
                     jugador->disparar();
+                    if (jugador->get_codigo_arma_en_mano() == CUCHILLO) {
+                        // El cuchillo no dispara, pero se puede usar para atacar
+                        Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
+                        bala_golpea_jugador(bala_disparada, false); // Verifica si golpea a un jugador
+                        break;
+                    }
                     Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
                     balas_disparadas.push_back(bala_disparada);
                 }

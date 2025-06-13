@@ -426,7 +426,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
-            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, (esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, (esperando) ? tiempo_max_ronda : t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (const ClosedQueue &) {

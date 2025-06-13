@@ -54,16 +54,25 @@ struct InfoArmaEnSuelo {
     int municiones;
 };
 
+struct InfoRondas {
+    int rondas_ganadas_ct;
+    int rondas_ganadas_tt;
+    int ronda_actual;
+    int total_rondas;
+};
+
 struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
     std::vector<InfoArmaEnSuelo> armas_sueltas;
+    InfoRondas rondas_info;
     int tiempo_restante;
     enum Equipo equipo_ganador;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
-    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas, auto& t_restante, enum Equipo equipo_ganador) {
+    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas, auto& t_restante, int rondas_ct, int rondas_tt, 
+        int ronda_actual, int total_rondas, enum Equipo equipo_ganador) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
@@ -107,6 +116,12 @@ struct Snapshot {
             armas_sueltas.push_back(info_arma);
         }
         this->tiempo_restante = t_restante;
+        InfoRondas rondas_info_actual;
+        rondas_info_actual.rondas_ganadas_ct = rondas_ct;
+        rondas_info_actual.rondas_ganadas_tt = rondas_tt;
+        rondas_info_actual.ronda_actual = ronda_actual;
+        rondas_info_actual.total_rondas = total_rondas;
+        this->rondas_info = rondas_info_actual;
         this->equipo_ganador = equipo_ganador;
     }
 

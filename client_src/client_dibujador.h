@@ -26,26 +26,31 @@ private:
     struct Mapa mapa;
     ParseadorSpriteSheets parseador;
     Snapshot snapshot;
+    bool estado_bomba_anterior;
+    bool explosion_en_progreso;
+    float explosion_alpha;
+    Uint32 explosion_last_ticks;
     Font fuente;
     Font fuenteChica;
     Color amarillo;
+    Texture mensaje_bomba_plantada;
     Texture fondo_transparente;
     Texture balas;
     Texture cs2d;
-    Texture dropped_bomb;
     Texture player_legs;
     Texture muerto;
     Texture simbolos_hud;
     Texture numeros_hud;
     Texture sight;
     std::vector<Texture> armas;
-    std::vector<Texture> armas_mercado;
+    std::vector<Texture> armas_mercado_y_tiradas;
     std::vector<Texture> ct_players;
     std::vector<Texture> tt_players;
     std::vector<Texture> textos_skin;
     std::vector<Texture> ct_nombres;
     std::vector<Texture> tt_nombres;
     std::vector<Texture> esperando_jugadores;
+    std::vector<Texture> mensajes_ganadores;
     SDL_Rect sprite_arma;
     SDL_Rect sprite_bala;
     SDL_Rect sprite_sight;
@@ -79,6 +84,11 @@ private:
     void dibujar_mapa();
     void dibujar_esperando_jugadores();
     void dibujar_seleccionar_skin();
+    void dibujar_armas_tiradas();
+    void dibujar_explosion_bomba();
+    void dibujar_mensaje_ganador();
+    void dibujar_mensaje_bomba_plantada();
+    void dibujar_vision_de_campo();
     
 public:
     explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 

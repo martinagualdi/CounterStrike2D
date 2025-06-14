@@ -19,11 +19,11 @@ Sonido::Sonido(const int client_id) :
     {   
         equipo_win.emplace_back("client_src/sfx/radio/ctwin.ogg");
         equipo_win.emplace_back("client_src/sfx/radio/terwin.ogg"); 
-        disparo_arma.emplace_back("client_src/sfx/weapons/knife_slash.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/glock18.wav");
         disparo_arma.emplace_back("client_src/sfx/weapons/ak47.wav");
         disparo_arma.emplace_back("client_src/sfx/weapons/m3.wav");
         disparo_arma.emplace_back("client_src/sfx/weapons/awp.wav");
+        disparo_arma.emplace_back("client_src/sfx/weapons/knife_slash.wav");
+        disparo_arma.emplace_back("client_src/sfx/weapons/glock18.wav");
         pasos.emplace_back("client_src/sfx/player/pl_dirt1.wav");
         pasos.emplace_back("client_src/sfx/player/pl_dirt2.wav");
         pasos.emplace_back("client_src/sfx/player/pl_dirt3.wav");
@@ -54,8 +54,12 @@ void Sonido::reproducirPasos() {
 void Sonido::reproducirDisparos() {
 
     for(const InfoJugador& jugador : snapshot.info_jugadores){  
-        if(jugador.esta_disparando)
-            mixer.PlayChannel(-1, disparo_arma[jugador.arma_en_mano]);
+        if(jugador.esta_disparando) {
+            int i = static_cast<int>(jugador.arma_en_mano);
+            if(jugador.arma_en_mano > BOMBA_TT) i--;
+            int canal = jugador.id;
+            mixer.PlayChannel(canal, disparo_arma[i]);
+        }
     }
 
 }

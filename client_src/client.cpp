@@ -34,6 +34,7 @@ void Client::iniciar() {
         SDLTTF ttf;
         SDL_ShowCursor(SDL_DISABLE);
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
+       // window.SetFullscreen(SDL_WINDOW_FULLSCREEN_DESKTOP);
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
         ClientMap mapa(mapa_inicial, renderer);
         EventHandler eventHandler(cola_enviador, cliente_id);

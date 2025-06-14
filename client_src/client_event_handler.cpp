@@ -173,29 +173,27 @@ void EventHandler::convertir_coordenadas(float &x, float &y) {
 float EventHandler::procesarPuntero() { 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    return calcularAngulo(ANCHO_MIN/2, ALTO_MIN/2, mouseX, mouseY);
+    return calcularAngulo(ANCHO_MIN / 2, ALTO_MIN / 2, mouseX, mouseY);
 }
 
 void EventHandler::procesarMouse(const SDL_Event &event)
 {
     if(event.type == SDL_MOUSEMOTION){
-        
-        ComandoDTO comando;
+        ComandoDTO comando = {};
         comando.tipo = ROTACION;
         comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }
-    else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
-        ComandoDTO comando;
+    else if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+        ComandoDTO comando = {};
         comando.tipo = DISPARO;
         comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
-    }  else if (event.type == SDL_MOUSEWHEEL) {
-        if (event.wheel.y < 0) {
-            ComandoDTO comando;
-            comando.tipo = CAMBIAR_ARMA;
-            cola_enviador.try_push(comando);
-        }
+    }  
+    else if (event.type == SDL_MOUSEWHEEL && event.wheel.y < 0) {
+        ComandoDTO comando = {};
+        comando.tipo = CAMBIAR_ARMA;
+        cola_enviador.try_push(comando);
     }
     
 }

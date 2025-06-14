@@ -1,10 +1,7 @@
 puerto: "8080"
 
-cantidad_max_jugadores: 10
 cantidad_min_ct: 1
-cantidad_max_ct: 5
 cantidad_min_tt: 1
-cantidad_max_tt: 5
 
 ronda_por_partida: 10
 rondas_por_bando: 5
@@ -15,7 +12,7 @@ tiempo_max_para_comprar: 30
 tiempo_para_activar_bomba: 10
 tiempo_pare_que_explote_bomba: 30
 
-dinero_inicial: 150
+dinero_inicial: 1500
 dinero_por_eliminacion: 50
 
 precio_awp: 200

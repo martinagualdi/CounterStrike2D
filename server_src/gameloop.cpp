@@ -7,11 +7,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     queue_comandos(queue_comandos), 
     queues_jugadores(queues_jugadores), 
     jugadores(),
-    cant_max_jugadores(Configuracion::get<int>("cantidad_max_jugadores")),
     cant_min_ct(Configuracion::get<int>("cantidad_min_ct")),
-    cant_max_ct(Configuracion::get<int>("cantidad_max_ct")),
     cant_min_tt(Configuracion::get<int>("cantidad_min_tt")),
-    cant_max_tt(Configuracion::get<int>("cantidad_max_tt")),
     activo(true), 
     balas_disparadas(), 
     ultimo_unido_ct(false), 
@@ -31,18 +28,33 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
-    if (ultimo_unido_ct){ 
-        jugador->establecer_equipo(TT);
-        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
-        equipo_tt.push_back(jugador);
-    } else {
+
+    bool puede_ct = equipo_ct.size() < static_cast<size_t>(cant_min_ct);
+    bool puede_tt = equipo_tt.size() < static_cast<size_t>(cant_min_tt);
+
+    if (puede_ct && puede_tt) {
+        // Si puedo unirme a ambos equipos
+        if (ultimo_unido_ct) {
+            jugador->establecer_equipo(TT);
+            equipo_tt.push_back(jugador);
+        } else {
+            jugador->establecer_equipo(CT);
+            equipo_ct.push_back(jugador);
+        }
+        ultimo_unido_ct = !ultimo_unido_ct;
+    } else if (puede_ct) {
         jugador->establecer_equipo(CT);
-        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
         equipo_ct.push_back(jugador);
+        ultimo_unido_ct = true;
+    } else if (puede_tt) {
+        jugador->establecer_equipo(TT);
+        equipo_tt.push_back(jugador);
+        ultimo_unido_ct = false;
     }
-    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(ultimo_unido_ct);
-    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]); // Posición inicial por defecto
-    ultimo_unido_ct = !ultimo_unido_ct; 
+
+    jugador->establecer_skin(SKIN1); // Asignar skin por defecto
+    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(jugador->get_equipo());
+    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]);
     jugadores.push_back(jugador);
 }
 
@@ -324,8 +336,8 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     ArmaEnSuelo &arma = armas_en_suelo[i];
                     if (arma.pos_x >= min_pos_x_jugador && arma.pos_x <= max_pos_x_jugador &&
                         arma.pos_y >= min_pos_y_jugador && arma.pos_y <= max_pos_y_jugador) {
-                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
                         ArmaDeFuego *arma_suelta = jugador->levantar_arma(arma.getArma());
+                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
                         if (arma_suelta)
                             armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));
                         break; // Salir del bucle una vez que se levanta un arma

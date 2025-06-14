@@ -324,8 +324,8 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     ArmaEnSuelo &arma = armas_en_suelo[i];
                     if (arma.pos_x >= min_pos_x_jugador && arma.pos_x <= max_pos_x_jugador &&
                         arma.pos_y >= min_pos_y_jugador && arma.pos_y <= max_pos_y_jugador) {
-                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
                         ArmaDeFuego *arma_suelta = jugador->levantar_arma(arma.getArma());
+                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
                         if (arma_suelta)
                             armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));
                         break; // Salir del bucle una vez que se levanta un arma

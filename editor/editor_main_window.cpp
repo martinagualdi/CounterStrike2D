@@ -67,13 +67,15 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QString dirPath;
     };
 
+    QString basePath = "/var/CounterStrike2D/assets/";
+
     TabInfo tabs[] = {
-        { "Fondos", "gfx/backgrounds/" },
-        { "Azteca", "gfx/aztec/" },
-        { "Dust",  "gfx/dust/" },
-        { "Inferno", "gfx/inferno/" },
-        { "Armas", "gfx/weapons/" },
-        { "Proteccion anti disparos", "gfx/proteccion_disparos/" },
+        { "Fondos", basePath + "gfx/backgrounds/" },
+        { "Azteca", basePath + "gfx/aztec/" },
+        { "Dust",  basePath + "gfx/dust/" },
+        { "Inferno", basePath + "gfx/inferno/" },
+        { "Armas", basePath + "gfx/weapons/" },
+        { "Proteccion anti disparos", basePath + "gfx/proteccion_disparos/" },
     };
 
     for (const auto& tab : tabs) {
@@ -244,7 +246,7 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-        QString rutaRelativa = path.mid(e.path.indexOf("/gfx"));
+        QString rutaRelativa = path.mid(e.path.indexOf("/var"));
         if (rutaRelativa.startsWith('/'))
             rutaRelativa.remove(0, 1);
         out << "  - imagen: " << rutaRelativa << "\n";
@@ -291,9 +293,8 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
     if (!fondo.startsWith('/'))
         fondo.prepend('/');
-    QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(basePath + fondo);
+    topWidget->setBackgroundPath(fondo);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
@@ -303,8 +304,7 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
         QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
         int x = elemento["x"].as<int>();
         int y = elemento["y"].as<int>();
-        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
-        topWidget->agregarElemento(fullPath, x, y);
+        topWidget->agregarElemento(imagen, x, y);
     }
 
     const auto& zonas = root["zonas"];

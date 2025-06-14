@@ -38,6 +38,7 @@ struct InfoJugador {
     int balas;
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
+    int muertes;
 };
 
 struct InfoMunicion {
@@ -94,6 +95,7 @@ struct Snapshot {
             info_jugador.balas = jugador_ptr->get_arma_actual()->getBalas();
             info_jugador.eliminaciones_esta_ronda = jugador_ptr->get_eliminaciones_esta_ronda();
             info_jugador.eliminaciones_totales = jugador_ptr->get_eliminaciones_totales();
+            info_jugador.muertes = jugador_ptr->get_muertes();
 
             info_jugadores.push_back(info_jugador);
         }

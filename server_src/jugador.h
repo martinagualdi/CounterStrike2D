@@ -38,6 +38,7 @@ class Jugador {
     Arma* arma_en_mano;
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
+    int muertes;
 
   public:  
 
@@ -62,7 +63,8 @@ class Jugador {
       cuchillo(new Cuchillo()), 
       arma_en_mano(arma_secundaria.get()),
       eliminaciones_esta_ronda(0),
-      eliminaciones_totales(0) {}
+      eliminaciones_totales(0),
+      muertes(0) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
@@ -93,6 +95,7 @@ class Jugador {
     bool compro_balas_ahora() const { return acaba_de_comprar_balas; }
     int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
     int get_eliminaciones_totales() const { return eliminaciones_totales; }
+    int get_muertes() const { return muertes; }
 
     // Logicas
     void disparar();

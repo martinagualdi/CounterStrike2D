@@ -34,6 +34,7 @@ private:
     ZonaBombas zona_bombas;
     std::vector<ElementoDeMapa> elementos;
     std::string inicio_mapa_dto;
+    int cantidad_zonas_bombas = 0;
 
     Area definir_inicio(const int x, const int y, const int ancho, const int alto);
 
@@ -46,6 +47,10 @@ public:
     int limite_ancho() const { return ancho_mapa; }
     std::vector<float> dar_posiciones_iniciales(bool es_tt);
     bool en_posicion_de_compra(float pos_x, float pos_y, enum Equipo equipo);
+    bool en_posicion_de_bomba_a(float pos_x, float pos_y);
+    bool en_posicion_de_bomba_b(float pos_x, float pos_y);
+    bool verificar_zona_bombas(float pos_x, float pos_y);
+    int verificar_cantidad_zonas_bombas() const { return cantidad_zonas_bombas; }
 };
 
 #endif

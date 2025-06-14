@@ -27,13 +27,16 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     rondas_ganadas_ct(0),
     rondas_ganadas_tt(0), 
     bomba_plantada(false),
-    armas_en_suelo() {}
+    armas_en_suelo(){}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
+        if (equipo_tt.empty()) {
+            jugador->asignar_bomba();
+        }
         equipo_tt.push_back(jugador);
     } else {
         jugador->establecer_equipo(CT);
@@ -207,6 +210,7 @@ void GameLoop::chequear_estados_jugadores(){
     }
 }
 
+
 void GameLoop::chequear_si_pueden_comprar(auto t_inicio) {
     auto t_ahora = std::chrono::steady_clock::now();
     auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_ahora - t_inicio).count();
@@ -303,14 +307,26 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 // manejar desconexion de un cliente
                 break;
             case ACCION_SOBRE_BOMBA:
-                if(comando.estado_bomba == ACCIONANDO){
-                    // Posibles casos a manjear:
-                    // * Un TT comenzo a plantar la bomba.
-                    // * Un CT comenzo a desactivar la bomba.
-                } else if(comando.estado_bomba == DETENIDO){
-                    // Posibles casos a manejar:
-                    // * Dejar de accionar si no llego a concretar el plantado/desactivado.
-                    // * Nada si se pudo realizar el plantado/accionado.
+                if (comando.estado_bomba == ACCIONANDO) {
+                    if (!bomba_plantada && jugador->get_equipo() == TT /*&&
+                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())*/) {
+                        jugador->empezar_a_plantar();
+                        jugador_plantando = jugador;
+                        tiempo_inicio_plantado = std::chrono::steady_clock::now();
+                        std::cout << "Jugador " << jugador->getId() << " comenzó a plantar la bomba." << std::endl;
+                    }else if(bomba_plantada && jugador->get_equipo() == CT) {
+                        //Desactivar bomba
+                        
+                    }
+                }
+                else if(comando.estado_bomba == DETENIDO){
+                    if (jugador == jugador_plantando) {
+                        jugador_plantando = nullptr;
+                        jugador->cancelar_plantado_bomba();
+                        std::cout << "Jugador " << jugador->getId() << " interrumpió el plantado de la bomba." << std::endl;
+                    }
+                    
+                    
                 }
                 break;
             case DROPEAR: {
@@ -396,6 +412,20 @@ void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) 
     }
 }
 
+void GameLoop::chequear_bomba_plantada() {
+    if (jugador_plantando) {
+        auto t_actual = std::chrono::steady_clock::now();
+        auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - tiempo_inicio_plantado).count();
+        if (t_transcurrido >= Configuracion::get<int>("tiempo_plantado_bomba")) {
+            bomba_plantada = true;
+            jugador_plantando->plantar_bomba(jugador_plantando->getX(), jugador_plantando->getY());
+            int id_jugador = jugador_plantando->getId();
+            jugador_plantando = nullptr;
+            std::cout << "Bomba plantada por el jugador " << id_jugador << std::endl;
+        }
+    }
+}
+
 void GameLoop::chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego) {
     if (!esperando_jugadores()) {
         en_juego = false;
@@ -422,6 +452,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
             ejecucion_comandos_recibidos();
             disparar_rafagas_restantes();
             chequear_colisiones(esperando);
+            chequear_bomba_plantada();
             enum Equipo eq_ganador = se_termino_ronda();
             if (esperando)
                 chequear_si_completaron_equipos(eq_ganador, en_juego);

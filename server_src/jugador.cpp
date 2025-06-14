@@ -1,6 +1,7 @@
 #include "jugador.h"
 
 #include <iostream>
+#include "bomba.h"
 
 
 void Jugador::disparar() {
@@ -21,6 +22,41 @@ Arma* Jugador::get_arma_actual() const {
     return arma_en_mano;
 }
 
+void Jugador::asignar_bomba() {
+    bomba = std::make_unique<Bomba>();
+    this->tiene_bomba = true;
+    
+    
+}
+
+void Jugador::cancelar_plantado_bomba() {
+    if (tiene_bomba && plantando_bomba) {
+        plantando_bomba = false;
+        bomba->reiniciar();
+    } else {
+        std::cout << "No se puede cancelar el plantado de la bomba, no se está plantando." << std::endl;
+    }
+}
+
+void Jugador::empezar_a_plantar() {
+    if (tiene_bomba && !bomba->estaActivada()) {
+        plantando_bomba = true;
+        bomba->iniciarCuentaRegresiva();
+    } else {
+        std::cout << "No se puede empezar a plantar la bomba, ya está activada o no se tiene una." << std::endl;
+    }
+}
+
+void Jugador::plantar_bomba(float x, float y) {
+    if (tiene_bomba && !bomba->estaActivada()) {
+        plantando_bomba = false;
+        bomba->activar(x,y);
+        tiene_bomba = false; // El jugador ya no tiene la bomba en mano
+    } else {
+        std::cout << "No se puede plantar la bomba, ya está activada o no se tiene una." << std::endl;
+    }
+}
+
 std::string Jugador::get_nombre_arma_en_mano() {
     return arma_en_mano->getNombre();
 }
@@ -32,6 +68,8 @@ void Jugador::cambiar_arma_en_mano() {
         arma_en_mano = arma_secundaria.get();
     } else if (arma_en_mano == arma_secundaria.get()) {
         arma_en_mano = cuchillo.get();
+    } else if (arma_en_mano == cuchillo.get() && tiene_bomba) {
+        arma_en_mano = bomba.get();
     } else {
         if(arma_principal != nullptr)
             arma_en_mano = arma_principal.get();

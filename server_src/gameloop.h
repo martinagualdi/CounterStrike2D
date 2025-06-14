@@ -9,6 +9,7 @@
 #include "lista_queues.h"
 #include "municion.h"
 #include "mapa.h"
+#include "bomba.h"
 
 class GameLoop : public Thread {
   private:
@@ -36,6 +37,11 @@ class GameLoop : public Thread {
     int rondas_ganadas_tt;
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
+    //Bomba bomba;
+    std::chrono::steady_clock::time_point tiempo_inicio_plantado;
+    std::chrono::steady_clock::time_point tiempo_inicio_desactivacion;
+    Jugador* jugador_plantando = nullptr;
+
 
     void volver_jugadores_a_spawn();
     void cargar_dinero_por_eliminaciones();
@@ -48,6 +54,7 @@ class GameLoop : public Thread {
     bool esperando_jugadores();
     void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
+    void chequear_bomba_plantada();
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);

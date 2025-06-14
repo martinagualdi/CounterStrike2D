@@ -4,7 +4,7 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BYTES_JUGADORES 27
+#define BYTES_JUGADORES 28
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 
@@ -64,6 +64,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(eliminaciones_esta_ronda); // Enviar las eliminaciones de esta ronda
         uint8_t eliminaciones_totales = static_cast<uint8_t>(j.eliminaciones_totales);
         buffer.push_back(eliminaciones_totales); // Enviar las eliminaciones totales del jugador
+        uint8_t muertes = static_cast<uint8_t>(j.muertes);
+        buffer.push_back(muertes); // Enviar las muertes del jugador
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);

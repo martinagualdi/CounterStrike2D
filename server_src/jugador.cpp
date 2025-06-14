@@ -8,12 +8,11 @@ void Jugador::disparar() {
 }
 
 void Jugador::recibir_danio(int danio) { 
-    std::cout << "[recibir_danio] Antes: vida=" << vida << ", danio=" << danio << std::endl;
     vida -= danio; 
     if (vida <= 0) {
         vida = 0;
         vivo = false;
-        std::cout << "Jugador " << id << " ha muerto." << std::endl;
+        muertes++;
     }
 }
 

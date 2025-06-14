@@ -15,11 +15,8 @@ class GameLoop : public Thread {
     Queue<ComandoDTO> &queue_comandos;
     ListaQueues &queues_jugadores;
     std::vector<Jugador *> jugadores;
-    int cant_max_jugadores;
     int cant_min_ct;
-    int cant_max_ct;
     int cant_min_tt;
-    int cant_max_tt;
     std::atomic<bool> activo;
     std::vector<Municion> balas_disparadas;
     std::atomic<bool> ultimo_unido_ct;

@@ -20,8 +20,10 @@ std::vector<std::string> MonitorPartidas::listar_partidas() {
     std::lock_guard<std::mutex> lock(mtx);
     std::vector<std::string> lista_partidas;
     for (const auto& partida : partidas) {
-        std::string nueva_partida = "Id: " + std::to_string(partida.first) + "  ||  Creada por: " + partida.second->get_creador() + "\n";
-        lista_partidas.push_back(nueva_partida);
+        if (partida.second->puedo_agregar_jugador()) {
+            std::string nueva_partida = "Id: " + std::to_string(partida.first) + "  ||  Creada por: " + partida.second->get_creador() + "\n";
+            lista_partidas.push_back(nueva_partida);
+        }
     }
     return lista_partidas;
 }

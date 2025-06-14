@@ -20,7 +20,7 @@ std::vector<std::pair<std::string, std::string>> ClientHandler::listar_mapas_dis
     namespace fs = std::filesystem;
     std::vector<std::pair<std::string, std::string>> mapas;
 
-    const std::string ruta = "server_src/mapas_disponibles";
+    const std::string ruta = "/var/CounterStrike2D/server/mapas_disponibles";
 
     for (const auto& entry : fs::directory_iterator(ruta)) {
         if (!entry.is_regular_file()) continue;

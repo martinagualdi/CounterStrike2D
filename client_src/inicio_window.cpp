@@ -7,13 +7,14 @@
 #include <QIntValidator>
 #include <QPalette>
 #include <QFont>
+#include <QCoreApplication>
 
 Inicio::Inicio(QWidget *parent) : QWidget(parent), ui(nullptr) {
 
     this->resize(900, 700); // Tamaño más grande para parecerse a la imagen
 
     // Fondo
-    QPixmap fondo("client_src/gfx/backgrounds/lobby.jpg"); 
+    QPixmap fondo("/var/CounterStrike2D/assets/gfx/lobby/lobby.jpg");
     if (!fondo.isNull()) {
         QPalette palette;
         palette.setBrush(QPalette::Window, QBrush(fondo.scaled(this->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));

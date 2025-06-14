@@ -1,0 +1,41 @@
+fondo: var/CounterStrike2D/assets/gfx/backgrounds/blood.jpg
+ancho_max_mapa: 640
+alto_max_mapa: 640
+elementos:
+  - imagen: var/CounterStrike2D/assets/gfx/aztec/obstaculo13.png
+    x: 96
+    y: 64
+    tipo: obstaculo
+    ancho: 64
+    alto: 64
+  - imagen: var/CounterStrike2D/assets/gfx/aztec/obstaculo10.png
+    x: 64
+    y: 64
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+  - imagen: var/CounterStrike2D/assets/gfx/aztec/obstaculo10.png
+    x: 32
+    y: 64
+    tipo: obstaculo
+    ancho: 32
+    alto: 32
+zonas:
+  - tipo: inicio_ct
+    x: 216
+    y: 84
+    ancho: 222
+    alto: 238
+    id: "035b2476-be4a-4fcc-9ec9-8ab0fb4fad32"
+  - tipo: zona_bombas
+    x: 36
+    y: 193
+    ancho: 143
+    alto: 139
+    id: "31336606-96e2-466d-9e11-20c61ad5d84a"
+  - tipo: inicio_tt
+    x: 465
+    y: 40
+    ancho: 97
+    alto: 304
+    id: "f4845ba3-e9fb-486c-a75c-c47a0396aef5"

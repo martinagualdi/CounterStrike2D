@@ -104,7 +104,7 @@ void MapSelectionDialog::mostrarPreview(QListWidgetItem* item) {
     QString rutaMiniatura = mapaToMiniatura.value(nombreMapa);
 
     QString basePath = QCoreApplication::applicationDirPath();
-    QString fullPath = basePath + "/server_src/mapas_disponibles/" + rutaMiniatura;
+    QString fullPath = "/var/CounterStrike2D/server/mapas_disponibles/" + rutaMiniatura;
 
     if (QFile::exists(fullPath)) {
         QPixmap miniatura(fullPath);

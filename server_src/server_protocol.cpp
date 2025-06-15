@@ -4,7 +4,8 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-//#define BYTES_JUGADORES 28
+
+#define BYTES_JUGADORES 28
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 

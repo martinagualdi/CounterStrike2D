@@ -108,7 +108,7 @@ void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
 }
 
 QString TopWidget::getFondoPath() const {
-    int idx = fondoPath.indexOf("/editor");
+    int idx = fondoPath.indexOf("/gfx");
     if (idx != -1) {
         return fondoPath.mid(idx);
     }
@@ -165,7 +165,12 @@ void TopWidget::setBackgroundPath(const QString& path) {
 
     fondoPath = path;
 
-    scene()->clear();
+    for (QGraphicsItem* item : scene()->items()) {
+        if (item->zValue() == -1) {
+            scene()->removeItem(item);
+            delete item;
+        }
+    }
 
     QPixmap scaledTile = tile.scaled(gridSize, gridSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
@@ -258,6 +263,14 @@ void TopWidget::keyPressEvent(QKeyEvent* event) {
     }
 }
 
+int TopWidget::zValueParaTipo(const QString& tipo) const {
+    if (tipo == "piso") return 1;
+    if (tipo == "obstaculo") return 2;
+    if (tipo == "bombsite") return 3;
+    if (tipo == "zona") return 4;
+    return 1;
+}
+
 void TopWidget::dropEvent(QDropEvent* event) {
     if (previewItem) {
         scene()->removeItem(previewItem);
@@ -286,9 +299,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setZValue(1);
 
             QString tipo = "otros";
-            if (path.contains("plantacion_bombas"))
-                tipo = "bombsite";
-            else if (path.contains("spawns"))
+            if (path.contains("spawns"))
                 tipo = "spawn";
             else if(path.contains("weapons"))
                 tipo = "arma";
@@ -300,6 +311,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
 
             item->setData(0, path);
             item->setData(1, tipo);
+            item->setZValue(zValueParaTipo(tipo));
             item->setData(2, pix.width());
             item->setData(3, pix.height());
 
@@ -496,19 +508,26 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
     });
 
     QString basePath = QCoreApplication::applicationDirPath();
-    QString imagen = basePath + ((cantidad == 0)
-        ? "/editor/gfx/plantacion_bombas/plantacion1.png"
-        : "/editor/gfx/plantacion_bombas/plantacion2.png");
-
-    QPixmap pix(imagen);
+    QString imagenRelativa = (cantidad == 0)
+        ? "/gfx/plantacion_bombas/plantacion1.png"
+        : "/gfx/plantacion_bombas/plantacion2.png";
+    QString imagenAbsoluta = basePath + imagenRelativa;
+    
+    QPixmap pix(imagenAbsoluta);
     if (!pix.isNull()) {
         QPointF centro = rect.center();
         QPointF pos = centro - QPointF(pix.width() / 2, pix.height() / 2);
 
-        auto* imagenItem = new QGraphicsPixmapItem(pix);
-        imagenItem->setPos(pos);
-        imagenItem->setZValue(2);
-        scene()->addItem(imagenItem);
+        auto* item = new QGraphicsPixmapItem(pix);
+        item->setPos(pos);
+        item->setZValue(3);
+
+        item->setData(0, imagenRelativa);
+        item->setData(1, "bombsite");
+        item->setData(2, pix.width());
+        item->setData(3, pix.height());
+
+        scene()->addItem(item);
     }
 }
 
@@ -538,6 +557,7 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
             tipo = "piso";
         item->setData(0, path);
         item->setData(1, tipo);
+        item->setZValue(zValueParaTipo(tipo));
         item->setData(2, pixmap.width());
         item->setData(3, pixmap.height());
 
@@ -569,10 +589,6 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo, const QUuid
     conectarActualizacionRect(zonaItem);
     zonaItem->setColor(color);
     zonaItem->setTexto(texto);
-
-    if (tipo == "zona_bombas") {
-        agregarImagenBomba(rect);
-    }
 
     scene()->addItem(zonaItem);
     ZonaMapa zona;

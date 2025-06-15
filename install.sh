@@ -92,6 +92,7 @@ Type=Application
 Name=CounterStrike2D Servidor
 Exec=/usr/bin/$TP_NAME-server /etc/$TP_NAME/configuracion.yaml
 Icon=$TP_NAME-server
+Path=/home/parallels/Desktop/CounterStrike2D
 Terminal=true
 Categories=Game;
 EOF

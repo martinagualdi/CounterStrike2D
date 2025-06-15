@@ -12,7 +12,7 @@
 
 using namespace SDL2pp;
 
-typedef enum {FONDO, OBSTACULO, PISO, ARMA} TipoElementoMapa;
+typedef enum {FONDO, OBSTACULO, PISO, ARMA, BOMBSITE} TipoElementoMapa;
 
 struct Mapa{
     int alto_mapa_max;

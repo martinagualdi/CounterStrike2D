@@ -80,7 +80,8 @@ Type=Application
 Name=CounterStrike2D Cliente
 Exec=/usr/bin/$TP_NAME-client 
 Icon=$TP_NAME-client
-Terminal=false
+Path=/home/parallels/Desktop/CounterStrike2D
+Terminal=true
 Categories=Game;
 EOF
 

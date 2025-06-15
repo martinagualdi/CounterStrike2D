@@ -38,15 +38,20 @@ struct Mapa ClientMap::parsearMapa() {
         if (tipo_str == "obstaculo") tipo = OBSTACULO;
         else if (tipo_str == "piso") tipo = PISO;
         else if (tipo_str == "arma") tipo = ARMA;
+        else if (tipo_str == "bombsite") tipo = BOMBSITE;
         else continue;
 
         mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
 
+    std::cout << "Se cargaron " << mapa.elementos.size() << " elementos\n";
+
+
     return mapa;
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {
+    std::cout << "Cargando textura: " << path << "\n";
     auto it = cache.find(path);
     if (it != cache.end())
         return it->second;

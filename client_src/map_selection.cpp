@@ -21,7 +21,6 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     previewLabel->setMaximumSize(256, 256);
     previewLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    // Estética
     titulo->setAlignment(Qt::AlignLeft);
     titulo->setStyleSheet(R"(
         QLabel {

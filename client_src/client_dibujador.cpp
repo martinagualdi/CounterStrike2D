@@ -31,8 +31,8 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     mapa(mapa),
     parseador(),
     snapshot(),
-    fuente("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_GRANDE),
-    fuenteChica("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_CHICA),
+    fuente("/var/CounterStrike2D/assets/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_GRANDE),
+    fuenteChica("/var/CounterStrike2D/assets/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_CHICA),
     amarillo(Color(255, 255, 0)),
     fondo_transparente([&renderer]() {
         SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
@@ -41,13 +41,13 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
         surface.FillRect(NullOpt, negroConAlpha);
 		return Texture(renderer, surface);
     }()),
-    balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),  
-    cs2d(Texture(renderer, Surface(IMG_Load("client_src/gfx/gametitle.png")))),
-    dropped_bomb(Texture(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb_d.bmp")))),  
-    player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
-    muerto(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/muerto.png")))),
+    balas(Texture(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/shells.png")))),  
+    cs2d(Texture(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/gametitle.png")))),
+    dropped_bomb(Texture(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/bomb_d.bmp")))),  
+    player_legs(Texture(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/player/legs.bmp")))),
+    muerto(Texture(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/player/muerto.png")))),
     simbolos_hud([&renderer]() {
-        Surface s(IMG_Load("client_src/gfx/hud_symbols.bmp"));
+        Surface s(IMG_Load("/var/CounterStrike2D/assets/gfx/hud_symbols.bmp"));
         s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
         Texture t(renderer, s);
         t.SetAlphaMod(128);
@@ -55,7 +55,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
         return t;
     }()),
     numeros_hud([&renderer]() {
-        Surface s(IMG_Load("client_src/gfx/hud_nums.bmp"));
+        Surface s(IMG_Load("/var/CounterStrike2D/assets/gfx/hud_nums.bmp"));
         s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
         Texture t(renderer, s);
         t.SetAlphaMod(128);
@@ -63,29 +63,29 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
         return t;
     }()),
     sight([&renderer]() {
-        Surface s(IMG_Load("client_src/gfx/pointer.bmp"));
+        Surface s(IMG_Load("/var/CounterStrike2D/assets/gfx/pointer.bmp"));
         s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 255, 0, 255));
         return Texture(renderer, s);
     }()),
     armas([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/knife.bmp")));
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/glock.bmp")));
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/ak47.bmp")));
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/m3.bmp")));
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/awp.bmp")));
-        textures.emplace_back(renderer, Surface(IMG_Load("client_src/gfx/weapons/bomb.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/knife.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/glock.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/ak47.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/m3.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/awp.bmp")));
+        textures.emplace_back(renderer, Surface(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/bomb.bmp")));
         return textures;
     }()),
     armas_mercado([&renderer]() {
         
-        Surface ak47(IMG_Load("client_src/gfx/weapons/ak47_m.bmp"));
+        Surface ak47(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/ak47_m.bmp"));
         ak47.SetColorKey(true, SDL_MapRGB(ak47.Get()->format, 255, 0, 255));
 
-        Surface m3(IMG_Load("client_src/gfx/weapons/m3_m.bmp"));
+        Surface m3(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/m3_m.bmp"));
         m3.SetColorKey(true, SDL_MapRGB(m3.Get()->format, 255, 0, 255));
 
-        Surface awp(IMG_Load("client_src/gfx/weapons/awp_m.bmp"));
+        Surface awp(IMG_Load("/var/CounterStrike2D/assets/gfx/weapons/awp_m.bmp"));
         awp.SetColorKey(true, SDL_MapRGB(awp.Get()->format, 255, 0, 255));
 
         std::vector<SDL2pp::Texture> textures;
@@ -97,7 +97,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     ct_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
         for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
-            std::string path = "client_src/gfx/player/ct" + std::to_string(i) + ".bmp";
+            std::string path = "/var/CounterStrike2D/assets/gfx/player/ct" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
         return textures;
@@ -105,7 +105,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     tt_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
         for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
-            std::string path = "client_src/gfx/player/t" + std::to_string(i) + ".bmp";
+            std::string path = "/var/CounterStrike2D/assets/gfx/player/t" + std::to_string(i) + ".bmp";
             textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
         }
         return textures;
@@ -121,9 +121,9 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     sprites_player_legs(parseador.obtener_sprites_pies_jugador()),
     sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
     sprites_numeros_hud(parseador.obtener_sprites_numeros_hud())
-    {
-        inicializar_textos();
-    }
+{
+    inicializar_textos();
+}
 
 void Dibujador::inicializar_textos() {
     textos_skin.emplace_back(renderer, fuente.RenderText_Blended("Seleccione el skin del personaje", amarillo));
@@ -145,7 +145,6 @@ void Dibujador::inicializar_textos() {
     
     
 }
-
 
 float Dibujador::convertir_angulo(float angulo){
     return 360.0f - angulo + DESFASE_ANGULO;

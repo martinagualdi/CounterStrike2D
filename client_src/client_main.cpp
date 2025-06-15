@@ -3,7 +3,14 @@
 #include <QApplication>
 #include <iostream>
 
+char cwd[1024];
 int main(int argc, char* argv[]){
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+        std::cerr << "[DEBUG] Current working directory: " << cwd << std::endl;
+    } else {
+        perror("getcwd() error");
+    }
 
     try{
         QApplication app(argc, argv);

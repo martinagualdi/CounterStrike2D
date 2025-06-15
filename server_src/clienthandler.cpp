@@ -52,7 +52,7 @@ void ClientHandler::comunicacion_del_lobby() {
                 std::vector<std::pair<std::string, std::string>>  mapas_disponibles = listar_mapas_disponibles();
                 protocolo.enviar_lista_mapas(mapas_disponibles);
                 std::string path = protocolo.recibir_path_mapa(); 
-                path = "server_src/mapas_disponibles/" + path;
+                path = "/var/CounterStrike2D/server/mapas_disponibles/" + path;
                 partida_id = monitor_partidas.crear_partida(id_client, comando_inicial[1], queue_enviadora, path);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocolo.enviar_mapa(yaml_serializado);

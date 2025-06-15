@@ -57,7 +57,7 @@ class GameLoop : public Thread {
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);
 
-    void agregar_jugador_a_partida(const int id);
+    void agregar_jugador_a_partida(const int id, std::string& nombre);
 
     std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
 

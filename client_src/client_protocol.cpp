@@ -71,12 +71,19 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / BYTES_JUGADORES; 
+   size_t num_jugadores = static_cast<size_t>(largo_jugadores); // largo_jugadores / BYTES_JUGADORES; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
+      InfoJugador info_jugador;
+      uint16_t largo_nombre;
+      socket.recvall(&largo_nombre, sizeof(largo_nombre));
+      largo_nombre = ntohs(largo_nombre);
+      std::vector<uint8_t> nombre_buffer(largo_nombre);
+      socket.recvall(nombre_buffer.data(), largo_nombre);
+      std::string nombre(nombre_buffer.begin(), nombre_buffer.end());
+      info_jugador.nombre = nombre;
       uint8_t buffer[BYTES_JUGADORES];
       socket.recvall(buffer, BYTES_JUGADORES);
-      InfoJugador info_jugador;
       info_jugador.id = static_cast<int>(buffer[0]);
       info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
       info_jugador.pos_y = static_cast<float>(ntohl(*(uint32_t*)&buffer[5])) / 100.0f;
@@ -172,11 +179,14 @@ void ProtocoloCliente::enviar_crear_partida(std::string username) {
    }
 }
 
-void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
+void ProtocoloCliente::enviar_unirse_partida(int id_partida, std::string& nombre) {
    std::vector<uint8_t> buffer; 
    uint8_t comando = PREFIJO_UNIRSE_PARTIDA;
    buffer.push_back(comando);
    push_back_uint16(buffer, (uint16_t)id_partida);
+   uint16_t largo_nombre = static_cast<uint16_t>(nombre.size());
+   push_back_uint16(buffer, largo_nombre);
+   buffer.insert(buffer.end(), nombre.begin(), nombre.end());
    if (!socket.sendall(buffer.data(), buffer.size())) {
       throw std::runtime_error("Error al enviar el comando de unirse a partida");
    }

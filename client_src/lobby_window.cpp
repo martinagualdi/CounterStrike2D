@@ -171,7 +171,7 @@ void LobbyWindow::onUnirseClicked() {
         return;
     }
 
-    protocolo.enviar_unirse_partida(id);
+    protocolo.enviar_unirse_partida(id, username);
 
     MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
     popup.exec();

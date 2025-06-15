@@ -15,6 +15,7 @@
 class Jugador {
   private:
     int id;
+    std::string nombre;
     float x;
     float y;
     float spawn_x;
@@ -42,8 +43,9 @@ class Jugador {
 
   public:  
 
-    explicit Jugador(int id) : 
-      id(id), 
+    explicit Jugador(int id, std::string& nombre) : 
+      id(id),
+      nombre(nombre), 
       x(0), 
       y(0), 
       angulo(0), 
@@ -68,6 +70,7 @@ class Jugador {
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
+    std::string getNombre() const { return nombre; }
     float getX() const { return x; }
     float getY() const { return y; }
     void setX(float posX) { this->x = posX; }

@@ -764,7 +764,7 @@ void Dibujador::dibujar_estadisticas_jugador(std::vector<int>& col_x, int& y_fil
     for (const InfoJugador& jug : snapshot.info_jugadores) {
         if (jug.equipo != equipo) continue;
 
-        Texture user(renderer, fuenteChica.RenderText_Blended("thiago", blanco));
+        Texture user(renderer, fuenteChica.RenderText_Blended(jug.nombre, blanco));
         Rect dst_username(col_x[0], y_fila_inicial + fila * altura_fila, user.GetWidth(), user.GetHeight());
         renderer.Copy(user, NullOpt, dst_username);
 

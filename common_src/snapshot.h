@@ -20,6 +20,7 @@ struct ArmaEnSuelo {
 
 struct InfoJugador {
     int id;
+    std::string nombre;
     float pos_x;
     float pos_y;
     float angulo;
@@ -77,6 +78,7 @@ struct Snapshot {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
+            info_jugador.nombre = jugador_ptr->getNombre();
             info_jugador.pos_x = jugador_ptr->getX();
             info_jugador.pos_y = jugador_ptr->getY();
             info_jugador.angulo = jugador_ptr->getAngulo();

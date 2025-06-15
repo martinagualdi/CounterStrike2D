@@ -29,8 +29,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     bomba_plantada(false),
     armas_en_suelo() {}
 
-void GameLoop::agregar_jugador_a_partida(const int id) {
-    Jugador *jugador = new Jugador(id);
+void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
+    Jugador *jugador = new Jugador(id, nombre);
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas

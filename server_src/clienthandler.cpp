@@ -58,7 +58,7 @@ void ClientHandler::comunicacion_del_lobby() {
                 protocolo.enviar_mapa(yaml_serializado);
                 break;
             } else if (comando_inicial[0] == "unirse") {
-                if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), id_client, queue_enviadora)) {
+                if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), id_client, comando_inicial[2], queue_enviadora)) {
                     continue;
                 }
                 partida_id = std::stoi(comando_inicial[1]);

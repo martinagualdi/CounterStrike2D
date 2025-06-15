@@ -32,7 +32,7 @@ public:
 
     int get_codigo_partida() {return this->codigo_partida;};
 
-    bool agregar_jugador(int id, Queue<Snapshot>& queue_enviadora);
+    bool agregar_jugador(int id, std::string nombre, Queue<Snapshot>& queue_enviadora);
 
     Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
 

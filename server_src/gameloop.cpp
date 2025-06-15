@@ -26,6 +26,7 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     bomba_plantada(false),
     armas_en_suelo() {}
 
+
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
 

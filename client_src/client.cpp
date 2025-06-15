@@ -30,6 +30,7 @@ void Client::iniciar() {
         hilo_enviador.start();
         hilo_recibidor.start();
         
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
         SDLTTF ttf;
         SDL_ShowCursor(SDL_DISABLE);

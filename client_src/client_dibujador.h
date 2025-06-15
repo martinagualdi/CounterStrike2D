@@ -33,6 +33,11 @@ private:
     Font fuente;
     Font fuenteChica;
     Color amarillo;
+    Color blanco;
+    Color verde;
+    Color rojo;
+    Color amarillento;
+    Color celeste;
     Texture mensaje_bomba_plantada;
     Texture fondo_transparente;
     Texture balas;
@@ -58,12 +63,12 @@ private:
     std::vector<SDL_Rect> sprites_player_legs;
     std::vector<SDL_Rect> sprites_simbolos_hud;
     std::vector<SDL_Rect> sprites_numeros_hud;
+
     std::vector<int> separar_digitos(int n);
     std::vector<int> separar_digitos_tiempo(int n);
     void inicializar_textos();
     float convertir_angulo(float angulo);
     void convertir_a_pantalla(float pos_x, float pos_y, float& pantalla_x, float& pantalla_y);
-    void convertir_coordenadas(float &x, float &y);
     Texture crearTextoArma(std::string nombre, int precio);
     void dibujar_salud(int salud);
     void dibujar_saldo(int saldo, bool arma_con_balas);
@@ -89,6 +94,9 @@ private:
     void dibujar_mensaje_ganador();
     void dibujar_mensaje_bomba_plantada();
     void dibujar_vision_de_campo();
+    void dibujar_estadisticas();
+    void dibujar_estadisticas_jugador(std::vector<int>& col_x, 
+    int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);
     
 public:
     explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 

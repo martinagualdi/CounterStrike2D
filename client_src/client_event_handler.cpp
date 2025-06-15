@@ -12,6 +12,7 @@ EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, const int client_id
     mercado_abierto(false),
     puede_comprar(false),
     skin_seleccionado(false),
+    estadisticas(false),
     teclas_validas({
         SDL_SCANCODE_W,
         SDL_SCANCODE_S,
@@ -157,17 +158,16 @@ bool EventHandler::mercadoAbierto() const {
     return mercado_abierto;
 }
 
+bool EventHandler::puedeMostrarEstadisticas() const {
+    return estadisticas;
+}
+
 void EventHandler::cerrarMercado() {
     this->mercado_abierto = false;
 }
 
 bool EventHandler::skinSeleccionado() const {
     return skin_seleccionado;
-}
-
-void EventHandler::convertir_coordenadas(float &x, float &y) {
-    x = x;
-    y = ALTO_MIN - y;
 }
 
 float EventHandler::procesarPuntero() { 
@@ -184,7 +184,7 @@ void EventHandler::procesarMouse(const SDL_Event &event)
         comando.angulo = procesarPuntero();
         cola_enviador.try_push(comando);
     }
-    else if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+    else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
         ComandoDTO comando = {};
         comando.tipo = DISPARO;
         comando.angulo = procesarPuntero();
@@ -274,6 +274,17 @@ void EventHandler::procesarLevantar(const SDL_Event &event) {
 
 }
 
+void EventHandler::procesarEstadisticas(const SDL_Event &event) {
+
+    if(event.key.keysym.scancode == SDL_SCANCODE_TAB){   
+        if(event.type == SDL_KEYDOWN && !event.key.repeat){
+            estadisticas = true;
+        } else if(event.type == SDL_KEYUP){
+            estadisticas = false;
+        }
+    }
+}
+
 void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
 {
     SDL_Event event;
@@ -303,6 +314,7 @@ void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
                 procesarPlantarBomba(event);
                 procesarDrop(event);
                 procesarLevantar(event);
+                procesarEstadisticas(event);
             }
         }
         

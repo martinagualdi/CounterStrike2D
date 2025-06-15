@@ -5,6 +5,9 @@ set -e  # Corta si algo falla
 REAL_USER=$(logname)
 USER_HOME=$(eval echo ~$REAL_USER)
 
+USER_HOME=$(eval echo ~$REAL_USER)
+PROJECT_DIR="$USER_HOME/Desktop/CounterStrike2D"
+
 TP_NAME="CounterStrike2D"
 
 echo "[1/4] Instalando dependencias del sistema..."
@@ -80,7 +83,7 @@ Type=Application
 Name=CounterStrike2D Cliente
 Exec=/usr/bin/$TP_NAME-client 
 Icon=$TP_NAME-client
-Path=/home/parallels/Desktop/CounterStrike2D
+Path=$PROJECT_DIR
 Terminal=true
 Categories=Game;
 EOF
@@ -92,7 +95,7 @@ Type=Application
 Name=CounterStrike2D Servidor
 Exec=/usr/bin/$TP_NAME-server /etc/$TP_NAME/configuracion.yaml
 Icon=$TP_NAME-server
-Path=/home/parallels/Desktop/CounterStrike2D
+Path=$PROJECT_DIR
 Terminal=true
 Categories=Game;
 EOF

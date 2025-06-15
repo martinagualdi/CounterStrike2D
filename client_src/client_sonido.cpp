@@ -11,23 +11,23 @@ Sonido::Sonido(const int client_id) :
     client_id(client_id),
     snapshot(),
     mixer(FRECUENCIA, MIX_DEFAULT_FORMAT, CANALES, TAM_BUFFER),
-    pickup("client_src/sfx/items/pickup.wav"),
-    compra_balas("client_src/sfx/items/ammo.wav"),
+    pickup("/var/CounterStrike2D/assets/sfx/items/pickup.wav"),
+    compra_balas("/var/CounterStrike2D/assets/sfx/items/ammo.wav"),
     equipo_win(),
     disparo_arma(),
     pasos()
     {   
-        equipo_win.emplace_back("client_src/sfx/radio/ctwin.ogg");
-        equipo_win.emplace_back("client_src/sfx/radio/terwin.ogg"); 
-        disparo_arma.emplace_back("client_src/sfx/weapons/knife_slash.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/glock18.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/ak47.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/m3.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/awp.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt1.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt2.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt3.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt4.wav");
+        equipo_win.emplace_back("/var/CounterStrike2D/assets/sfx/radio/ctwin.ogg");
+        equipo_win.emplace_back("/var/CounterStrike2D/assets/sfx/radio/terwin.ogg"); 
+        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/knife_slash.wav");
+        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/glock18.wav");
+        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/ak47.wav");
+        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/m3.wav");
+        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/awp.wav");
+        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt1.wav");
+        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt2.wav");
+        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt3.wav");
+        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt4.wav");
         mixer.AllocateChannels(32);
     }
 

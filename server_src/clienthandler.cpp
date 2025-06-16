@@ -52,6 +52,9 @@ void ClientHandler::comunicacion_del_lobby() {
                 std::vector<std::pair<std::string, std::string>>  mapas_disponibles = listar_mapas_disponibles();
                 protocolo.enviar_lista_mapas(mapas_disponibles);
                 std::string path = protocolo.recibir_path_mapa(); 
+                if (path == "cancelled") {
+                    continue;
+                }
                 path = "server_src/mapas_disponibles/" + path;
                 partida_id = monitor_partidas.crear_partida(id_client, comando_inicial[1], queue_enviadora, path);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
@@ -61,8 +64,10 @@ void ClientHandler::comunicacion_del_lobby() {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), id_client, comando_inicial[2], queue_enviadora)) {
                     /* VALIDAR ESTE CASO EN QT */
                     std::cout << "No se pudo unir a la partida" << std::endl;
+                    protocolo.enviar_mensaje("failed");
                     continue;
                 }
+                protocolo.enviar_mensaje("success");
                 partida_id = std::stoi(comando_inicial[1]);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocolo.enviar_mapa(yaml_serializado);

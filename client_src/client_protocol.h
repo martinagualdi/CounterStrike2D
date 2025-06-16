@@ -27,6 +27,7 @@ public:
     std::string recibir_lista_partidas();
     void enviar_mensaje(const std::string& mensaje);
     std::string recibir_mapa();
+    std::string recibir_mensaje();
     std::vector<std::pair<std::string, std::string>> recibir_lista_mapas();
 
     ProtocoloCliente(const ProtocoloCliente&) = delete;

@@ -53,8 +53,6 @@ void Receiver::comunicacion_del_lobby() {
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, comando_inicial[2], queue_enviadora)) {
-                    /* VALIDAR ESTE CASO EN QT */
-                    std::cout << "No se pudo unir a la partida" << std::endl;
                     protocol.enviar_mensaje("failed");
                     continue;
                 }

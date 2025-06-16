@@ -17,10 +17,7 @@ private:
     MonitorPartidas& monitor_partidas;
     std::atomic<bool> is_alive;
     Receiver r;
-    Sender s;
     int id_client;
-
-    std::vector<std::pair<std::string, std::string>> listar_mapas_disponibles();
 
   public:
     explicit ClientHandler(Socket skt, MonitorPartidas& monitor_partidas, int id);
@@ -35,8 +32,6 @@ private:
 
     // Cierra el socket
     void cortar_conexion();
-
-    void comunicacion_del_lobby();
 
     // Devuelve la queue de mensajes del cliente
     Queue<Snapshot> &get_queue() {

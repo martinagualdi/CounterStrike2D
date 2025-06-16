@@ -92,7 +92,6 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
 }
 
 void LobbyWindow::onCrearClicked() {
-    //std::cout << "Creando partida para: " << username << std::endl;
     protocolo.enviar_crear_partida(username);
 
     std::vector<std::pair<std::string, std::string>> mapas_disponibles = protocolo.recibir_lista_mapas();
@@ -101,7 +100,6 @@ void LobbyWindow::onCrearClicked() {
         return;
     }
 
-    // Convertimos a QVector de pares de QString
     QVector<QPair<QString, QString>> lista_mapas;
     for (const auto& m : mapas_disponibles) {
         QString nombre = QString::fromStdString(m.first);
@@ -118,6 +116,8 @@ void LobbyWindow::onCrearClicked() {
         popup.exec();
         emit partidaSeleccionada();
         fadeOutAudioAndClose();
+    } else {
+        protocolo.enviar_mensaje("cancelled");
     }
 }
 
@@ -172,10 +172,15 @@ void LobbyWindow::onUnirseClicked() {
     }
 
     protocolo.enviar_unirse_partida(id, username);
-
-    MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
-    popup.exec();
-    emit partidaSeleccionada();
-    fadeOutAudioAndClose();
-
+    std::string resultado = protocolo.recibir_mensaje();
+    if (resultado == "failed") {
+        MensajePopup popup("Error", "La partida ya está llena.", this);
+        popup.exec();
+        return;
+    } else{
+        MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
+        popup.exec();
+        emit partidaSeleccionada();
+        fadeOutAudioAndClose();
+    }
 }

@@ -1,9 +1,5 @@
 #include "clienthandler.h"
 
-#include <utility>
-#include <filesystem>
-#include <syslog.h>
-
 #include "../common_src/liberror.h"
 
 ClientHandler::ClientHandler(Socket s, MonitorPartidas& monitor_partidas, int id): 
@@ -13,10 +9,9 @@ ClientHandler::ClientHandler(Socket s, MonitorPartidas& monitor_partidas, int id
     monitor_partidas(monitor_partidas),
     is_alive(true), 
     r(protocolo, monitor_partidas, is_alive, id, queue_enviadora),
-    s(protocolo, queue_enviadora, is_alive, id), 
     id_client(id) {}
 
-std::vector<std::pair<std::string, std::string>> ClientHandler::listar_mapas_disponibles() {
+/*std::vector<std::pair<std::string, std::string>> ClientHandler::listar_mapas_disponibles() {
     namespace fs = std::filesystem;
     std::vector<std::pair<std::string, std::string>> mapas;
 
@@ -62,7 +57,7 @@ void ClientHandler::comunicacion_del_lobby() {
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), id_client, comando_inicial[2], queue_enviadora)) {
-                    /* VALIDAR ESTE CASO EN QT */
+                    
                     std::cout << "No se pudo unir a la partida" << std::endl;
                     protocolo.enviar_mensaje("failed");
                     continue;
@@ -82,13 +77,13 @@ void ClientHandler::comunicacion_del_lobby() {
     }
     Queue<ComandoDTO>* queue_cmds = monitor_partidas.obtener_queue_de_partida(partida_id);
     r.asignar_queue_comandos(queue_cmds);
-}
+}*/
 
 void ClientHandler::iniciar() {
-    comunicacion_del_lobby();
+    //comunicacion_del_lobby();
 
     r.start();
-    s.start();
+    //s.start();
 }
 
 void ClientHandler::cortar_conexion() {
@@ -96,7 +91,7 @@ void ClientHandler::cortar_conexion() {
 }
 
 ClientHandler::~ClientHandler() {
-    s.terminar_ejecucion();
+    //s.terminar_ejecucion();
     r.terminar_ejecucion();
     queue_enviadora.close();
     skt.shutdown(RW_CLOSE);

@@ -2,9 +2,13 @@
 #define RECEIVER_H
 
 #include <atomic>
+#include <utility>
+#include <filesystem>
+#include <syslog.h>
 
 #include "server_protocol.h"
 #include "monitor_partidas.h"
+#include "sender.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/socket.h"
 #include "../common_src/queue.h"
@@ -26,6 +30,7 @@ class Receiver : public Thread {
     int player_id;
     Queue<ComandoDTO>* queue_comandos = nullptr;
     Queue<Snapshot>& queue_enviadora;
+    Sender sender;
 
     //void comunicacion_del_lobby();
     void comunicacion_de_partida();
@@ -41,7 +46,11 @@ class Receiver : public Thread {
         this->alive = false;
     }
 
-    void asignar_queue_comandos(Queue<ComandoDTO>* q);
+    //void asignar_queue_comandos(Queue<ComandoDTO>* q);
+
+    std::vector<std::pair<std::string, std::string>> listar_mapas_disponibles();
+
+    void comunicacion_del_lobby();
 
     virtual ~Receiver();
 };

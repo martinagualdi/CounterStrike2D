@@ -17,7 +17,6 @@ private:
     MonitorPartidas& monitor_partidas;
     std::atomic<bool> is_alive;
     Receiver r;
-    Sender s;
     int id_client;
 
     std::vector<std::pair<std::string, std::string>> listar_mapas_disponibles();

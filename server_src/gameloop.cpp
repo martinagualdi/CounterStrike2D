@@ -27,8 +27,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     armas_en_suelo() {}
 
 
-void GameLoop::agregar_jugador_a_partida(const int id) {
-    Jugador *jugador = new Jugador(id);
+void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
+    Jugador *jugador = new Jugador(id, nombre);
 
     bool puede_ct = equipo_ct.size() < static_cast<size_t>(cant_min_ct);
     bool puede_tt = equipo_tt.size() < static_cast<size_t>(cant_min_tt);
@@ -455,6 +455,7 @@ bool GameLoop::esperando_jugadores() {
 }
 
 void GameLoop::run() {
+    std::cout << "Iniciando el GameLoop..." << std::endl;
     jugar_ronda(true);
     while (activo) {
         jugar_ronda(false);

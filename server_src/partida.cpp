@@ -13,13 +13,14 @@ Partida::Partida(std::string creador_username, const int codigo, std::string yam
 }
 
 
-bool Partida::agregar_jugador(int id, Queue<Snapshot>& queue_enviadora) {
-    if (puedo_agregar_jugador()) {
+bool Partida::agregar_jugador(int id, std::string nombre, Queue<Snapshot>& queue_enviadora) {
+    if (!puedo_agregar_jugador()) {
         return false;
     }
     jugadores_queues.agregar_queue(queue_enviadora, id);
     gameloop.agregar_jugador_a_partida(id, nombre);
     cant_jugadores++;
+    
     return true;
 }
 

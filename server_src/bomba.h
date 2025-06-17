@@ -19,7 +19,7 @@ class Bomba : public Arma {
 public:
     // Valores Hardcodeados hasta tener YAML
     Bomba()
-: Arma("Bomba", 1.0f, 5000.0f, 0, 100, false,1), activada(false), desactivada(false), detonada(false), 
+: Arma("Bomba", 1.0f, 3000.0f, 0, 100, false,1), activada(false), desactivada(false), detonada(false), 
 tiempo_para_detonar(Configuracion::get<int>("tiempo_pare_que_explote_bomba")) {}
     int accion(float distancia) override {
         detonada = true;

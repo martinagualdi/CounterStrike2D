@@ -123,8 +123,9 @@ void Sonido::reproducirEquipoGanador() {
     if(snapshot.equipo_ganador != NONE && equipo_ganador_anterior == NONE){
         if(snapshot.bomba_en_suelo.estado_bomba == DESACTIVADA) {
             mixer.PlayChannel(CANAL_LIBRE, bomb_has_been_defused);
-        } 
+        } else{
         mixer.PlayChannel(CANAL_LIBRE, equipo_win[snapshot.equipo_ganador]);
+        }
         
     }   
     equipo_ganador_anterior = snapshot.equipo_ganador;

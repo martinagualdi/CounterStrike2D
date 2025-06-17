@@ -56,6 +56,24 @@ struct InfoArmaEnSuelo {
     int municiones;
 };
 
+enum EstadoBombaRonda {
+    PLANTADA,
+    DETONADA,
+    DESACTIVADA,
+    SIN_PLANTAR
+};
+
+struct InfoBomba{
+    enum EstadoBombaRonda estado_bomba;
+    float pos_x;
+    float pos_y;
+    int tiempo_para_detonar;
+    bool acaba_de_detonar=false;
+    bool acaba_de_ser_plantada=false;
+    bool acaba_de_ser_desactivada=false;
+
+};
+
 struct InfoRondas {
     int rondas_ganadas_ct;
     int rondas_ganadas_tt;
@@ -67,6 +85,7 @@ struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
     std::vector<InfoArmaEnSuelo> armas_sueltas;
+    InfoBomba bomba_en_suelo;
     InfoRondas rondas_info;
     int tiempo_restante;
     enum Equipo equipo_ganador;

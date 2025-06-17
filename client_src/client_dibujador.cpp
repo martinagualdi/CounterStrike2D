@@ -32,7 +32,7 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     mapa(mapa),
     parseador(),
     snapshot(),
-    estado_bomba_anterior(false),
+    estado_bomba_anterior(SIN_PLANTAR),
     explosion_en_progreso(false),
     explosion_alpha(0.0f),
     explosion_last_ticks(0),
@@ -45,6 +45,10 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     amarillento(Color(240,180,50)),
     celeste(Color(80,200,255)),
     mensaje_bomba_plantada(renderer, fuenteChica.RenderText_Blended("¡La bomba ha sido plantada!", amarillo)),
+    mantenga_presionado_activar(renderer, fuenteChica.RenderText_Blended
+    ("Mantenga presionado hasta finalizar la activación", amarillo)),
+    mantenga_presionado_desactivar(renderer, fuenteChica.RenderText_Blended
+    ("Mantenga presionado hasta finalizar la desactivación", amarillo)),
     fondo_transparente([&renderer]() {
         SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
         Surface surface(rawSurface);
@@ -254,8 +258,10 @@ void Dibujador::dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arm
 
     SDL_FRect dst;
     if(arma_actual == CUCHILLO)
-        dst = {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 14) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
-    else
+      dst = {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 14) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    else if(arma_actual == BOMBA_TT)
+        dst = {x - TAM_PLAYER / 2  - TAM_PLAYER / 10 , (y - TAM_PLAYER / 6) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
+    else 
         dst = {x - TAM_PLAYER / 2, (y - TAM_PLAYER / 6) - TAM_PLAYER, TAM_PLAYER, TAM_PLAYER};
     SDL_FPoint center = {x - dst.x, y - dst.y};
     SDL_RenderCopyExF(renderer.Get(), armas[arma_actual].Get(), &sprite_arma, &dst, angulo, &center, SDL_FLIP_NONE);
@@ -411,21 +417,6 @@ void Dibujador::dibujar_balas_hud(int balas) {
 
 }
 
-void Dibujador::dibujar_hud() {
-    
-    const InfoJugador* jugador_principal = snapshot.getJugadorPorId(client_id);
-
-    dibujar_salud(jugador_principal->vida);
-    dibujar_tiempo(snapshot.tiempo_restante);
-    if(jugador_principal->puede_comprar_ya) dibujar_simbolo_mercado();
-    if(jugador_principal->arma_en_mano != CUCHILLO){
-        dibujar_balas_hud(jugador_principal->balas);
-        dibujar_saldo(jugador_principal->dinero, true);
-    }    
-    else dibujar_saldo(jugador_principal->dinero, false);
-
-}
-
 Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
     std::string texto = nombre + "$" + std::to_string(precio);
     return Texture(renderer, fuente.RenderText_Blended(texto, amarillo));
@@ -439,6 +430,34 @@ void Dibujador::dibujar_simbolo_mercado() {
     dst.SetW(TAM_SIMBOLOS_HUD);
     dst.SetH(TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprites_simbolos_hud[MERCADO], dst);
+
+}
+
+void Dibujador::dibujar_simbolo_zona_detonar() {
+
+    Rect dst;
+    dst.SetX(static_cast<int>(ANCHO_MIN * 5/8) + TAM_SIMBOLOS_HUD);
+    dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    dst.SetW(TAM_SIMBOLOS_HUD);
+    dst.SetH(TAM_SIMBOLOS_HUD);
+    renderer.Copy(simbolos_hud, sprites_simbolos_hud[ZONA_BOMBA], dst);
+
+}
+
+void Dibujador::dibujar_mantenga_presionado(bool activar) {
+
+    Texture& mantenga_presionado = activar ? mantenga_presionado_activar 
+    : mantenga_presionado_desactivar;
+
+    int ancho_mensaje = mantenga_presionado.GetWidth();
+    int alto_mensaje = mantenga_presionado.GetHeight();
+
+    Rect dst;
+    dst.SetX((ANCHO_MIN / 2) - ancho_mensaje / 2);
+    dst.SetY((ALTO_MIN / 3) - alto_mensaje/ 2);
+    dst.SetW(ancho_mensaje);
+    dst.SetH(alto_mensaje);
+    renderer.Copy(mantenga_presionado, NullOpt, dst);
 
 }
 
@@ -577,13 +596,15 @@ void Dibujador::dibujar_armas_tiradas() {
 
 void Dibujador::dibujar_explosion_bomba() {
 
-    if (/*snapshot.estado_bomba  == EXPLOTO &&*/ !estado_bomba_anterior) {
+    enum EstadoBombaRonda estado_actual = snapshot.bomba_en_suelo.estado_bomba;
+
+    if (estado_actual ==  DETONADA && estado_bomba_anterior != DETONADA) {
         explosion_en_progreso = true;
         explosion_alpha = 255.0f;
         explosion_last_ticks = SDL_GetTicks();
     }
 
-    // estado_bomba_anterior = estado actual
+    estado_bomba_anterior = estado_actual;
 
     if (explosion_en_progreso) {
         Uint32 ahora = SDL_GetTicks();
@@ -607,14 +628,14 @@ void Dibujador::dibujar_mensaje_ganador() {
 
     int ganador = static_cast<int>(snapshot.equipo_ganador);
     int ancho_mensaje = mensajes_ganadores[ganador].GetWidth();
-    int alto_mensaje = esperando_jugadores[ganador].GetHeight();
+    int alto_mensaje = mensajes_ganadores[ganador].GetHeight();
 
     Rect dst;
     dst.SetX((ANCHO_MIN / 2) - ancho_mensaje / 2);
     dst.SetY((ALTO_MIN / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
-    renderer.Copy(esperando_jugadores[ganador], NullOpt, dst);
+    renderer.Copy(mensajes_ganadores[ganador], NullOpt, dst);
 }
 
 void Dibujador::dibujar_mensaje_bomba_plantada() {
@@ -629,6 +650,22 @@ void Dibujador::dibujar_mensaje_bomba_plantada() {
     dst.SetH(alto_mensaje);
     renderer.Copy(mensaje_bomba_plantada, NullOpt, dst);
 
+}
+
+void Dibujador::dibujar_bomba_plantada() {
+
+    float x_logica = snapshot.bomba_en_suelo.pos_x;
+    float y_logica = snapshot.bomba_en_suelo.pos_y;
+    float x_pixel, y_pixel;
+    convertir_a_pantalla(x_logica, y_logica, x_pixel, y_pixel);
+    Rect dst;
+    dst.SetX(x_pixel - TAM_PLAYER / 2);
+    dst.SetY(y_pixel - TAM_PLAYER / 2);
+    dst.SetW(TAM_PLAYER);
+    dst.SetH(TAM_PLAYER);
+        
+    renderer.Copy(armas[BOMBA_TT], NullOpt, dst);
+       
 }
 
 void Dibujador::dibujar_vision_de_campo() {
@@ -822,24 +859,46 @@ void Dibujador::dibujar_esperando_jugadores() {
 
 }
 
+void Dibujador::dibujar_hud() {
+    
+    const InfoJugador* jugador_principal = snapshot.getJugadorPorId(client_id);
+
+    dibujar_salud(jugador_principal->vida);
+    dibujar_tiempo(snapshot.tiempo_restante);
+    if(jugador_principal->puede_comprar_ya) dibujar_simbolo_mercado();
+    //if(jugador_principal->tiene_bomba && jugador_principal->esta_en_zona_de_detonar())
+        dibujar_simbolo_zona_detonar();
+    if(jugador_principal->arma_en_mano != CUCHILLO){
+        dibujar_balas_hud(jugador_principal->balas);
+        dibujar_saldo(jugador_principal->dinero, true);
+    }    
+    else dibujar_saldo(jugador_principal->dinero, false);
+
+}
+
 void Dibujador::renderizar(Snapshot& snapshot)
 {
     this->snapshot = snapshot;
+
+    const InfoJugador* principal = snapshot.getJugadorPorId(client_id);
+    if(!principal) return;
+
     renderer.Clear();
     dibujar_mapa();
     dibujar_armas_tiradas();
+    if(snapshot.bomba_en_suelo.estado_bomba == PLANTADA) dibujar_bomba_plantada();
     dibujar_balas();
     dibujar_jugadores();
     dibujar_sight();
     dibujar_hud();
-    if(snapshot.equipo_ganador != NONE) dibujar_mensaje_ganador();
+    dibujar_explosion_bomba();
+    if(principal->esta_plantando_bomba) dibujar_mantenga_presionado(true);
+    //if(principal->esta_desactivando_bomba) dibujar_mantenga_presionado(false);
+    if(snapshot.rondas_info.ronda_actual == 0) dibujar_esperando_jugadores();
     if(eventHandler.mercadoAbierto()) dibujar_mercado();
     if(!eventHandler.skinSeleccionado()) dibujar_seleccionar_skin();
     if(eventHandler.puedeMostrarEstadisticas()) dibujar_estadisticas();
-    if(snapshot.rondas_info.ronda_actual == 0){
-        dibujar_esperando_jugadores();
-    }
-    // if(snapshot.estadoBomba == EXPLOTO) dibujar_explosion_bomba();
+    if(snapshot.equipo_ganador != NONE) dibujar_mensaje_ganador();
 
     //dibujar_vision_de_campo();
 

@@ -1,3 +1,5 @@
+#ifndef AK47_H
+#define AK47_H
 #include "armaDeFuego.h"
 
 class Ak47 : public ArmaDeFuego {
@@ -70,3 +72,4 @@ public:
 
     enum ArmaEnMano getCodigoArma() const override { return AK_47; }
 };
+#endif

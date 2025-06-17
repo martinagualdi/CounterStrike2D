@@ -11,7 +11,7 @@
 class Arma {
 protected:
     const std::string nombre;
-    const float precision; // 0.0 a 1.0
+    float precision; // 0.0 a 1.0
     const float alcance;   // en unidades del juego
     const int min_danio;
     const int max_danio;

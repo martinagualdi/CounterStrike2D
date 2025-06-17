@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 28
+#define BYTES_JUGADORES 29
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 #define RW_CLOSE 2
@@ -97,13 +97,14 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
       info_jugador.esta_disparando = (buffer[19] == 0x01);
       info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
-      info_jugador.puede_comprar_ya = (buffer[21] == 0x01); // Enviar si el jugador puede comprar ya
-      info_jugador.acaba_de_comprar_arma = (buffer[22] == 0x01); // Enviar si el jugador acaba de comprar arma
-      info_jugador.acaba_de_comprar_balas = (buffer[23] == 0x01); // Enviar si el jugador acaba de comprar balas
-      info_jugador.balas = static_cast<int>(buffer[24]); // Enviar la cantidad de balas del jugador
-      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[25]); // Enviar las eliminaciones de esta ronda
-      info_jugador.eliminaciones_totales = static_cast<int>(buffer[26]); // Enviar las eliminaciones totales del jugador
-      info_jugador.muertes = static_cast<int>(buffer[27]); // Enviar las muertes del jugador
+      info_jugador.esta_desactivando_bomba = (buffer[21]== 0x01);
+      info_jugador.puede_comprar_ya = (buffer[22] == 0x01); // Enviar si el jugador puede comprar ya
+      info_jugador.acaba_de_comprar_arma = (buffer[23] == 0x01); // Enviar si el jugador acaba de comprar arma
+      info_jugador.acaba_de_comprar_balas = (buffer[24] == 0x01); // Enviar si el jugador acaba de comprar balas
+      info_jugador.balas = static_cast<int>(buffer[25]); // Enviar la cantidad de balas del jugador
+      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[26]); // Enviar las eliminaciones de esta ronda
+      info_jugador.eliminaciones_totales = static_cast<int>(buffer[27]); // Enviar las eliminaciones totales del jugador
+      info_jugador.muertes = static_cast<int>(buffer[28]); // Enviar las muertes del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
@@ -139,6 +140,34 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.armas_sueltas.push_back(info_arma);
       num_armas--;
    }
+
+   uint32_t bomba_pos_x, bomba_pos_y;
+   socket.recvall(&bomba_pos_x, sizeof(bomba_pos_x));
+   socket.recvall(&bomba_pos_y, sizeof(bomba_pos_y));
+   bomba_pos_x = ntohl(bomba_pos_x);
+   bomba_pos_y = ntohl(bomba_pos_y);
+
+   uint8_t esta_plantada, esta_detonada;
+   socket.recvall(&esta_plantada, sizeof(esta_plantada));
+   socket.recvall(&esta_detonada, sizeof(esta_detonada));
+
+   uint16_t tiempo_para_detonar;
+   socket.recvall(&tiempo_para_detonar, sizeof(tiempo_para_detonar));
+   tiempo_para_detonar = ntohs(tiempo_para_detonar);
+
+   uint8_t acaba_de_detonar, acaba_de_ser_plantada, acaba_de_ser_desactivada;
+   socket.recvall(&acaba_de_detonar, sizeof(acaba_de_detonar));
+   socket.recvall(&acaba_de_ser_plantada, sizeof(acaba_de_ser_plantada));
+   socket.recvall(&acaba_de_ser_desactivada, sizeof(acaba_de_ser_desactivada));
+
+   snapshot.bomba_en_suelo.pos_x = static_cast<float>(bomba_pos_x) / 100.0f;
+   snapshot.bomba_en_suelo.pos_y = static_cast<float>(bomba_pos_y) / 100.0f;
+   snapshot.bomba_en_suelo.estado_bomba = static_cast<enum EstadoBombaRonda>(esta_plantada);
+   snapshot.bomba_en_suelo.tiempo_para_detonar = static_cast<int>(tiempo_para_detonar);
+   snapshot.bomba_en_suelo.acaba_de_detonar = (acaba_de_detonar == 0x01);
+   snapshot.bomba_en_suelo.acaba_de_ser_plantada = (acaba_de_ser_plantada == 0x01);
+   snapshot.bomba_en_suelo.acaba_de_ser_desactivada = (acaba_de_ser_desactivada == 0x01);
+
    /*RECIBO TIEMPO*/
    uint16_t tiempo_restante;
    socket.recvall(&tiempo_restante, sizeof(tiempo_restante));

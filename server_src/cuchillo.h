@@ -8,7 +8,7 @@ public:
     Cuchillo() : Arma(
         "Cuchillo", 
         Configuracion::get<float>("precision_cuchillo"), 
-        1.0f, 
+        30.0f, 
         Configuracion::get<int>("danio_min_cuchillo"), 
         Configuracion::get<int>("danio_max_cuchillo"), 
         false,

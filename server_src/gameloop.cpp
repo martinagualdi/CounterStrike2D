@@ -478,14 +478,16 @@ void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) 
 }
 
 void GameLoop::reiniciar_estado_bomba(){
-    bomba->reiniciar();
-    info_bomba= BombaEnSuelo(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false);
-    jugador_desactivando = nullptr;
-    jugador_plantando = nullptr;
-    bomba = nullptr;
-    bomba_plantada = false;
-    tiempo_inicio_desactivado = std::chrono::steady_clock::time_point();
-    tiempo_inicio_plantado = std::chrono::steady_clock::time_point();
+    if(bomba){
+        bomba->reiniciar();
+        info_bomba= BombaEnSuelo(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false);
+        jugador_desactivando = nullptr;
+        jugador_plantando = nullptr;
+        bomba = nullptr;
+        bomba_plantada = false;
+        tiempo_inicio_desactivado = std::chrono::steady_clock::time_point();
+        tiempo_inicio_plantado = std::chrono::steady_clock::time_point();
+    }
 }
 
 void GameLoop::chequear_bomba_plantada() {

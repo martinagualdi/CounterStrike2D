@@ -59,13 +59,7 @@ void Jugador::empezar_a_desactivar() {
 }
 
 void Jugador::desactivar_bomba() {
-    if (bomba->estaActivada()) {
-        desactivando_bomba = false;
-        bomba->desactivar();
-        bomba->setPlantada(false);
-    } else {
-        std::cout << "No se puede desactivar la bomba, no está activada o no se tiene una." << std::endl;
-    }
+    desactivando_bomba = false;
 }
 
 void Jugador::plantar_bomba(float x, float y) {

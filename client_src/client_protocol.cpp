@@ -147,9 +147,9 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    bomba_pos_x = ntohl(bomba_pos_x);
    bomba_pos_y = ntohl(bomba_pos_y);
 
-   uint8_t esta_plantada, esta_detonada;
-   socket.recvall(&esta_plantada, sizeof(esta_plantada));
-   socket.recvall(&esta_detonada, sizeof(esta_detonada));
+   uint8_t estado;
+   socket.recvall(&estado, sizeof(estado));
+   snapshot.bomba_en_suelo.estado_bomba = static_cast<enum EstadoBombaRonda>(estado);
 
    uint16_t tiempo_para_detonar;
    socket.recvall(&tiempo_para_detonar, sizeof(tiempo_para_detonar));
@@ -162,7 +162,6 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
 
    snapshot.bomba_en_suelo.pos_x = static_cast<float>(bomba_pos_x) / 100.0f;
    snapshot.bomba_en_suelo.pos_y = static_cast<float>(bomba_pos_y) / 100.0f;
-   snapshot.bomba_en_suelo.estado_bomba = static_cast<enum EstadoBombaRonda>(esta_plantada);
    snapshot.bomba_en_suelo.tiempo_para_detonar = static_cast<int>(tiempo_para_detonar);
    snapshot.bomba_en_suelo.acaba_de_detonar = (acaba_de_detonar == 0x01);
    snapshot.bomba_en_suelo.acaba_de_ser_plantada = (acaba_de_ser_plantada == 0x01);

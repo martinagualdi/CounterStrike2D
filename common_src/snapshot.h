@@ -10,13 +10,6 @@
 
 /*Structs para enviar la informacion necesaria para dibujar el juevo en "client"*/
 
-enum EstadoBombaRonda {
-    PLANTADA,
-    DETONADA,
-    DESACTIVADA,
-    SIN_PLANTAR
-};
-
 struct ArmaEnSuelo {
     Arma *arma;
     float pos_x;
@@ -24,6 +17,24 @@ struct ArmaEnSuelo {
 
     ArmaEnSuelo(Arma *arma, float pos_x, float pos_y) : arma(arma), pos_x(pos_x), pos_y(pos_y) {}
     Arma* getArma() const { return arma; }
+};
+
+enum EstadoBombaRonda {
+    PLANTADA,
+    DETONADA,
+    DESACTIVADA,
+    SIN_PLANTAR
+};
+
+struct InfoBomba{
+    float pos_x;
+    float pos_y;
+    enum EstadoBombaRonda estado_bomba;
+    int tiempo_para_detonar;
+    bool acaba_de_detonar=false;
+    bool acaba_de_ser_plantada=false;
+    bool acaba_de_ser_desactivada=false;
+
 };
 
 struct BombaEnSuelo {
@@ -35,7 +46,7 @@ struct BombaEnSuelo {
     bool acaba_de_ser_plantada;
     bool acaba_de_ser_desactivada;
 
-    BombaEnSuelo(float pos_x, float pos_y, enum EstadoBombaRonda  estado, int tiempo_para_detonar, bool acaba_de_detonar, bool acaba_de_ser_plantada, bool acaba_de_ser_desactivada)
+    BombaEnSuelo(float pos_x, float pos_y, enum EstadoBombaRonda estado, int tiempo_para_detonar, bool acaba_de_detonar, bool acaba_de_ser_plantada, bool acaba_de_ser_desactivada)
         : 
           pos_x(pos_x),
           pos_y(pos_y),
@@ -47,18 +58,6 @@ struct BombaEnSuelo {
     {}
 };
 
-
-struct InfoBomba{
-    enum EstadoBombaRonda  estado_bomba;
-    float pos_x;
-    float pos_y;
-    int tiempo_para_detonar;
-    bool acaba_de_detonar=false;
-    bool acaba_de_ser_plantada=false;
-    bool acaba_de_ser_desactivada=false;
-
-}
-;
 struct InfoJugador {
     int id;
     std::string nombre;
@@ -96,24 +95,6 @@ struct InfoArmaEnSuelo {
     float pos_x;
     float pos_y;
     int municiones;
-};
-
-enum EstadoBombaRonda {
-    PLANTADA,
-    DETONADA,
-    DESACTIVADA,
-    SIN_PLANTAR
-};
-
-struct InfoBomba{
-    enum EstadoBombaRonda estado_bomba;
-    float pos_x;
-    float pos_y;
-    int tiempo_para_detonar;
-    bool acaba_de_detonar=false;
-    bool acaba_de_ser_plantada=false;
-    bool acaba_de_ser_desactivada=false;
-
 };
 
 struct InfoRondas {

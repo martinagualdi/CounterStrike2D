@@ -152,11 +152,11 @@ void Sonido::reproducirEstadoBomba() {
 
     if(estado == PLANTADA) reproducirBeep();
 
-    else if(snapshot.bomba_en_suelo.acaba_de_detonar){
+    if(snapshot.bomba_en_suelo.acaba_de_detonar){
         mixer.PlayChannel(CANAL_LIBRE, bomb_detonada);
     }
 
-    else if(snapshot.bomba_en_suelo.acaba_de_ser_plantada){
+    if(snapshot.bomba_en_suelo.acaba_de_ser_plantada){
         mixer.PlayChannel(CANAL_LIBRE, bomb_has_been_planted);
     }
 

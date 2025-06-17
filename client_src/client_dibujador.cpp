@@ -46,9 +46,9 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     celeste(Color(80,200,255)),
     mensaje_bomba_plantada(renderer, fuenteChica.RenderText_Blended("¡La bomba ha sido plantada!", amarillo)),
     mantenga_presionado_activar(renderer, fuenteChica.RenderText_Blended
-    ("Mantenga presionado hasta finalizar la activación", amarillo)),
+    ("Mantenga presionado hasta finalizar el activado", amarillo)),
     mantenga_presionado_desactivar(renderer, fuenteChica.RenderText_Blended
-    ("Mantenga presionado hasta finalizar la desactivación", amarillo)),
+    ("Mantenga presionado hasta finalizar el desactivado", amarillo)),
     fondo_transparente([&renderer]() {
         SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
         Surface surface(rawSurface);
@@ -893,7 +893,7 @@ void Dibujador::renderizar(Snapshot& snapshot)
     dibujar_hud();
     dibujar_explosion_bomba();
     if(principal->esta_plantando_bomba) dibujar_mantenga_presionado(true);
-    //if(principal->esta_desactivando_bomba) dibujar_mantenga_presionado(false);
+    if(principal->esta_desactivando_bomba) dibujar_mantenga_presionado(false);
     if(snapshot.rondas_info.ronda_actual == 0) dibujar_esperando_jugadores();
     if(eventHandler.mercadoAbierto()) dibujar_mercado();
     if(!eventHandler.skinSeleccionado()) dibujar_seleccionar_skin();

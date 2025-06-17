@@ -205,15 +205,17 @@ enum Equipo GameLoop::se_termino_ronda() {
             return TT;
         }
     }
-    if (bomba->fueDesactivada()){
-        rondas_ganadas_ct++;
-        return CT;
-    }
-    if (bomba->detonar()){
-        info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
-        explosion();
-        rondas_ganadas_tt++;
-        return TT;
+    if(bomba) {
+        if (bomba->fueDesactivada()){
+            rondas_ganadas_ct++;
+            return CT;
+        }
+        if (bomba->detonar()){
+            info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
+            explosion();
+            rondas_ganadas_tt++;
+            return TT;
+        }
     }
     /*
     HACE FALTA IMPLEMENTAR LA LOGICA DE FINALIZAR PARTIDA POR TIEMPO
@@ -497,7 +499,7 @@ void GameLoop::chequear_bomba_plantada() {
             bomba= jugador_plantando->soltar_bomba(); 
             if (bomba) {
                 info_bomba = BombaEnSuelo (jugador_plantando->getX(), jugador_plantando->getY(), PLANTADA, bomba->getTiempoParaDetonar(),
-            true, false, false);
+            false, true, false);
             }
             jugador_plantando = nullptr;
             std::cout << "Bomba plantada por el jugador " << id_jugador << std::endl;
@@ -514,6 +516,8 @@ void GameLoop::chequear_bomba_desactivada(){
             bomba_plantada = false;
             info_bomba = BombaEnSuelo( bomba->getX(), bomba->getY(), DESACTIVADA, 0, false, false, true);
             jugador_desactivando->desactivar_bomba();
+            bomba->desactivar();
+            bomba->setPlantada(false);
             int id_jugador = jugador_desactivando->getId();
             jugador_desactivando= nullptr;
             std::cout << "Bomba desactivada por el jugador " << id_jugador<< std::endl;
@@ -570,8 +574,8 @@ bool GameLoop::jugar_ronda(bool esperando) {
             ejecucion_comandos_recibidos();
             disparar_rafagas_restantes();
             chequear_colisiones(esperando);
-            chequear_bomba_plantada();
             chequear_bomba_desactivada();
+            chequear_bomba_plantada();            
             enum Equipo eq_ganador = se_termino_ronda();
             if (esperando)
                 chequear_si_completaron_equipos(eq_ganador, en_juego);

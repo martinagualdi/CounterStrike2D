@@ -54,11 +54,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     mainLayout->addLayout(topBarLayout);
 
-    // Parte superior
     topWidget = new TopWidget;
     mainLayout->addWidget(topWidget);
 
-    //Pestañas
     QTabWidget* tabWidget = new QTabWidget;
     tabWidget->setFixedHeight(140);
 
@@ -77,6 +75,8 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Armas", basePath + "gfx/weapons/" },
         { "Proteccion anti disparos", basePath + "gfx/proteccion_disparos/" },
     };
+
+    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp", "glock_m.bmp"};
 
     for (const auto& tab : tabs) {
         QScrollArea* scrollArea = new QScrollArea;
@@ -97,6 +97,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QStringList images = dir.entryList(filters, QDir::Files);
 
         for (const QString& imgName : images) {
+            if (tab.name == "Armas" && !armasPermitidas.contains(imgName))
+                continue;
+
             QString fullPath = dir.absoluteFilePath(imgName);
 
             QPixmap pixmap;
@@ -108,12 +111,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 for (int y = 0; y < img.height(); ++y) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
-                        if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
-                        }
+                        if (pixel == magenta)
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));
                     }
                 }
-
                 pixmap = QPixmap::fromImage(img);
             } else {
                 pixmap = QPixmap(fullPath);
@@ -147,6 +148,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         scrollArea->setWidget(container);
         tabWidget->addTab(scrollArea, tab.name);
     }
+
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);

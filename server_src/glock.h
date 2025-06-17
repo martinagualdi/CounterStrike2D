@@ -20,10 +20,12 @@ public:
     int accion(float distancia) override {
         if (municion_actual <= 0) return 0;
         if (distancia > alcance) return 0; // Si la distancia es mayor que el alcance, no hace daño
+        if (distancia*2.5>=alcance) precision = 1;
         std::random_device rd; std::mt19937 gen(rd());
         std::uniform_real_distribution<> hit(0.0, 1.0);
         if (hit(gen) <= precision) {
-            int danio = static_cast<int>(max_danio * (alcance/distancia) * 0.5f);
+            float factor = 1.0f - (distancia / alcance);
+            int danio = static_cast<int>(max_danio * factor );
             return danio > max_danio ? max_danio : danio;
         }
         return min_danio;

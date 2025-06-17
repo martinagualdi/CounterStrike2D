@@ -53,6 +53,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
         uint8_t esta_desactivando_bomba = j.esta_desactivando_bomba ? 0x01 : 0x00;
+        buffer.push_back(esta_desactivando_bomba);
         uint8_t puede_comprar_ya = j.puede_comprar_ya ? 0x01 : 0x00;
         buffer.push_back(puede_comprar_ya); // Enviar si el jugador puede comprar ya
         uint8_t acaba_de_comprar_arma = j.acaba_de_comprar_arma ? 0x01 : 0x00;

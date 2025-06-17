@@ -35,9 +35,6 @@ void GameLoop::agregar_jugador_a_partida(const int id) {
     if (ultimo_unido_ct){ 
         jugador->establecer_equipo(TT);
         jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
-        if (equipo_tt.empty()) {
-            jugador->asignar_bomba();
-        }
         equipo_tt.push_back(jugador);
     } else {
         jugador->establecer_equipo(CT);
@@ -201,6 +198,7 @@ enum Equipo GameLoop::se_termino_ronda() {
     }
     if (bomba->detonar()){
         info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
+        explosion();
         rondas_ganadas_tt++;
         return TT;
     }
@@ -208,6 +206,18 @@ enum Equipo GameLoop::se_termino_ronda() {
     HACE FALTA IMPLEMENTAR LA LOGICA DE FINALIZAR PARTIDA POR TIEMPO
     */
    return NONE;
+}
+
+void GameLoop::explosion(){
+    if (!bomba) return;
+    for (Jugador* jugador : jugadores) {
+        if (jugador->get_equipo() == CT && jugador->esta_vivo()) {
+            float dx = jugador->getX() - bomba->getX();
+            float dy = jugador->getY() - bomba->getY();
+            float distancia = std::sqrt(dx * dx + dy * dy);
+            jugador->recibir_danio(bomba->accion(distancia));
+        }
+    }
 }
 
 void GameLoop::chequear_estados_jugadores(){
@@ -525,6 +535,20 @@ bool GameLoop::jugar_ronda(bool esperando) {
     bool en_juego = true;
     std::cout << "Iniciando ronda " << ronda_actual << std::endl;
     auto t_inicio = std::chrono::steady_clock::now();
+    if (!esperando) {
+        // Buscar jugadores TT vivos y sin bomba
+        std::vector<Jugador*> tts_sin_bomba;
+        for (Jugador* jugador : equipo_tt) {
+            if (jugador->esta_vivo() && !jugador->posee_bomba()) {
+                tts_sin_bomba.push_back(jugador);
+            }
+        }
+        if (!tts_sin_bomba.empty()) {
+            // Asignar la bomba a un TT aleatorio
+            size_t idx = static_cast<size_t>(std::rand()) % tts_sin_bomba.size();
+            tts_sin_bomba[idx]->asignar_bomba();
+        }
+    }
     while (activo && en_juego) {
         try {
             chequear_estados_jugadores();

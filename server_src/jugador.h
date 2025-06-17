@@ -107,6 +107,7 @@ class Jugador {
     void asignar_bomba();
     int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
     int get_eliminaciones_totales() const { return eliminaciones_totales; }
+    bool posee_bomba(){return tiene_bomba;}
 
     // Logicas
     void disparar();

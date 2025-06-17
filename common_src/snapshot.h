@@ -27,17 +27,16 @@ struct ArmaEnSuelo {
 };
 
 struct BombaEnSuelo {
-    Bomba *bomba;
-    enum EstadoBombaRonda estado_bomba;
     float pos_x;
     float pos_y;
+    enum EstadoBombaRonda estado_bomba;
     int tiempo_para_detonar;
     bool acaba_de_detonar;
     bool acaba_de_ser_plantada;
     bool acaba_de_ser_desactivada;
 
     BombaEnSuelo(float pos_x, float pos_y, enum EstadoBombaRonda  estado, int tiempo_para_detonar, bool acaba_de_detonar, bool acaba_de_ser_plantada, bool acaba_de_ser_desactivada)
-        : bomba(bomba),
+        : 
           pos_x(pos_x),
           pos_y(pos_y),
           estado_bomba(estado),

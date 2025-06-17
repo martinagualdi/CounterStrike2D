@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         { "Proteccion anti disparos", basePath + "gfx/proteccion_disparos/" },
     };
 
-    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp", "glock_m.bmp"};
+    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp"};
 
     for (const auto& tab : tabs) {
         QScrollArea* scrollArea = new QScrollArea;

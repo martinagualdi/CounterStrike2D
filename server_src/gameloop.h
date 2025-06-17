@@ -37,10 +37,12 @@ class GameLoop : public Thread {
     int rondas_ganadas_tt;
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
-    //Bomba bomba;
+    BombaEnSuelo info_bomba;
+    Bomba* bomba;
     std::chrono::steady_clock::time_point tiempo_inicio_plantado;
-    std::chrono::steady_clock::time_point tiempo_inicio_desactivacion;
+    std::chrono::steady_clock::time_point tiempo_inicio_desactivado;
     Jugador* jugador_plantando = nullptr;
+    Jugador* jugador_desactivando = nullptr;
 
 
     void volver_jugadores_a_spawn();
@@ -55,6 +57,8 @@ class GameLoop : public Thread {
     void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
     void chequear_bomba_plantada();
+    void chequear_bomba_desactivada();
+    void reiniciar_estado_bomba();
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);

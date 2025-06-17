@@ -27,7 +27,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     rondas_ganadas_ct(0),
     rondas_ganadas_tt(0), 
     bomba_plantada(false),
-    armas_en_suelo(){}
+    armas_en_suelo(),
+    info_bomba(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false) {}
 
 void GameLoop::agregar_jugador_a_partida(const int id) {
     Jugador *jugador = new Jugador(id);
@@ -194,9 +195,16 @@ enum Equipo GameLoop::se_termino_ronda() {
             return TT;
         }
     }
+    if (bomba->fueDesactivada()){
+        rondas_ganadas_ct++;
+        return CT;
+    }
+    if (bomba->detonar()){
+        info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
+        rondas_ganadas_tt++;
+        return TT;
+    }
     /*
-    HACE FALTA IMPLEMENTAR LA LOGICA DE LA BOMBA
-    CON EL TIEMPO DE LA MISMA
     HACE FALTA IMPLEMENTAR LA LOGICA DE FINALIZAR PARTIDA POR TIEMPO
     */
    return NONE;
@@ -314,8 +322,13 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         jugador_plantando = jugador;
                         tiempo_inicio_plantado = std::chrono::steady_clock::now();
                         std::cout << "Jugador " << jugador->getId() << " comenzó a plantar la bomba." << std::endl;
-                    }else if(bomba_plantada && jugador->get_equipo() == CT) {
+                    }else if(bomba_plantada && jugador->get_equipo() == CT/*&&
+                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())*/) {
                         //Desactivar bomba
+                        jugador->empezar_a_desactivar();
+                        jugador_desactivando = jugador;
+                        tiempo_inicio_desactivado = std::chrono::steady_clock::now();
+                        std::cout << "Jugador " << jugador->getId() << " comenzó a desactivar la bomba." << std::endl;
                         
                     }
                 }
@@ -324,12 +337,25 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         jugador_plantando = nullptr;
                         jugador->cancelar_plantado_bomba();
                         std::cout << "Jugador " << jugador->getId() << " interrumpió el plantado de la bomba." << std::endl;
+                    }else if (jugador==jugador_desactivando){
+                        jugador_desactivando = nullptr;
+                        jugador->cancelar_desactivado_bomba();
+                        bomba->reiniciar();
+                        std::cout << "Jugador " << jugador->getId() << " interrumpió el desactivado de la bomba." << std::endl;
                     }
-                    
                     
                 }
                 break;
             case DROPEAR: {
+                if (jugador->get_codigo_arma_en_mano() == BOMBA_TT) {
+                        Bomba* arma_suelta = jugador->soltar_bomba();
+                        if (arma_suelta) {
+                            armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));
+                        }
+                         
+                    break;
+                }
+                
                 ArmaDeFuego *arma_suelta = jugador->soltar_arma_pricipal();
                 if (arma_suelta)
                     armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY())); 
@@ -345,11 +371,24 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     ArmaEnSuelo &arma = armas_en_suelo[i];
                     if (arma.pos_x >= min_pos_x_jugador && arma.pos_x <= max_pos_x_jugador &&
                         arma.pos_y >= min_pos_y_jugador && arma.pos_y <= max_pos_y_jugador) {
-                        armas_en_suelo.erase(armas_en_suelo.begin() + i); 
-                        ArmaDeFuego *arma_suelta = jugador->levantar_arma(arma.getArma());
-                        if (arma_suelta)
-                            armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));
-                        break; // Salir del bucle una vez que se levanta un arma
+                        if (arma.getArma()->getCodigoArma() == BOMBA_TT && jugador->get_equipo() == TT && !bomba_plantada){
+                            Bomba* bomba_en_suelo = jugador->levantar_bomba(arma.getArma());
+                            if(bomba_en_suelo ) {
+                                jugador->asignar_bomba();
+                                armas_en_suelo.erase(armas_en_suelo.begin() + i); 
+                                armas_en_suelo.push_back(ArmaEnSuelo(bomba_en_suelo, jugador->getX(), jugador->getY()));
+                                break;
+                            }
+                        
+                        }else{
+                            ArmaDeFuego* arma_suelta = jugador->levantar_arma(arma.getArma());
+                            armas_en_suelo.erase(armas_en_suelo.begin() + i); 
+                            if (arma_suelta){
+                            armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));}
+                            break;
+                        }
+
+                         // Salir del bucle una vez que se levanta un arma
                     }
                     i++;
                 }
@@ -406,10 +445,22 @@ void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) 
         // Reiniciar la ronda
         volver_jugadores_a_spawn();
         cargar_dinero_por_eliminaciones();
+        reiniciar_estado_bomba();
         balas_disparadas.clear();
         ronda_actual++;
         en_juego = false; // Terminar el bucle de juego
     }
+}
+
+void GameLoop::reiniciar_estado_bomba(){
+    bomba->reiniciar();
+    info_bomba= BombaEnSuelo(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false);
+    jugador_desactivando = nullptr;
+    jugador_plantando = nullptr;
+    bomba = nullptr;
+    bomba_plantada = false;
+    tiempo_inicio_desactivado = std::chrono::steady_clock::time_point();
+    tiempo_inicio_plantado = std::chrono::steady_clock::time_point();
 }
 
 void GameLoop::chequear_bomba_plantada() {
@@ -420,11 +471,41 @@ void GameLoop::chequear_bomba_plantada() {
             bomba_plantada = true;
             jugador_plantando->plantar_bomba(jugador_plantando->getX(), jugador_plantando->getY());
             int id_jugador = jugador_plantando->getId();
+            bomba= jugador_plantando->soltar_bomba(); 
+            if (bomba) {
+                info_bomba = BombaEnSuelo (jugador_plantando->getX(), jugador_plantando->getY(), PLANTADA, bomba->getTiempoParaDetonar(),
+            true, false, false);
+            }
             jugador_plantando = nullptr;
             std::cout << "Bomba plantada por el jugador " << id_jugador << std::endl;
+            
         }
     }
 }
+
+void GameLoop::chequear_bomba_desactivada(){
+    if (jugador_desactivando) {
+        auto t_actual = std::chrono::steady_clock::now();
+        auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - tiempo_inicio_desactivado).count();
+        if (t_transcurrido >= Configuracion::get<int>("tiempo_desactivacion_bomba")) {
+            bomba_plantada = false;
+            info_bomba = BombaEnSuelo( bomba->getX(), bomba->getY(), DESACTIVADA, 0, false, false, true);
+            jugador_desactivando->desactivar_bomba();
+            int id_jugador = jugador_desactivando->getId();
+            jugador_desactivando= nullptr;
+            std::cout << "Bomba desactivada por el jugador " << id_jugador<< std::endl;
+            
+        }
+    }else{
+       if (bomba_plantada){
+            info_bomba = BombaEnSuelo(bomba->getX(), bomba->getY(), PLANTADA, bomba->getTiempoParaDetonar(), false, false, false);
+       }else{
+        info_bomba = BombaEnSuelo(0.0f,0.0f,SIN_PLANTAR,Configuracion::get<int>("tiempo_desactivacion_bomba"),false,false,false);
+       }
+    }
+}
+
+
 
 void GameLoop::chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego) {
     if (!esperando_jugadores()) {
@@ -453,6 +534,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
             disparar_rafagas_restantes();
             chequear_colisiones(esperando);
             chequear_bomba_plantada();
+            chequear_bomba_desactivada();
             enum Equipo eq_ganador = se_termino_ronda();
             if (esperando)
                 chequear_si_completaron_equipos(eq_ganador, en_juego);
@@ -462,7 +544,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
-            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, (esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba,(esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (const ClosedQueue &) {

@@ -23,6 +23,9 @@ Arma* Jugador::get_arma_actual() const {
 }
 
 void Jugador::asignar_bomba() {
+    if (equipo_actual == CT){
+        return; 
+    }
     bomba = std::make_unique<Bomba>();
     this->tiene_bomba = true;
     
@@ -38,20 +41,39 @@ void Jugador::cancelar_plantado_bomba() {
     }
 }
 
+void Jugador::cancelar_desactivado_bomba(){
+    if (desactivando_bomba){
+        desactivando_bomba=false;
+    }
+}
+
 void Jugador::empezar_a_plantar() {
     if (tiene_bomba && !bomba->estaActivada()) {
         plantando_bomba = true;
-        bomba->iniciarCuentaRegresiva();
     } else {
         std::cout << "No se puede empezar a plantar la bomba, ya está activada o no se tiene una." << std::endl;
+    }
+}
+
+void Jugador::empezar_a_desactivar() {
+    desactivando_bomba=true;
+}
+
+void Jugador::desactivar_bomba() {
+    if (bomba->estaActivada()) {
+        desactivando_bomba = false;
+        bomba->desactivar();
+        bomba->setPlantada(false);
+    } else {
+        std::cout << "No se puede desactivar la bomba, no está activada o no se tiene una." << std::endl;
     }
 }
 
 void Jugador::plantar_bomba(float x, float y) {
     if (tiene_bomba && !bomba->estaActivada()) {
         plantando_bomba = false;
-        bomba->activar(x,y);
-        tiene_bomba = false; // El jugador ya no tiene la bomba en mano
+        bomba->activar(x,y); 
+        bomba->setPlantada(true);
     } else {
         std::cout << "No se puede plantar la bomba, ya está activada o no se tiene una." << std::endl;
     }
@@ -199,11 +221,35 @@ ArmaDeFuego* Jugador::soltar_arma_pricipal() {
     return nullptr; 
 }
 
-ArmaDeFuego* Jugador::levantar_arma(ArmaDeFuego* arma_del_suelo) {
+
+Bomba* Jugador::soltar_bomba() {
+    if (tiene_bomba) {
+        arma_en_mano = cuchillo.get(); 
+        Bomba* bomba_suelta = bomba.release();
+        tiene_bomba = false; 
+        return bomba_suelta;
+    }
+    return nullptr; 
+}
+
+Bomba* Jugador::levantar_bomba(Arma* bomba_del_suelo) {
+    if (!tiene_bomba ) {
+        Bomba* ver_bomba = dynamic_cast<Bomba*>(bomba_del_suelo);
+        if (ver_bomba->estaPlantada()){return nullptr;} 
+        bomba.reset(dynamic_cast<Bomba*>(bomba_del_suelo));
+        tiene_bomba = true;
+        plantando_bomba = false;
+        arma_en_mano= bomba.get(); 
+        return bomba.get();
+    }
+    return nullptr; // Ya tiene una bomba
+}
+
+ArmaDeFuego* Jugador::levantar_arma(Arma* arma_del_suelo) {
     ArmaDeFuego* arma_soltar = nullptr;
     if (arma_principal) 
         arma_soltar = arma_principal.release(); 
-    arma_principal.reset(arma_del_suelo);
+    arma_principal.reset(dynamic_cast<ArmaDeFuego*>(arma_del_suelo));
     arma_en_mano = arma_principal.get();
     acaba_de_comprar_arma = true; // Uso el mismo booleano para no sobrecargar la lógica
     return arma_soltar; 

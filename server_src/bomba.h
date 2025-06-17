@@ -8,7 +8,8 @@ class Bomba : public Arma {
     bool activada;
     bool desactivada; // Si se desactiva se acaba el juego
     bool detonada;
-    const int tiempo_para_detonar;
+    int tiempo_para_detonar;
+    bool plantada;
     // en segundos, configurable
     std::chrono::steady_clock::time_point tiempo_detonacion;
     std::chrono::steady_clock::time_point tiempo_activacion;
@@ -49,22 +50,37 @@ tiempo_para_detonar(Configuracion::get<int>("tiempo_pare_que_explote_bomba")) {}
         x_plantada = x;
         y_plantada = y;
         activada = true; 
+        tiempo_activacion = std::chrono::steady_clock::now();
         tiempo_detonacion = std::chrono::steady_clock::now() + std::chrono::seconds(tiempo_para_detonar);
     }
     bool estaActivada() const { return activada; }
     int getBalas() override { return 1; } // La bomba no tiene balas, pero se usa para el HUD
     
-    bool estaDetonada() const { return detonada; }
+
+    bool detonar(){
+        if (getTiempoParaDetonar()<=0){
+            detonada = true;
+        }
+        return detonada;
+    }
     bool puedeAccionar() override {
         return false; // La bomba nunca puede ser disparada
     }
 
-    void iniciarCuentaRegresiva() {
-        tiempo_activacion = std::chrono::steady_clock::now();
-        
+    bool estaPlantada() const { return plantada; }
+    void setPlantada(bool plantada) { this->plantada = plantada; }
+    int getTiempoParaDetonar() {
+        if (!activada) return tiempo_para_detonar;
+        auto ahora = std::chrono::steady_clock::now();
+        auto restante = std::chrono::duration_cast<std::chrono::seconds>(tiempo_detonacion - ahora).count();
+        return restante > 0 ? static_cast<int>(restante) : 0;
     }
-
-    int getTiempoParaDetonar() const { return tiempo_para_detonar; }
+    float getX(){
+        return x_plantada;
+    }
+    float getY(){
+        return y_plantada;
+    }
 
     enum ArmaEnMano getCodigoArma() const override {
         return BOMBA_TT; // Asumiendo que la bomba es del equipo terrorista

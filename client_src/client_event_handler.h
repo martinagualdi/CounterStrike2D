@@ -14,6 +14,7 @@ private:
     bool mercado_abierto;
     bool puede_comprar;
     bool skin_seleccionado;
+    bool estadisticas;
     std::unordered_set<SDL_Scancode> teclas_validas;
     std::unordered_set<SDL_Scancode> teclas_presionadas;
     void procesarMovimiento(const SDL_Event& event);
@@ -23,14 +24,15 @@ private:
     void procesarPlantarBomba(const SDL_Event& event);
     void procesarDrop(const SDL_Event& event);
     void procesarLevantar(const SDL_Event& event);
+    void procesarEstadisticas(const SDL_Event& event);
     float procesarPuntero();
-    void convertir_coordenadas(float& x, float& y);
     float calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse);
 
 public:
     explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
     void manejarEventos(bool& isRunning, bool puede_comprar);
     bool mercadoAbierto() const;
+    bool puedeMostrarEstadisticas() const;
     void cerrarMercado();
     bool skinSeleccionado() const;
     EventHandler(const EventHandler&) = delete;

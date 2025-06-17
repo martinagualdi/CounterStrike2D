@@ -7,11 +7,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     queue_comandos(queue_comandos), 
     queues_jugadores(queues_jugadores), 
     jugadores(),
-    cant_max_jugadores(Configuracion::get<int>("cantidad_max_jugadores")),
     cant_min_ct(Configuracion::get<int>("cantidad_min_ct")),
-    cant_max_ct(Configuracion::get<int>("cantidad_max_ct")),
     cant_min_tt(Configuracion::get<int>("cantidad_min_tt")),
-    cant_max_tt(Configuracion::get<int>("cantidad_max_tt")),
     activo(true), 
     balas_disparadas(), 
     ultimo_unido_ct(false), 
@@ -30,20 +27,36 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     armas_en_suelo(),
     info_bomba(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false) {}
 
-void GameLoop::agregar_jugador_a_partida(const int id) {
-    Jugador *jugador = new Jugador(id);
-    if (ultimo_unido_ct){ 
-        jugador->establecer_equipo(TT);
-        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Terroristas
-        equipo_tt.push_back(jugador);
-    } else {
+
+void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
+    Jugador *jugador = new Jugador(id, nombre);
+
+    bool puede_ct = equipo_ct.size() < static_cast<size_t>(cant_min_ct);
+    bool puede_tt = equipo_tt.size() < static_cast<size_t>(cant_min_tt);
+
+    if (puede_ct && puede_tt) {
+        // Si puedo unirme a ambos equipos
+        if (ultimo_unido_ct) {
+            jugador->establecer_equipo(TT);
+            equipo_tt.push_back(jugador);
+        } else {
+            jugador->establecer_equipo(CT);
+            equipo_ct.push_back(jugador);
+        }
+        ultimo_unido_ct = !ultimo_unido_ct;
+    } else if (puede_ct) {
         jugador->establecer_equipo(CT);
-        jugador->establecer_skin(SKIN1); // Asignar skin por defecto a los Contra Terroristas
         equipo_ct.push_back(jugador);
+        ultimo_unido_ct = true;
+    } else if (puede_tt) {
+        jugador->establecer_equipo(TT);
+        equipo_tt.push_back(jugador);
+        ultimo_unido_ct = false;
     }
-    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(ultimo_unido_ct);
-    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]); // Posición inicial por defecto
-    ultimo_unido_ct = !ultimo_unido_ct; 
+
+    jugador->establecer_skin(SKIN1); // Asignar skin por defecto
+    std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(jugador->get_equipo());
+    jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]);
     jugadores.push_back(jugador);
 }
 
@@ -568,7 +581,8 @@ bool GameLoop::jugar_ronda(bool esperando) {
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
-            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba,(esperando) ? tiempo_max_ronda : t_restante, eq_ganador);
+
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba,(esperando) ? tiempo_max_ronda : t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (const ClosedQueue &) {
@@ -584,6 +598,7 @@ bool GameLoop::esperando_jugadores() {
 }
 
 void GameLoop::run() {
+    std::cout << "Iniciando el GameLoop..." << std::endl;
     jugar_ronda(true);
     while (activo) {
         jugar_ronda(false);

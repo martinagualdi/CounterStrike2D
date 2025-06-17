@@ -16,6 +16,7 @@
 class Jugador {
   private:
     int id;
+    std::string nombre;
     float x;
     float y;
     float spawn_x;
@@ -42,11 +43,13 @@ class Jugador {
     Arma* arma_en_mano;
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
+    int muertes;
 
   public:  
 
-    explicit Jugador(int id) : 
-      id(id), 
+    explicit Jugador(int id, std::string& nombre) : 
+      id(id),
+      nombre(nombre), 
       x(0), 
       y(0), 
       angulo(0), 
@@ -68,10 +71,12 @@ class Jugador {
       cuchillo(new Cuchillo()), 
       arma_en_mano(arma_secundaria.get()),
       eliminaciones_esta_ronda(0),
-      eliminaciones_totales(0) {}
+      eliminaciones_totales(0),
+      muertes(0) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
+    std::string getNombre() const { return nombre; }
     float getX() const { return x; }
     float getY() const { return y; }
     void setX(float posX) { this->x = posX; }
@@ -108,6 +113,7 @@ class Jugador {
     int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
     int get_eliminaciones_totales() const { return eliminaciones_totales; }
     bool posee_bomba(){return tiene_bomba;}
+    int get_muertes() const { return muertes; }
 
     // Logicas
     void disparar();

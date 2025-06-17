@@ -16,11 +16,8 @@ class GameLoop : public Thread {
     Queue<ComandoDTO> &queue_comandos;
     ListaQueues &queues_jugadores;
     std::vector<Jugador *> jugadores;
-    int cant_max_jugadores;
     int cant_min_ct;
-    int cant_max_ct;
     int cant_min_tt;
-    int cant_max_tt;
     std::atomic<bool> activo;
     std::vector<Municion> balas_disparadas;
     std::atomic<bool> ultimo_unido_ct;
@@ -69,7 +66,7 @@ class GameLoop : public Thread {
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);
 
-    void agregar_jugador_a_partida(const int id);
+    void agregar_jugador_a_partida(const int id, std::string& nombre);
 
     std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
 

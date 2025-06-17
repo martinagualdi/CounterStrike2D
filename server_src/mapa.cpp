@@ -122,12 +122,12 @@ bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
     return false;
 }
 
-std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
+std::vector<float> Mapa::dar_posiciones_iniciales(enum Equipo equipo) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
     Area area_inicio;
-    if (es_tt) 
+    if (equipo == TT) 
         area_inicio = inicio_tt;
     else
         area_inicio = inicio_ct;

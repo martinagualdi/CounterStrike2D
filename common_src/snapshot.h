@@ -61,6 +61,7 @@ struct InfoBomba{
 ;
 struct InfoJugador {
     int id;
+    std::string nombre;
     float pos_x;
     float pos_y;
     float angulo;
@@ -80,6 +81,7 @@ struct InfoJugador {
     int balas;
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
+    int muertes;
 };
 
 struct InfoMunicion {
@@ -96,20 +98,48 @@ struct InfoArmaEnSuelo {
     int municiones;
 };
 
+enum EstadoBombaRonda {
+    PLANTADA,
+    DETONADA,
+    DESACTIVADA,
+    SIN_PLANTAR
+};
+
+struct InfoBomba{
+    enum EstadoBombaRonda estado_bomba;
+    float pos_x;
+    float pos_y;
+    int tiempo_para_detonar;
+    bool acaba_de_detonar=false;
+    bool acaba_de_ser_plantada=false;
+    bool acaba_de_ser_desactivada=false;
+
+};
+
+struct InfoRondas {
+    int rondas_ganadas_ct;
+    int rondas_ganadas_tt;
+    int ronda_actual;
+    int total_rondas;
+};
+
 struct Snapshot {
     std::vector<InfoJugador> info_jugadores;
     std::vector<InfoMunicion> balas_disparadas;
     std::vector<InfoArmaEnSuelo> armas_sueltas;
     InfoBomba bomba_en_suelo;
+    InfoRondas rondas_info;
     int tiempo_restante;
     enum Equipo equipo_ganador;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
-    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas, BombaEnSuelo bomba_suelta,auto& t_restante, enum Equipo equipo_ganador) {
+    Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas,BombaEnSuelo bomba_suelta, auto& t_restante, int rondas_ct, int rondas_tt, 
+        int ronda_actual, int total_rondas, enum Equipo equipo_ganador) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
+            info_jugador.nombre = jugador_ptr->getNombre();
             info_jugador.pos_x = jugador_ptr->getX();
             info_jugador.pos_y = jugador_ptr->getY();
             info_jugador.angulo = jugador_ptr->getAngulo();
@@ -129,6 +159,7 @@ struct Snapshot {
             info_jugador.balas = jugador_ptr->get_arma_actual()->getBalas();
             info_jugador.eliminaciones_esta_ronda = jugador_ptr->get_eliminaciones_esta_ronda();
             info_jugador.eliminaciones_totales = jugador_ptr->get_eliminaciones_totales();
+            info_jugador.muertes = jugador_ptr->get_muertes();
 
             info_jugadores.push_back(info_jugador);
         }
@@ -159,6 +190,12 @@ struct Snapshot {
         bomba_en_suelo.acaba_de_ser_desactivada = bomba_suelta.acaba_de_ser_desactivada;
     
         this->tiempo_restante = t_restante;
+        InfoRondas rondas_info_actual;
+        rondas_info_actual.rondas_ganadas_ct = rondas_ct;
+        rondas_info_actual.rondas_ganadas_tt = rondas_tt;
+        rondas_info_actual.ronda_actual = ronda_actual;
+        rondas_info_actual.total_rondas = total_rondas;
+        this->rondas_info = rondas_info_actual;
         this->equipo_ganador = equipo_ganador;
     }
 

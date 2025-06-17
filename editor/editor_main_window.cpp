@@ -68,12 +68,12 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     };
 
     TabInfo tabs[] = {
-        { "Fondos", "editor/gfx/backgrounds/" },
-        { "Azteca", "editor/gfx/aztec/" },
-        { "Dust",  "editor/gfx/dust/" },
-        { "Inferno", "editor/gfx/inferno/" },
-        { "Armas", "editor/gfx/weapons/" },
-        { "Proteccion anti disparos", "editor/gfx/proteccion_disparos/" },
+        { "Fondos", "gfx/backgrounds/" },
+        { "Azteca", "gfx/aztec/" },
+        { "Dust",  "gfx/dust/" },
+        { "Inferno", "gfx/inferno/" },
+        { "Armas", "gfx/weapons/" },
+        { "Proteccion anti disparos", "gfx/proteccion_disparos/" },
     };
 
     for (const auto& tab : tabs) {
@@ -244,7 +244,7 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-        QString rutaRelativa = path.mid(e.path.indexOf("/editor"));
+        QString rutaRelativa = path.mid(e.path.indexOf("/gfx"));
         if (rutaRelativa.startsWith('/'))
             rutaRelativa.remove(0, 1);
         out << "  - imagen: " << rutaRelativa << "\n";

@@ -61,6 +61,7 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     QPixmap filtrarFondo(const QString& path);
     void pintarPisoEnPosicion(const QPoint& pos);
+    int zValueParaTipo(const QString& tipo) const;
 
 private:
     QPixmap backgroundPixmap;

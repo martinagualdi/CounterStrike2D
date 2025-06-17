@@ -15,7 +15,7 @@ private:
 public:
     int crear_partida(int player_id, std::string creador_username, Queue<Snapshot>& queue_enviadora, std::string yaml_path);
 
-    bool unirse_a_partida(int id_partida_str, int player_id, Queue<Snapshot>& queue_enviadora);
+    bool unirse_a_partida(int id_partida_str, int player_id, std::string& nombre, Queue<Snapshot>& queue_enviadora);
     
     std::vector<std::string> listar_partidas();
 

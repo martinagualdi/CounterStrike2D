@@ -45,7 +45,7 @@ public:
     bool bala_colision_contra_pared(float pos_x, float pos_y);
     int limite_alto() const { return alto_mapa; }
     int limite_ancho() const { return ancho_mapa; }
-    std::vector<float> dar_posiciones_iniciales(bool es_tt);
+    std::vector<float> dar_posiciones_iniciales(enum Equipo equipo);
     bool en_posicion_de_compra(float pos_x, float pos_y, enum Equipo equipo);
     bool en_posicion_de_bomba_a(float pos_x, float pos_y);
     bool en_posicion_de_bomba_b(float pos_x, float pos_y);

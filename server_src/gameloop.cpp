@@ -197,10 +197,10 @@ enum Equipo GameLoop::se_termino_ronda() {
     }
 
     if (!ct_vivos || !tt_vivos) {
-        if (ct_vivos) { 
+        if (ct_vivos && !bomba_plantada) { 
             rondas_ganadas_ct++;
             return CT;
-        } else {
+        } if (tt_vivos){
             rondas_ganadas_tt++;
             return TT;
         }
@@ -468,9 +468,6 @@ void GameLoop::chequear_colisiones(bool esperando) {
 void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) {
     if (eq_ganador != NONE) {
         // Reiniciar la ronda
-        volver_jugadores_a_spawn();
-        cargar_dinero_por_eliminaciones();
-        reiniciar_estado_bomba();
         balas_disparadas.clear();
         ronda_actual++;
         en_juego = false; // Terminar el bucle de juego
@@ -568,6 +565,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
             tts_sin_bomba[idx]->asignar_bomba();
         }
     }
+    enum Equipo eq_ganador = NONE;
     while (activo && en_juego) {
         try {
             chequear_estados_jugadores();
@@ -578,12 +576,13 @@ bool GameLoop::jugar_ronda(bool esperando) {
             chequear_colisiones(esperando);
             chequear_bomba_desactivada();
             chequear_bomba_plantada();            
-            enum Equipo eq_ganador = se_termino_ronda();
-            if (esperando)
+            eq_ganador = se_termino_ronda();
+            if (esperando) {
                 chequear_si_completaron_equipos(eq_ganador, en_juego);
-            else
+                } else {
                 chequear_si_equipo_gano(eq_ganador, en_juego);
-            
+                if (!en_juego) break;
+                }
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
@@ -595,7 +594,38 @@ bool GameLoop::jugar_ronda(bool esperando) {
             return false;
         }
     }
+    constexpr int tiempo_entre_rondas = 4;
+    int t_restante = 0; // o el valor que quieras mostrar en el cliente
+     
+    esperar_entre_rondas(tiempo_entre_rondas, t_restante, eq_ganador);
+
     return true;
+}
+
+void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador){
+    auto t_inicio = std::chrono::steady_clock::now();
+    while (true) {
+        auto t_actual = std::chrono::steady_clock::now();
+        auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
+        if (t_transcurrido >= segundos) break;
+
+        // Seguí enviando snapshots para que el cliente pueda actualizar sonidos/animaciones
+        Snapshot snapshot(
+            jugadores, balas_disparadas, armas_en_suelo, info_bomba,
+            t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador
+        );
+        
+        queues_jugadores.broadcast(snapshot);
+        if(info_bomba.acaba_de_detonar){
+            info_bomba= BombaEnSuelo(0.0f, 0.0f, DETONADA, 0, false, false, false);
+        }    
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+    }
+    reiniciar_estado_bomba();
+    volver_jugadores_a_spawn();
+    cargar_dinero_por_eliminaciones();
+    
 }
 
 bool GameLoop::esperando_jugadores() {

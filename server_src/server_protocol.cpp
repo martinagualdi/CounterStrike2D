@@ -53,6 +53,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_moviendose); // Enviar si el jugador está moviéndose
         uint8_t esta_disparando = j.esta_disparando ? 0x01 : 0x00;
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
+        uint8_t tiene_bomba = j.tiene_bomba ? 0x01 : 0x00;
+        buffer.push_back(tiene_bomba); // Enviar si el jugador tiene la bomba
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
         uint8_t esta_desactivando_bomba = j.esta_desactivando_bomba ? 0x01 : 0x00;

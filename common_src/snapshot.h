@@ -72,6 +72,7 @@ struct InfoJugador {
     bool esta_vivo;
     bool esta_moviendose;
     bool esta_disparando;
+    bool tiene_bomba;
     bool esta_plantando_bomba;
     bool esta_desactivando_bomba;
     bool puede_comprar_ya;
@@ -132,6 +133,7 @@ struct Snapshot {
             info_jugador.esta_vivo = jugador_ptr->esta_vivo();
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
             info_jugador.esta_disparando = jugador_ptr->esta_disparando();
+            info_jugador.tiene_bomba = jugador_ptr->posee_bomba();
             info_jugador.esta_plantando_bomba = jugador_ptr->esta_plantando_bomba();
             info_jugador.esta_desactivando_bomba = jugador_ptr->esta_desactivando_bomba();
             info_jugador.puede_comprar_ya = jugador_ptr->puede_comprar_ahora();

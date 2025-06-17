@@ -53,8 +53,12 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_moviendose); // Enviar si el jugador está moviéndose
         uint8_t esta_disparando = j.esta_disparando ? 0x01 : 0x00;
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
+        uint8_t tiene_bomba = j.tiene_bomba ? 0x01 : 0x00;
+        buffer.push_back(tiene_bomba); // Enviar si el jugador tiene la bomba
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
+        uint8_t esta_desactivando_bomba = j.esta_desactivando_bomba ? 0x01 : 0x00;
+        buffer.push_back(esta_desactivando_bomba);
         uint8_t puede_comprar_ya = j.puede_comprar_ya ? 0x01 : 0x00;
         buffer.push_back(puede_comprar_ya); // Enviar si el jugador puede comprar ya
         uint8_t acaba_de_comprar_arma = j.acaba_de_comprar_arma ? 0x01 : 0x00;
@@ -88,6 +92,16 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint32_t(buffer, static_cast<uint32_t>(arma.pos_y * 100));
         push_back_uint16_t(buffer, static_cast<uint16_t>(arma.municiones)); 
     }
+    
+    const InfoBomba& bomba = snapshot.bomba_en_suelo;
+    push_back_uint32_t(buffer, static_cast<uint32_t>(bomba.pos_x * 100));
+    push_back_uint32_t(buffer, static_cast<uint32_t>(bomba.pos_y * 100));
+    buffer.push_back(static_cast<uint8_t>(bomba.estado_bomba)); // Enviar el estado de la bomba
+    push_back_uint16_t(buffer, static_cast<uint16_t>(bomba.tiempo_para_detonar));
+    buffer.push_back(bomba.acaba_de_detonar ? 0x01 : 0x00);
+    buffer.push_back(bomba.acaba_de_ser_plantada ? 0x01 : 0x00);
+    buffer.push_back(bomba.acaba_de_ser_desactivada ? 0x01 : 0x00);
+
     push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_restante)); //Enviar tiempo restante
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_ct)); // Enviar rondas ganadas CT
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_tt)); // Enviar rondas ganadas TT

@@ -9,6 +9,7 @@
 #include "lista_queues.h"
 #include "municion.h"
 #include "mapa.h"
+#include "bomba.h"
 
 class GameLoop : public Thread {
   private:
@@ -33,6 +34,13 @@ class GameLoop : public Thread {
     int rondas_ganadas_tt;
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
+    BombaEnSuelo info_bomba;
+    Bomba* bomba;
+    std::chrono::steady_clock::time_point tiempo_inicio_plantado;
+    std::chrono::steady_clock::time_point tiempo_inicio_desactivado;
+    Jugador* jugador_plantando = nullptr;
+    Jugador* jugador_desactivando = nullptr;
+
 
     void volver_jugadores_a_spawn();
     void cargar_dinero_por_eliminaciones();
@@ -45,11 +53,16 @@ class GameLoop : public Thread {
     bool esperando_jugadores();
     void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
+    void chequear_bomba_plantada();
+    void chequear_bomba_desactivada();
+    void reiniciar_estado_bomba();
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);
     void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego);
     void chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego);
+    void explosion();
+    void esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador);
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);

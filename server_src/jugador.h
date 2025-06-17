@@ -7,6 +7,7 @@
 #include "ak47.h"
 #include "m3.h"
 #include "awp.h"
+#include "bomba.h"
 #include "armaDeFuego.h"
 #include "../common_src/enums_jugador.h"
 #include "../common_src/comando_dto.h"
@@ -28,11 +29,14 @@ class Jugador {
     bool vivo;
     bool moviendose;
     bool disparando;
+    bool tiene_bomba;
     bool plantando_bomba;
+    bool desactivando_bomba;
     bool puede_comprar;
     bool acaba_de_comprar_arma;
     bool acaba_de_comprar_balas;
     enum Movimiento movimiento_actual = DETENER;
+    std::unique_ptr<Bomba> bomba; // Bomba del jugador, si la tiene
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
     std::unique_ptr<Cuchillo> cuchillo;
@@ -56,10 +60,12 @@ class Jugador {
       vivo(true), 
       moviendose(false), 
       disparando(false), 
+      tiene_bomba(false),
       plantando_bomba(false),
       puede_comprar(true),
       acaba_de_comprar_arma(false),
       acaba_de_comprar_balas(false), 
+      bomba(nullptr),
       arma_principal(nullptr), 
       arma_secundaria(new Glock()), 
       cuchillo(new Cuchillo()), 
@@ -91,13 +97,22 @@ class Jugador {
     bool esta_disparando() const {  return disparando; }
     void dejar_de_disparar() { disparando = false; }
     bool esta_plantando_bomba() const { return plantando_bomba; }
+    bool esta_desactivando_bomba() const {return desactivando_bomba;}
     bool puede_disparar() const { return arma_en_mano->puedeAccionar(); }
+    void empezar_a_plantar();
+    void empezar_a_desactivar();
+    void desactivar_bomba();
+    void plantar_bomba(float x, float y); 
+    void cancelar_plantado_bomba();
+    void cancelar_desactivado_bomba();
     bool puede_comprar_ahora() { return puede_comprar; }
     void en_posicion_de_compra(bool puede_o_no) {puede_comprar = puede_o_no; }
     bool compro_arma_ahora() const { return acaba_de_comprar_arma; }
     bool compro_balas_ahora() const { return acaba_de_comprar_balas; }
+    void asignar_bomba();
     int get_eliminaciones_esta_ronda() const { return eliminaciones_esta_ronda; }
     int get_eliminaciones_totales() const { return eliminaciones_totales; }
+    bool posee_bomba(){return tiene_bomba;}
     int get_muertes() const { return muertes; }
 
     // Logicas
@@ -126,8 +141,11 @@ class Jugador {
     void finalizar_ronda();
 
     ArmaDeFuego* soltar_arma_pricipal();
+    Bomba* soltar_bomba();
 
-    ArmaDeFuego* levantar_arma(ArmaDeFuego* arma_del_suelo);
+
+    ArmaDeFuego* levantar_arma(Arma* arma_del_suelo);
+    Bomba* levantar_bomba(Arma* bomba_del_suelo);
 
     void definir_spawn(float x, float y);
 

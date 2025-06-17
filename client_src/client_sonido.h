@@ -22,19 +22,29 @@ private:
     Mixer mixer;
     Chunk pickup;
     Chunk compra_balas;
+    Chunk bomb_has_been_planted;
+    Chunk bomb_has_been_defused;
+    Chunk bomb_detonada;
+    Chunk bomb_beep;
+    Chunk accionando_sobre_bomba;
     std::vector<Chunk> equipo_win;
     std::vector<Chunk> disparo_arma;
     std::vector<Chunk> pasos;
     std::unordered_map<int, FootstepState> estadosPasos;
-    size_t paso_actual = 0;
-    Uint32 ultimo_tick = 0;
-    const Uint32 delay_pasos = 250;
+    enum Equipo equipo_ganador_anterior;
+    size_t paso_actual;
+    Uint32 ultimo_tick;
+    Uint32 last_beep_ticks;
+    const Uint32 delay_pasos;
 
+    int volumen_segun_distancia(float x_jugador, float y_jugador, float x_sonido, float y_sonido);
     void reproducirPasos();
     void reproducirDisparos();
     void reproducirArmaNueva();
     void reproducirEquipoGanador();
     void reproducirCompraBalas();
+    void reproducirEstadoBomba();
+    void reproducirBeep();
 
 public:
     explicit Sonido(int client_id);

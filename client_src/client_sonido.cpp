@@ -7,6 +7,9 @@
 #define CANALES 2
 #define TAM_BUFFER 2048
 #define CANAL_BOMBA 29
+#define DISTANCIA_MAX 900.0f
+#define DISTANCIA_MIN 70.0f
+#define CANTIDAD_SONIDOS_A_LA_VEZ 4
 #define CANAL_LIBRE -1
 
 Sonido::Sonido(const int client_id) : 
@@ -48,9 +51,6 @@ int Sonido::volumen_segun_distancia(float x_jugador, float y_jugador, float x_so
     float dy = y_jugador - y_sonido;
     float distancia = sqrt(dx*dx + dy*dy);
 
-    const float DISTANCIA_MAX = 900.0f;  // hasta donde se escucha
-    const float DISTANCIA_MIN = 70.0f;   // desde donde suena al máximo
-
     if (distancia <= DISTANCIA_MIN) return MIX_MAX_VOLUME;
     if (distancia >= DISTANCIA_MAX) return 0;
     float factor = 1.0f - (distancia - DISTANCIA_MIN) / (DISTANCIA_MAX - DISTANCIA_MIN);
@@ -60,10 +60,10 @@ int Sonido::volumen_segun_distancia(float x_jugador, float y_jugador, float x_so
 
 void Sonido::reproducirPasos() {
     const InfoJugador* principal = snapshot.getJugadorPorId(client_id);
-    
     if(!principal) return;
 
     Uint32 ahora = SDL_GetTicks();
+    int cap = 6; // Máximo de pasos simultáneos que se escuchan cerca
 
     for (const InfoJugador &jugador : snapshot.info_jugadores) {
         FootstepState &state = estadosPasos[jugador.id];
@@ -74,9 +74,30 @@ void Sonido::reproducirPasos() {
         }
 
         if (ahora - state.ultimo_tick >= delay_pasos) {
-            int canal = mixer.PlayChannel(CANAL_LIBRE, pasos[state.paso_actual], 0);
-            int volumen = volumen_segun_distancia(principal->pos_x, principal->pos_y, jugador.pos_x, jugador.pos_y);
-            mixer.SetVolume(canal, volumen);
+            int volumen = volumen_segun_distancia(
+                principal->pos_x, principal->pos_y, 
+                jugador.pos_x, jugador.pos_y);
+
+            // No reproducir ni contar si el paso no se va a escuchar
+            if (volumen < 5) {
+                state.paso_actual = (state.paso_actual + 1) % pasos.size();
+                state.ultimo_tick = ahora;
+                continue;
+            }
+
+            Mix_Chunk* chunk = pasos[state.paso_actual].Get();
+            int count = 0;
+            int channels = Mix_AllocateChannels(-1);
+            for (int c = 0; c < channels; ++c) {
+                if (Mix_GetChunk(c) == chunk && Mix_Playing(c) && Mix_Volume(c, -1) > 0)
+                    count++;
+            }
+
+            if (count < cap) {
+                int canal = mixer.PlayChannel(CANAL_LIBRE, pasos[state.paso_actual], 0);
+                if (canal != -1) mixer.SetVolume(canal, volumen);
+            }
+
             state.paso_actual = (state.paso_actual + 1) % pasos.size();
             state.ultimo_tick = ahora;
         }
@@ -93,10 +114,23 @@ void Sonido::reproducirDisparos() {
         if(jugador.esta_disparando) {
             int i = static_cast<int>(jugador.arma_en_mano);
             if(jugador.arma_en_mano > BOMBA_TT) i--;
-            int canal = jugador.id;
-            mixer.PlayChannel(canal, disparo_arma[i]);
+          
             int volumen = volumen_segun_distancia(principal->pos_x, principal->pos_y, jugador.pos_x, jugador.pos_y);
-            mixer.SetVolume(canal, volumen);
+            if (volumen < 5) continue;
+
+            Mix_Chunk* chunk = disparo_arma[i].Get();
+            int count = 0;
+            int channels = Mix_AllocateChannels(-1);
+            for (int c = 0; c < channels; ++c) {
+                // SOLO contás los sonidos activos que realmente se están escuchando (volumen no-cero)
+                if (Mix_GetChunk(c) == chunk && Mix_Playing(c) && Mix_Volume(c, -1) > 0)
+                    count++;
+            }
+            if (count < CANTIDAD_SONIDOS_A_LA_VEZ) {
+                int canal = jugador.id;
+                mixer.PlayChannel(canal, disparo_arma[i]);
+                mixer.SetVolume(canal, volumen);
+            }
         }
     }
 
@@ -171,10 +205,15 @@ void Sonido::reproducirBeep() {
 
     Uint32 ahora = SDL_GetTicks();
     int tiempo_restante = snapshot.bomba_en_suelo.tiempo_para_detonar;
-    int intervalo = 1000; 
-    if (tiempo_restante < 3) intervalo = 150;
-    else if (tiempo_restante < 7) intervalo = 350;
-    else if (tiempo_restante < 15) intervalo = 500;
+    int intervalo = 1000;
+    if (tiempo_restante < 1)        intervalo = 30; 
+    else if (tiempo_restante < 2)   intervalo = 110;
+    else if (tiempo_restante < 3)   intervalo = 140;
+    else if (tiempo_restante < 4)   intervalo = 180;
+    else if (tiempo_restante < 5)   intervalo = 220;
+    else if (tiempo_restante < 7)   intervalo = 300;
+    else if (tiempo_restante < 10)  intervalo = 400;
+    else if (tiempo_restante < 15)  intervalo = 600;
 
     if (ahora - last_beep_ticks >= (Uint32)intervalo) {
         int canal = mixer.PlayChannel(CANAL_BOMBA, bomb_beep);

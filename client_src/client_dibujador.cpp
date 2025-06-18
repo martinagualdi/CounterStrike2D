@@ -39,23 +39,16 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     fuente("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_GRANDE),
     fuenteChica("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_CHICA),
     amarillo(Color(255, 255, 0)),
-    blanco(Color(255,255,255)),
-    verde(Color(100,220,100)),
-    rojo(Color(200,80,80)),
-    amarillento(Color(240,180,50)),
-    celeste(Color(80,200,255)),
+    blanco(Color(255, 255, 255)),
+    verde(Color(100, 220, 100)),
+    rojo(Color(200, 80, 80)),
+    amarillento(Color(240, 180, 50)),
+    celeste(Color(80, 200, 255)),
     mensaje_bomba_plantada(renderer, fuenteChica.RenderText_Blended("¡La bomba ha sido plantada!", amarillo)),
     mantenga_presionado_activar(renderer, fuenteChica.RenderText_Blended
     ("Mantenga presionado hasta finalizar el activado", amarillo)),
     mantenga_presionado_desactivar(renderer, fuenteChica.RenderText_Blended
     ("Mantenga presionado hasta finalizar el desactivado", amarillo)),
-    fondo_transparente([&renderer]() {
-        SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
-        Surface surface(rawSurface);
-        Uint32 negroConAlpha = SDL_MapRGBA(surface.Get()->format, 0, 0, 0, 180);
-        surface.FillRect(NullOpt, negroConAlpha);
-		return Texture(renderer, surface);
-    }()),
     balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),  
     cs2d(Texture(renderer, Surface(IMG_Load("client_src/gfx/gametitle.png")))),
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
@@ -159,8 +152,8 @@ void Dibujador::inicializar_textos() {
         esperando_jugadores.emplace_back(renderer, fuenteChica.RenderText_Blended(texto, amarillo));
     }
     
-    mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("¡Los Counter-Terrorist han ganado!", amarillo));
-    mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("¡Los Terroristas han ganado!", amarillo));
+    mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("Los Counter-Terrorist han ganado!", amarillo));
+    mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("Los Terroristas han ganado!", amarillo));
 
     
 }
@@ -183,15 +176,13 @@ void Dibujador::convertir_a_pantalla(float pos_x, float pos_y, float& x_pixel, f
 void Dibujador::dibujar_jugadores() {
 
     for(const InfoJugador& jugador : snapshot.info_jugadores){
+
+        if(!jugador.esta_vivo) continue;
+
         float x_pixel, y_pixel;
         convertir_a_pantalla(jugador.pos_x, jugador.pos_y, x_pixel, y_pixel);
         
         float angulo_sdl = convertir_angulo(jugador.angulo);
-        
-        if(!jugador.esta_vivo){
-            dibujar_muerto(x_pixel, y_pixel);
-            continue;
-        }
 
         if(jugador.esta_moviendose)
             dibujar_pies(x_pixel, y_pixel, angulo_sdl);
@@ -204,9 +195,17 @@ void Dibujador::dibujar_jugadores() {
     }
 }
 
-void Dibujador::dibujar_muerto(int x_pixel, int y_pixel) {
-    Rect dst(x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER);
-    renderer.Copy(muerto, NullOpt, dst);
+void Dibujador::dibujar_muertos() {
+
+    for(const InfoJugador& jugador : snapshot.info_jugadores){
+
+        if(jugador.esta_vivo) continue;
+        float x_pixel, y_pixel;
+        convertir_a_pantalla(jugador.pos_x, jugador.pos_y, x_pixel, y_pixel);
+        Rect dst(x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER);
+        renderer.Copy(muerto, NullOpt, dst);
+    }
+
 }
 
 void Dibujador::dibujar_fondo(const ElementoMapa& elemento){
@@ -231,12 +230,9 @@ void Dibujador::dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos sk
     SDL_Rect sprite;
     std::vector<Texture>& players = (equipo == CT) ? ct_players : tt_players;
 
-    if(arma == CUCHILLO)
-        sprite = sprites_player[MANO_IZQ_CUCHILLO];
-    else if(arma == BOMBA_TT)
-        sprite = sprites_player[DOS_MANOS];
-    else
-        sprite = sprites_player[ARMADO];
+    if(arma == CUCHILLO) sprite = sprites_player[MANO_IZQ_CUCHILLO];
+    else if(arma == BOMBA_TT) sprite = sprites_player[DOS_MANOS];
+    else sprite = sprites_player[ARMADO];
 
     SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
     SDL_RenderCopyExF(renderer.Get(), players[skin].Get(), &sprite, &dst, angulo, &center, SDL_FLIP_NONE);
@@ -433,7 +429,7 @@ void Dibujador::dibujar_simbolo_mercado() {
 
 }
 
-void Dibujador::dibujar_simbolo_zona_detonar() {
+void Dibujador::dibujar_simbolo_tiene_bomba() {
 
     Rect dst;
     dst.SetX(static_cast<int>(ANCHO_MIN * 5/8) + TAM_SIMBOLOS_HUD);
@@ -461,18 +457,30 @@ void Dibujador::dibujar_mantenga_presionado(bool activar) {
 
 }
 
-void Dibujador::dibujar_mercado() {
+void Dibujador::dibujar_cuadro_negro_transparente(Texture& titulo) {
 
     int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
     int altoCuadro = ALTO_MIN - OFFSET_TRANSPARENTE;
     int x = (ANCHO_MIN - anchoCuadro) / 2;
-    int y = (ALTO_MIN - altoCuadro) / 2;
+    int y = (ALTO_MIN - altoCuadro) / 2; 
 
-    renderer.Copy(fondo_transparente, NullOpt, Rect(x, y, anchoCuadro, altoCuadro));
-    renderer.Copy(cs2d, NullOpt, Rect(x + OFFSET_CS2D, y + OFFSET_CS2D, ANCHO_CS2D, ALTO_CS2D));
-    Texture comprarArmas(renderer, fuente.RenderText_Blended("Comprar Armas", amarillo));
-    renderer.Copy(comprarArmas, NullOpt, Rect(x + 130, y + 10,  comprarArmas.GetWidth(), comprarArmas.GetHeight()));
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(0, 0, 0, 180);
+    renderer.FillRect(Rect(x, y, anchoCuadro, altoCuadro));
     
+    renderer.Copy(cs2d, NullOpt, Rect(x + OFFSET_CS2D, y + OFFSET_CS2D, ANCHO_CS2D, ALTO_CS2D));
+    renderer.Copy(titulo, NullOpt, Rect(x + 130, y + 10,  titulo.GetWidth(), titulo.GetHeight()));
+
+}
+
+void Dibujador::dibujar_mercado() {
+
+    Texture titulo(renderer, fuente.RenderText_Blended("Comprar Armas", amarillo));
+    dibujar_cuadro_negro_transparente(titulo);
+
+    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
+    int x = (ANCHO_MIN - anchoCuadro) / 2;
+
     std::vector <Texture> textos;
     textos.push_back(crearTextoArma("[1] AK-47       ", 150));
     textos.push_back(crearTextoArma("[2] M3             ", 100));
@@ -534,15 +542,9 @@ void Dibujador::dibujar_seleccionar_skin() {
     std::vector<Texture>& nombres = es_tt ? tt_nombres : ct_nombres;
     std::vector<Texture>& players = es_tt ? tt_players : ct_players;
 
+    dibujar_cuadro_negro_transparente(textos_skin[0]);
     int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
-    int altoCuadro = ALTO_MIN - OFFSET_TRANSPARENTE;
-    int x = (ANCHO_MIN - anchoCuadro) / 2;
-    int y = (ALTO_MIN - altoCuadro) / 2;
-
-    renderer.Copy(fondo_transparente, NullOpt, Rect(x, y, anchoCuadro, altoCuadro));
-    renderer.Copy(cs2d, NullOpt, Rect(x + OFFSET_CS2D, y + OFFSET_CS2D, ANCHO_CS2D, ALTO_CS2D));
-    Rect texto_dst(x + 130, y + 10,  textos_skin[0].GetWidth(), textos_skin[0].GetHeight());
-    renderer.Copy(textos_skin[0], NullOpt, texto_dst);
+    int x = (ANCHO_MIN - anchoCuadro) / 2; 
 
     int alto_total = 0;
     for (int i = 0; i < CANT_SKINS_PLAYER; i++) {
@@ -668,63 +670,72 @@ void Dibujador::dibujar_bomba_plantada() {
        
 }
 
-void Dibujador::dibujar_vision_de_campo() {
+void Dibujador::dibujar_vision_de_campo(float angulo_jugador) {
 
-    const int ancho = ANCHO_MIN;
-    const int alto = ALTO_MIN;
-    const float angulo_fov = 90.0f;
-    const float radio_cono = 1.5f * std::max(ancho, alto);
-    const float radio_centro = 55.0f;
-    const float direccion_centro = convertir_angulo(snapshot.getJugadorPorId(client_id)->angulo) - DESFASE_ANGULO;
-    const Uint8 opacidad_fondo = 200;
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    renderer.SetDrawColor(0, 0, 0, 160);  // Fondo oscuro
+    renderer.FillRect(0, 0, ANCHO_MIN, ALTO_MIN);
 
-    SDL_Surface* surf = SDL_CreateRGBSurfaceWithFormat(0, ancho, alto, 32, SDL_PIXELFORMAT_RGBA8888);
-    if (!surf) throw std::runtime_error("No se pudo crear surface");
+    // 2. Círculo más claro (más transparente)
+    renderer.SetDrawColor(0, 0, 0, 0); // o probá con 40, 60, 80
 
-    Uint32 negroConAlpha = SDL_MapRGBA(surf->format, 0, 0, 0, opacidad_fondo);
-    SDL_FillRect(surf, nullptr, negroConAlpha);
+    int radio_centro = 55;
+    rellenarCirculoStencil(ANCHO_MIN / 2, ALTO_MIN / 2, radio_centro);
+    float angulo_fov = 90.0f;
+    float direccion_centro = fmodf(angulo_jugador, 360.0f);
+    if (direccion_centro < 0) direccion_centro += 360.0f;
+    float radio = std::sqrt(ANCHO_MIN * ANCHO_MIN + ALTO_MIN * ALTO_MIN);
 
-    int cx = ancho / 2;
-    int cy = alto / 2;
-
+    std::vector<SDL_Point> puntos;
+    int cx = ANCHO_MIN / 2;
+    int cy = ALTO_MIN / 2;
+    puntos.push_back({cx, cy});
     float desde = direccion_centro - angulo_fov / 2.0f;
     float hasta = direccion_centro + angulo_fov / 2.0f;
+    for (float a = desde; a <= hasta; a += 1.0f) {
+        float rad = a * M_PI / 180.0f;
+        int x = static_cast<int>(cx + std::cos(rad) * radio);
+        int y = static_cast<int>(cy + std::sin(rad) * radio);
+        puntos.push_back({x, y});
+    }
+    rellenarPoligonoStencil(puntos);
 
-    auto normalizar = [](float ang) {
-        while (ang < 0) ang += 360.0f;
-        while (ang >= 360.0f) ang -= 360.0f;
-        return ang;
-    };
+}
 
-    desde = normalizar(desde);
-    hasta = normalizar(hasta);
+void Dibujador::rellenarCirculoStencil(int cx, int cy, int r) {
 
-    for (int y = 0; y < alto; ++y) {
-        for (int x = 0; x < ancho; ++x) {
-            float dx = x - cx;
-            float dy = y - cy;
-            float dist = std::sqrt(dx*dx + dy*dy);
-            bool en_circulo = (dist <= radio_centro);
-            bool en_cono = false;
-            if (dist <= radio_cono) {
-                float ang = std::atan2(dy, dx) * 180.0f / M_PI;
-                if (ang < 0) ang += 360.0f;
-                if (desde < hasta)
-                    en_cono = (ang >= desde && ang <= hasta);
-                else
-                    en_cono = (ang >= desde || ang <= hasta);
-            }
-
-            if (en_circulo || en_cono) {
-                Uint32* pixel = (Uint32*)((Uint8*)surf->pixels + y*surf->pitch + x*4);
-                *pixel = SDL_MapRGBA(surf->format, 0, 0, 0, 0); // transparente total
-            }
+    renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
+    for (int dy = -r; dy <= r; ++dy) {
+        int dx_max = static_cast<int>(std::sqrt(r * r - dy * dy));
+        for (int dx = -dx_max; dx <= dx_max; ++dx) {
+            renderer.DrawPoint(cx + dx, cy + dy);
         }
-    }   
+    }
+}
 
-    Texture campo_de_vision(renderer, Surface(surf));
-    campo_de_vision.SetBlendMode(SDL_BLENDMODE_BLEND);
-    renderer.Copy(campo_de_vision, NullOpt, NullOpt);
+void Dibujador::rellenarPoligonoStencil(const std::vector<SDL_Point>& puntos) {
+
+    if (puntos.size() < 3) return;
+    int minY = puntos[0].y, maxY = puntos[0].y;
+    for (const auto& p : puntos) {
+        if (p.y < minY) minY = p.y;
+        if (p.y > maxY) maxY = p.y;
+    }
+    for (int y = minY; y <= maxY; ++y) {
+        std::vector<int> nodesX;
+        size_t j = puntos.size() - 1;
+        for (size_t i = 0; i < puntos.size(); ++i) {
+            if ((puntos[i].y < y && puntos[j].y >= y) || (puntos[j].y < y && puntos[i].y >= y)) {
+                int x = puntos[i].x + (y - puntos[i].y) * (puntos[j].x - puntos[i].x) / (puntos[j].y - puntos[i].y);
+                nodesX.push_back(x);
+            }
+            j = i;
+        }
+        std::sort(nodesX.begin(), nodesX.end());
+        for (size_t k = 0; k + 1 < nodesX.size(); k += 2) {
+            renderer.DrawLine(nodesX[k], y, nodesX[k + 1], y);
+        }
+    }
 }
 
 void Dibujador::dibujar_estadisticas() {
@@ -866,8 +877,7 @@ void Dibujador::dibujar_hud() {
     dibujar_salud(jugador_principal->vida);
     dibujar_tiempo(snapshot.tiempo_restante);
     if(jugador_principal->puede_comprar_ya) dibujar_simbolo_mercado();
-    //if(jugador_principal->tiene_bomba && jugador_principal->esta_en_zona_de_detonar())
-        dibujar_simbolo_zona_detonar();
+    if (jugador_principal->tiene_bomba) dibujar_simbolo_tiene_bomba();
     if(jugador_principal->arma_en_mano != CUCHILLO){
         dibujar_balas_hud(jugador_principal->balas);
         dibujar_saldo(jugador_principal->dinero, true);
@@ -885,6 +895,7 @@ void Dibujador::renderizar(Snapshot& snapshot)
 
     renderer.Clear();
     dibujar_mapa();
+    dibujar_muertos();
     dibujar_armas_tiradas();
     if(snapshot.bomba_en_suelo.estado_bomba == PLANTADA) dibujar_bomba_plantada();
     dibujar_balas();
@@ -900,7 +911,7 @@ void Dibujador::renderizar(Snapshot& snapshot)
     if(eventHandler.puedeMostrarEstadisticas()) dibujar_estadisticas();
     if(snapshot.equipo_ganador != NONE) dibujar_mensaje_ganador();
 
-    //dibujar_vision_de_campo();
+    //dibujar_vision_de_campo(principal->angulo);
 
     renderer.Present();
 }

@@ -41,7 +41,6 @@ private:
     Texture mensaje_bomba_plantada;
     Texture mantenga_presionado_activar;
     Texture mantenga_presionado_desactivar;
-    Texture fondo_transparente;
     Texture balas;
     Texture cs2d;
     Texture player_legs;
@@ -78,18 +77,19 @@ private:
     void dibujar_jugadores();
     void dibujar_fondo(const ElementoMapa& elemento);
     void dibujar_balas();
-    void dibujar_muerto(int x_pixel, int y_pixel);
+    void dibujar_muertos();
     void dibujar_cuerpo(float x, float y, float angulo, enum SkinTipos skin,
              enum ArmaEnMano arma, enum Equipo equipo);
     void dibujar_pies(float x, float y, float angulo);
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
     void dibujar_simbolo_mercado();
-    void dibujar_simbolo_zona_detonar();
+    void dibujar_simbolo_tiene_bomba();
     void dibujar_mantenga_presionado(bool activar);
     void dibujar_hud();
     void dibujar_mercado();
     void dibujar_mapa();
+    void dibujar_cuadro_negro_transparente(Texture& titulo);
     void dibujar_esperando_jugadores();
     void dibujar_seleccionar_skin();
     void dibujar_armas_tiradas();
@@ -97,7 +97,9 @@ private:
     void dibujar_mensaje_ganador();
     void dibujar_mensaje_bomba_plantada();
     void dibujar_bomba_plantada();
-    void dibujar_vision_de_campo();
+    void dibujar_vision_de_campo(float angulo_jugador);
+    void rellenarPoligonoStencil(const std::vector<SDL_Point>& puntos);
+    void rellenarCirculoStencil(int cx, int cy, int r);
     void dibujar_estadisticas();
     void dibujar_estadisticas_jugador(std::vector<int>& col_x, 
     int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);

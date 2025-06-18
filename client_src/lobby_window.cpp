@@ -1,6 +1,7 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
 #include "map_selection.h"
+#include "../common_src/ruta_base.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -15,8 +16,7 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
 
     this->resize(900, 700);
 
-    // Fondo
-    QPixmap fondo("/var/CounterStrike2D/assets/gfx/lobby/lobby.jpg");
+    QPixmap fondo(QString::fromStdString(RUTA_IMAGENES("lobby/lobby.jpg")));
     if (!fondo.isNull()) {
         QPalette palette;
         palette.setBrush(QPalette::Window, QBrush(fondo.scaled(this->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
@@ -79,7 +79,8 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer = new QMediaPlayer(this);
     audioOutput = new QAudioOutput(this);
     mediaPlayer->setAudioOutput(audioOutput);
-    mediaPlayer->setSource(QUrl::fromLocalFile("client_src/sfx/gamestart.mp3"));
+    std::string path_musica = RUTA_SONIDO("gamestart.mp3");
+    mediaPlayer->setSource(QUrl::fromLocalFile(QString::fromStdString(path_musica)));
     audioOutput->setVolume(100); 
     mediaPlayer->play();
 }

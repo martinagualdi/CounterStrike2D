@@ -1,4 +1,5 @@
 #include "map_selection.h"
+#include "../common_src/ruta_base.h"
 #include <QPixmap>
 #include <QDir>
 #include <QCoreApplication>
@@ -71,7 +72,6 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
         }
     )");
 
-    // Layout
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(listaMapas);
     layout->addWidget(previewLabel);
@@ -83,14 +83,12 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
 
     setLayout(mainLayout);
 
-    // Guardamos el mapeo
     for (const auto& par : mapas) {
         QListWidgetItem* item = new QListWidgetItem(par.first);
         listaMapas->addItem(item);
         this->mapaToMiniatura[par.first] = par.second;
     }
 
-    // Conexiones
     connect(listaMapas, &QListWidget::itemEntered, this, &MapSelectionDialog::mostrarPreview);
     connect(listaMapas, &QListWidget::itemClicked, this, &MapSelectionDialog::mostrarPreview);
     connect(okButton, &QPushButton::clicked, this, &MapSelectionDialog::aceptarSeleccion);
@@ -102,12 +100,11 @@ void MapSelectionDialog::mostrarPreview(QListWidgetItem* item) {
     QString nombreMapa = item->text();
     QString rutaMiniatura = mapaToMiniatura.value(nombreMapa);
 
-    QString basePath = QCoreApplication::applicationDirPath();
-    QString fullPath = "/var/CounterStrike2D/server/mapas_disponibles/" + rutaMiniatura;
+    QString fullPath = RUTA_SERVER("") + rutaMiniatura;
 
     if (QFile::exists(fullPath)) {
         QPixmap miniatura(fullPath);
-        previewLabel->clear();  // Limpiar cualquier texto o imagen anterior
+        previewLabel->clear();
         previewLabel->setPixmap(miniatura.scaled(
             previewLabel->size(),
             Qt::KeepAspectRatio,

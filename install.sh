@@ -12,7 +12,6 @@ sudo apt-get install -y \
   libyaml-cpp-dev
 
 echo "[2/4] Compilando proyecto y corriendo tests..."
-#make build-and-test
 
 echo "[3/4] Instalando archivos..."
 
@@ -80,7 +79,7 @@ Categories=Game;
 EOF
 
 echo "[3.2] Copiando accesos al escritorio del usuario actual..."
-DESKTOP_DIR="$USER_HOME/Desktop"
+DESKTOP_DIR="$(eval echo ~$SUDO_USER)/Desktop"
 
 mkdir -p "$DESKTOP_DIR"
 

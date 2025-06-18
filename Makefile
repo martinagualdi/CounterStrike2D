@@ -2,7 +2,7 @@
 
 build:
 	mkdir -p build/
-	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug $(EXTRA_GENERATE)
+	RUTA_BASE="" cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DINSTALADO=OFF $(EXTRA_GENERATE)
 	cmake --build  build/ $(EXTRA_COMPILE)
 
 run-tests:
@@ -17,5 +17,12 @@ clean:
 	find build/ -type d -name '*.dir' -exec rm -rf {} +
 	rm -f client server taller_editor taller_tests
 
-install: build-and-test
+install:
+	mkdir -p build-and-test/
+	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=debug -DINSTALADO=ON $(EXTRA_GENERATE)
+	cmake --build build/ $(EXTRA_COMPILE)
+	chmod +x uninstall.sh
 	sudo bash ./install.sh
+
+uninstall:
+	sudo bash ./uninstall.sh

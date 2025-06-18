@@ -1,6 +1,7 @@
 #include "editor_main_window.h"
 #include "draggable_label.h" 
 #include "clickable_label.h" 
+#include "../common_src/ruta_base.h"
 
 #include <yaml-cpp/yaml.h>
 #include <QVBoxLayout>
@@ -68,13 +69,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QString basePath = "/var/CounterStrike2D/assets/";
 
     TabInfo tabs[] = {
-        { "Fondos", basePath + "gfx/backgrounds/" },
-        { "Azteca", basePath + "gfx/aztec/" },
-        { "Dust",  basePath + "gfx/dust/" },
-        { "Inferno", basePath + "gfx/inferno/" },
-        { "Armas", basePath + "gfx/weapons/" },
-        { "Proteccion anti disparos", basePath + "gfx/proteccion_disparos/" },
+        { "Fondos", QString::fromStdString(RUTA_IMAGENES("backgrounds/")) },
+        { "Azteca", QString::fromStdString(RUTA_IMAGENES("aztec/")) },
+        { "Dust", QString::fromStdString(RUTA_IMAGENES("dust/")) },
+        { "Inferno", QString::fromStdString(RUTA_IMAGENES("inferno/")) },
+        { "Armas", QString::fromStdString(RUTA_IMAGENES("weapons/")) },
+        { "Proteccion anti disparos", QString::fromStdString(RUTA_IMAGENES("proteccion_disparos/")) },
     };
+
 
     QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp"};
 

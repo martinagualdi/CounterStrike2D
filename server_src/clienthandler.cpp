@@ -1,10 +1,10 @@
 #include "clienthandler.h"
+#include "../common_src/ruta_base.h"
+#include "../common_src/liberror.h"
 
 #include <utility>
 #include <filesystem>
 #include <syslog.h>
-
-#include "../common_src/liberror.h"
 
 ClientHandler::ClientHandler(Socket s, MonitorPartidas& monitor_partidas, int id): 
     skt(std::move(s)),
@@ -20,7 +20,7 @@ std::vector<std::pair<std::string, std::string>> ClientHandler::listar_mapas_dis
     namespace fs = std::filesystem;
     std::vector<std::pair<std::string, std::string>> mapas;
 
-    const std::string ruta = "/var/CounterStrike2D/server/mapas_disponibles";
+    const std::string ruta = RUTA_SERVER_BASE;
 
     for (const auto& entry : fs::directory_iterator(ruta)) {
         if (!entry.is_regular_file()) continue;

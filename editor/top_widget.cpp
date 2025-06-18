@@ -1,6 +1,7 @@
 #include "top_widget.h"
 #include "zona_rect_item.h"
 #include "grid_pixmap_item.h"
+#include "../common_src/ruta_base.h"
 #include <QMimeData>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
@@ -30,10 +31,9 @@ int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, i
     dialog.setComboBoxItems(opciones);
     dialog.setWindowTitle(titulo);
     dialog.setLabelText(label);
-    dialog.setOption(QInputDialog::UseListViewForComboBoxItems); // activa scroll automático
+    dialog.setOption(QInputDialog::UseListViewForComboBoxItems);
     dialog.setTextValue(QString::number(valorPorDefecto));
 
-    // Estilo opcional (como tenías antes)
     QString estilo = R"(
         QInputDialog {
             background-color: #2c2c2c;
@@ -509,8 +509,8 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
 
     QString basePath = QCoreApplication::applicationDirPath();
     QString imagenRelativa = (cantidad == 0)
-        ? "/var/CounterStrike2D/assets/gfx/plantacion_bombas/plantacion1.png"
-        : "/var/CounterStrike2D/assets/gfx/plantacion_bombas/plantacion2.png";
+        ? QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion1.png"))
+        : QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion2.png"));
     QString imagenAbsoluta = basePath + imagenRelativa;
     
     QPixmap pix(imagenAbsoluta);

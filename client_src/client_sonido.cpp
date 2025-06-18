@@ -1,4 +1,5 @@
 #include "client_sonido.h"
+#include "../common_src/ruta_base.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -11,26 +12,28 @@ Sonido::Sonido(const int client_id) :
     client_id(client_id),
     snapshot(),
     mixer(FRECUENCIA, MIX_DEFAULT_FORMAT, CANALES, TAM_BUFFER),
-    pickup("/var/CounterStrike2D/assets/sfx/items/pickup.wav"),
-    compra_balas("/var/CounterStrike2D/assets/sfx/items/ammo.wav"),
+    pickup(RUTA_SONIDO("items/pickup.wav").c_str()),
+    compra_balas(RUTA_SONIDO("items/ammo.wav").c_str()),
     equipo_win(),
     disparo_arma(),
     pasos()
-    {   
-        equipo_win.emplace_back("/var/CounterStrike2D/assets/sfx/radio/ctwin.ogg");
-        equipo_win.emplace_back("/var/CounterStrike2D/assets/sfx/radio/terwin.ogg"); 
-        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/knife_slash.wav");
-        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/glock18.wav");
-        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/ak47.wav");
-        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/m3.wav");
-        disparo_arma.emplace_back("/var/CounterStrike2D/assets/sfx/weapons/awp.wav");
-        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt1.wav");
-        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt2.wav");
-        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt3.wav");
-        pasos.emplace_back("/var/CounterStrike2D/assets/sfx/player/pl_dirt4.wav");
-        mixer.AllocateChannels(32);
-    }
+{   
+    equipo_win.emplace_back(RUTA_SONIDO("radio/ctwin.ogg").c_str());
+    equipo_win.emplace_back(RUTA_SONIDO("radio/terwin.ogg").c_str()); 
 
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/knife_slash.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/glock18.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/ak47.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/m3.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/awp.wav").c_str());
+
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt1.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt2.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt3.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt4.wav").c_str());
+
+    mixer.AllocateChannels(32);
+}
 
 void Sonido::reproducirPasos() {
     Uint32 ahora = SDL_GetTicks();

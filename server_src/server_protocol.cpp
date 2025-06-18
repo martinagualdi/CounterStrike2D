@@ -4,7 +4,8 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#define BYTES_JUGADORES 27
+
+#define BYTES_JUGADORES 28
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 
@@ -30,10 +31,12 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         return false;
     }
     std::vector<uint8_t> buffer;
-    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size() * BYTES_JUGADORES));
+    uint16_t largo_jugadores = htons(static_cast<uint16_t>(snapshot.info_jugadores.size()));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[0]);
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_jugadores)[1]);
     for (const InfoJugador& j : snapshot.info_jugadores) {
+        push_back_uint16_t(buffer, static_cast<uint16_t>(j.nombre.size()));
+        buffer.insert(buffer.end(), j.nombre.begin(), j.nombre.end());
         uint8_t id = static_cast<uint8_t>(j.id);
         buffer.push_back(id);
         push_back_uint32_t(buffer, static_cast<uint32_t>(j.pos_x * 100));
@@ -50,8 +53,14 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_moviendose); // Enviar si el jugador está moviéndose
         uint8_t esta_disparando = j.esta_disparando ? 0x01 : 0x00;
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
+        uint8_t tiene_bomba = j.tiene_bomba ? 0x01 : 0x00;
+        buffer.push_back(tiene_bomba); // Enviar si el jugador tiene la bomba
+        uint8_t esta_en_zona_de_plantar = j.esta_en_zona_de_plantar ? 0x01 : 0x00;
+        buffer.push_back(esta_en_zona_de_plantar); // Enviar si el jugador está en zona de plantar
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
+        uint8_t esta_desactivando_bomba = j.esta_desactivando_bomba ? 0x01 : 0x00;
+        buffer.push_back(esta_desactivando_bomba);
         uint8_t puede_comprar_ya = j.puede_comprar_ya ? 0x01 : 0x00;
         buffer.push_back(puede_comprar_ya); // Enviar si el jugador puede comprar ya
         uint8_t acaba_de_comprar_arma = j.acaba_de_comprar_arma ? 0x01 : 0x00;
@@ -64,6 +73,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(eliminaciones_esta_ronda); // Enviar las eliminaciones de esta ronda
         uint8_t eliminaciones_totales = static_cast<uint8_t>(j.eliminaciones_totales);
         buffer.push_back(eliminaciones_totales); // Enviar las eliminaciones totales del jugador
+        uint8_t muertes = static_cast<uint8_t>(j.muertes);
+        buffer.push_back(muertes); // Enviar las muertes del jugador
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
@@ -83,12 +94,23 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         push_back_uint32_t(buffer, static_cast<uint32_t>(arma.pos_y * 100));
         push_back_uint16_t(buffer, static_cast<uint16_t>(arma.municiones)); 
     }
+    
+    const InfoBomba& bomba = snapshot.bomba_en_suelo;
+    push_back_uint32_t(buffer, static_cast<uint32_t>(bomba.pos_x * 100));
+    push_back_uint32_t(buffer, static_cast<uint32_t>(bomba.pos_y * 100));
+    buffer.push_back(static_cast<uint8_t>(bomba.estado_bomba)); // Enviar el estado de la bomba
+    push_back_uint16_t(buffer, static_cast<uint16_t>(bomba.tiempo_para_detonar));
+    buffer.push_back(bomba.acaba_de_detonar ? 0x01 : 0x00);
+    buffer.push_back(bomba.acaba_de_ser_plantada ? 0x01 : 0x00);
+    buffer.push_back(bomba.acaba_de_ser_desactivada ? 0x01 : 0x00);
+
     push_back_uint16_t(buffer, static_cast<uint16_t>(snapshot.tiempo_restante)); //Enviar tiempo restante
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_ct)); // Enviar rondas ganadas CT
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.rondas_ganadas_tt)); // Enviar rondas ganadas TT
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.ronda_actual)); // Enviar ronda actual
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.total_rondas)); // Enviar total de rondas
     buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
+    buffer.push_back(snapshot.termino_partida ? 0x01 : 0x00); // Enviar si la partida terminó
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }
@@ -178,6 +200,13 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
         uint16_t id_partida;
         skt.recvall(&id_partida, sizeof(id_partida));
         comando.push_back(std::to_string(ntohs(id_partida)));
+        uint16_t largo_nombre;
+        skt.recvall(&largo_nombre, sizeof(largo_nombre));
+        largo_nombre = ntohs(largo_nombre);
+        std::vector<uint8_t> buffer(largo_nombre);
+        skt.recvall(buffer.data(), largo_nombre);
+        std::string nombre(buffer.begin(), buffer.end());
+        comando.push_back(nombre);
     } else if(codigo == PREFIJO_LISTAR) {
         comando.push_back("listar");
     }

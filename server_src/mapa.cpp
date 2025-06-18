@@ -25,6 +25,22 @@ Mapa::Mapa(std::string yamlPath) {
             tipo = PISO;
         } else if(tipo_str == "arma"){
             tipo = PISO;
+            /* HAY QUE MODIFICAR PARA QUE SE MUESTRE EL PISO Y ARRIBA EL ARMA, AGREGAR EL ARMA AL VECTOR DE ARMASDEFAULTENMAPA */
+            std::string aux = nodo["imagen"].as<std::string>();
+            const std::string prefix = "gfx/weapons/";
+            const std::string suffix = "_m.bmp";
+            size_t start = aux.find(prefix);
+            size_t end = aux.find(suffix);
+            std::string arma;
+            if (start != std::string::npos && end != std::string::npos) {
+                start += prefix.length();
+                arma = aux.substr(start, end - start);
+            }
+            ArmaDefaultDelMapa arma_default;
+            arma_default.nombre = arma;
+            arma_default.x = nodo["x"].as<int>();
+            arma_default.y = alto_mapa - nodo["y"].as<int>();
+            armas_en_suelo.push_back(arma_default);
         }
         elemento.tipo = tipo;
         elementos.push_back(elemento);
@@ -43,15 +59,19 @@ Mapa::Mapa(std::string yamlPath) {
             if (!zona_bombas_definida) {
                 zona_bombas.zona_bombas_a = definir_inicio(x, y, ancho, alto);
                 zona_bombas_definida = true;
+                cantidad_zonas_bombas++;
             }else {
                 zona_bombas.zona_bombas_b = definir_inicio(x, y, ancho, alto);
+                cantidad_zonas_bombas++;
             }
         }
     }
+    
     std::stringstream dto;
     dto << data;
     this->inicio_mapa_dto = dto.str();
 }
+
 
 Area Mapa::definir_inicio(const int x, const int y, const int ancho, const int alto) {
     Area inicio;
@@ -61,6 +81,20 @@ Area Mapa::definir_inicio(const int x, const int y, const int ancho, const int a
     inicio.alto = alto;
     return inicio;
 }
+
+bool Mapa::verificar_zona_bombas(float pos_x, float pos_y) {
+    
+    if (cantidad_zonas_bombas == 1){
+        return en_posicion_de_bomba_a(pos_x, pos_y);
+    }
+    else if (cantidad_zonas_bombas == 2) {
+        return en_posicion_de_bomba_a(pos_x, pos_y) || en_posicion_de_bomba_b(pos_x, pos_y);
+    } else {
+        std::cout << "Error: Cantidad de zonas de bombas no válida: " << cantidad_zonas_bombas << std::endl;
+        return false; // No hay zonas de bombas definidas
+    }
+}
+
 
 bool Mapa::jugador_colision_contra_pared(float pos_x, float pos_y) {
     float max_pos_x_jugador = pos_x + 20; 
@@ -105,12 +139,12 @@ bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
     return false;
 }
 
-std::vector<float> Mapa::dar_posiciones_iniciales(bool es_tt) {
+std::vector<float> Mapa::dar_posiciones_iniciales(enum Equipo equipo) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
     Area area_inicio;
-    if (es_tt) 
+    if (equipo == TT) 
         area_inicio = inicio_tt;
     else
         area_inicio = inicio_ct;
@@ -140,4 +174,23 @@ bool Mapa::en_posicion_de_compra(float pos_x, float pos_y, enum Equipo equipo) {
 
     return (pos_x >= min_pos_x_zona && pos_x <= max_pos_x_zona &&
             pos_y >= min_pos_y_zona && pos_y <= max_pos_y_zona);
+}
+
+bool Mapa::en_posicion_de_bomba_a(float pos_x, float pos_y) {
+    float max_pos_x_zona_a = zona_bombas.zona_bombas_a.x + zona_bombas.zona_bombas_a.ancho;
+    float min_pos_x_zona_a = zona_bombas.zona_bombas_a.x;
+    float max_pos_y_zona_a = zona_bombas.zona_bombas_a.y + zona_bombas.zona_bombas_a.alto;
+    float min_pos_y_zona_a = zona_bombas.zona_bombas_a.y;
+
+    return (pos_x >= min_pos_x_zona_a && pos_x <= max_pos_x_zona_a &&
+            pos_y >= min_pos_y_zona_a && pos_y <= max_pos_y_zona_a);
+}
+bool Mapa::en_posicion_de_bomba_b(float pos_x, float pos_y) {
+    float max_pos_x_zona_b = zona_bombas.zona_bombas_b.x + zona_bombas.zona_bombas_b.ancho;
+    float min_pos_x_zona_b = zona_bombas.zona_bombas_b.x;
+    float max_pos_y_zona_b = zona_bombas.zona_bombas_b.y + zona_bombas.zona_bombas_b.alto;
+    float min_pos_y_zona_b = zona_bombas.zona_bombas_b.y;
+
+    return (pos_x >= min_pos_x_zona_b && pos_x <= max_pos_x_zona_b &&
+            pos_y >= min_pos_y_zona_b && pos_y <= max_pos_y_zona_b);
 }

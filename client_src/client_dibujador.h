@@ -26,26 +26,38 @@ private:
     struct Mapa mapa;
     ParseadorSpriteSheets parseador;
     Snapshot snapshot;
+    enum EstadoBombaRonda estado_bomba_anterior;
+    bool explosion_en_progreso;
+    float explosion_alpha;
+    Uint32 explosion_last_ticks;
     Font fuente;
     Font fuenteChica;
     Color amarillo;
+    Color blanco;
+    Color verde;
+    Color rojo;
+    Color amarillento;
+    Color celeste;
+    Texture mensaje_bomba_plantada;
+    Texture mantenga_presionado_activar;
+    Texture mantenga_presionado_desactivar;
     Texture fondo_transparente;
     Texture balas;
     Texture cs2d;
-    Texture dropped_bomb;
     Texture player_legs;
     Texture muerto;
     Texture simbolos_hud;
     Texture numeros_hud;
     Texture sight;
     std::vector<Texture> armas;
-    std::vector<Texture> armas_mercado;
+    std::vector<Texture> armas_mercado_y_tiradas;
     std::vector<Texture> ct_players;
     std::vector<Texture> tt_players;
     std::vector<Texture> textos_skin;
     std::vector<Texture> ct_nombres;
     std::vector<Texture> tt_nombres;
     std::vector<Texture> esperando_jugadores;
+    std::vector<Texture> mensajes_ganadores;
     SDL_Rect sprite_arma;
     SDL_Rect sprite_bala;
     SDL_Rect sprite_sight;
@@ -58,7 +70,6 @@ private:
     void inicializar_textos();
     float convertir_angulo(float angulo);
     void convertir_a_pantalla(float pos_x, float pos_y, float& pantalla_x, float& pantalla_y);
-    void convertir_coordenadas(float &x, float &y);
     Texture crearTextoArma(std::string nombre, int precio);
     void dibujar_salud(int salud);
     void dibujar_saldo(int saldo, bool arma_con_balas);
@@ -74,11 +85,22 @@ private:
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
     void dibujar_simbolo_mercado();
+    void dibujar_simbolo_zona_detonar();
+    void dibujar_mantenga_presionado(bool activar);
     void dibujar_hud();
     void dibujar_mercado();
     void dibujar_mapa();
     void dibujar_esperando_jugadores();
     void dibujar_seleccionar_skin();
+    void dibujar_armas_tiradas();
+    void dibujar_explosion_bomba();
+    void dibujar_mensaje_ganador();
+    void dibujar_mensaje_bomba_plantada();
+    void dibujar_bomba_plantada();
+    void dibujar_vision_de_campo();
+    void dibujar_estadisticas();
+    void dibujar_estadisticas_jugador(std::vector<int>& col_x, 
+    int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);
     
 public:
     explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 

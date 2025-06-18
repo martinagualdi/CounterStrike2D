@@ -29,11 +29,12 @@ void Client::iniciar() {
         std::string mapa_inicial = protocolo.recibir_mapa();
         hilo_enviador.start();
         hilo_recibidor.start();
-        
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
         SDLTTF ttf;
         SDL_ShowCursor(SDL_DISABLE);
         Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ANCHO_MIN, ALTO_MIN, SDL_WINDOW_SHOWN);
+       // window.SetFullscreen(SDL_WINDOW_FULLSCREEN_DESKTOP);
         Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
         ClientMap mapa(mapa_inicial, renderer);
         EventHandler eventHandler(cola_enviador, cliente_id);
@@ -46,6 +47,7 @@ void Client::iniciar() {
 
             Snapshot snapshotActual;
             std::vector<Snapshot> snapshots;
+            //std::cout << "Voy a recibir snapshots..." << std::endl;
             while (cola_recibidor.try_pop(snapshotActual)) {
                 snapshots.push_back(snapshotActual);
             }
@@ -57,6 +59,7 @@ void Client::iniciar() {
                 dibujador.renderizar(snapshot);
                 puede_comprar = snapshot.getJugadorPorId(cliente_id)->puede_comprar_ya;
             }
+            //std::cout << "Voy a manejar eventos..." << std::endl;
             eventHandler.manejarEventos(clienteActivo, puede_comprar);
     
             auto t2 = std::chrono::steady_clock::now();

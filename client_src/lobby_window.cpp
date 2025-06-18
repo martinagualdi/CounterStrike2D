@@ -110,6 +110,8 @@ void LobbyWindow::onCrearClicked() {
         popup.exec();
         emit partidaSeleccionada();
         fadeOutAudioAndClose();
+    } else {
+        protocolo.enviar_mensaje("cancelled");
     }
 }
 
@@ -163,11 +165,16 @@ void LobbyWindow::onUnirseClicked() {
         return;
     }
 
-    protocolo.enviar_unirse_partida(id);
-
-    MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
-    popup.exec();
-    emit partidaSeleccionada();
-    fadeOutAudioAndClose();
-
+    protocolo.enviar_unirse_partida(id, username);
+    std::string resultado = protocolo.recibir_mensaje();
+    if (resultado == "failed") {
+        MensajePopup popup("Error", "La partida ya está llena.", this);
+        popup.exec();
+        return;
+    } else{
+        MensajePopup popup("Partida", QString("Unido a la partida %1").arg(id), this);
+        popup.exec();
+        emit partidaSeleccionada();
+        fadeOutAudioAndClose();
+    }
 }

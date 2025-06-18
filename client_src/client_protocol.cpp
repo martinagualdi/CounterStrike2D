@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 27
+#define BYTES_JUGADORES 31
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 #define RW_CLOSE 2
@@ -71,12 +71,19 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = largo_jugadores / BYTES_JUGADORES; 
+   size_t num_jugadores = static_cast<size_t>(largo_jugadores); // largo_jugadores / BYTES_JUGADORES; 
    Snapshot snapshot;
    while (num_jugadores > 0) {
+      InfoJugador info_jugador;
+      uint16_t largo_nombre;
+      socket.recvall(&largo_nombre, sizeof(largo_nombre));
+      largo_nombre = ntohs(largo_nombre);
+      std::vector<uint8_t> nombre_buffer(largo_nombre);
+      socket.recvall(nombre_buffer.data(), largo_nombre);
+      std::string nombre(nombre_buffer.begin(), nombre_buffer.end());
+      info_jugador.nombre = nombre;
       uint8_t buffer[BYTES_JUGADORES];
       socket.recvall(buffer, BYTES_JUGADORES);
-      InfoJugador info_jugador;
       info_jugador.id = static_cast<int>(buffer[0]);
       info_jugador.pos_x = static_cast<float>(ntohl(*(uint32_t*)&buffer[1])) / 100.0f;
       info_jugador.pos_y = static_cast<float>(ntohl(*(uint32_t*)&buffer[5])) / 100.0f;
@@ -89,13 +96,17 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_vivo = (buffer[17] == 0x01);
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
       info_jugador.esta_disparando = (buffer[19] == 0x01);
-      info_jugador.esta_plantando_bomba = (buffer[20] == 0x01);
-      info_jugador.puede_comprar_ya = (buffer[21] == 0x01); // Enviar si el jugador puede comprar ya
-      info_jugador.acaba_de_comprar_arma = (buffer[22] == 0x01); // Enviar si el jugador acaba de comprar arma
-      info_jugador.acaba_de_comprar_balas = (buffer[23] == 0x01); // Enviar si el jugador acaba de comprar balas
-      info_jugador.balas = static_cast<int>(buffer[24]); // Enviar la cantidad de balas del jugador
-      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[25]); // Enviar las eliminaciones de esta ronda
-      info_jugador.eliminaciones_totales = static_cast<int>(buffer[26]); // Enviar las eliminaciones totales del jugador
+      info_jugador.tiene_bomba = (buffer[20] == 0x01);
+      info_jugador.esta_en_zona_de_plantar = (buffer[21] == 0x01); // Enviar si el jugador está en zona de plantar
+      info_jugador.esta_plantando_bomba = (buffer[22] == 0x01);
+      info_jugador.esta_desactivando_bomba = (buffer[23]== 0x01);
+      info_jugador.puede_comprar_ya = (buffer[24] == 0x01); // Enviar si el jugador puede comprar ya
+      info_jugador.acaba_de_comprar_arma = (buffer[25] == 0x01); // Enviar si el jugador acaba de comprar arma
+      info_jugador.acaba_de_comprar_balas = (buffer[26] == 0x01); // Enviar si el jugador acaba de comprar balas
+      info_jugador.balas = static_cast<int>(buffer[27]); // Enviar la cantidad de balas del jugador
+      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[28]); // Enviar las eliminaciones de esta ronda
+      info_jugador.eliminaciones_totales = static_cast<int>(buffer[29]); // Enviar las eliminaciones totales del jugador
+      info_jugador.muertes = static_cast<int>(buffer[30]); // Enviar las muertes del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
@@ -131,6 +142,33 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       snapshot.armas_sueltas.push_back(info_arma);
       num_armas--;
    }
+
+   uint32_t bomba_pos_x, bomba_pos_y;
+   socket.recvall(&bomba_pos_x, sizeof(bomba_pos_x));
+   socket.recvall(&bomba_pos_y, sizeof(bomba_pos_y));
+   bomba_pos_x = ntohl(bomba_pos_x);
+   bomba_pos_y = ntohl(bomba_pos_y);
+
+   uint8_t estado;
+   socket.recvall(&estado, sizeof(estado));
+   snapshot.bomba_en_suelo.estado_bomba = static_cast<enum EstadoBombaRonda>(estado);
+
+   uint16_t tiempo_para_detonar;
+   socket.recvall(&tiempo_para_detonar, sizeof(tiempo_para_detonar));
+   tiempo_para_detonar = ntohs(tiempo_para_detonar);
+
+   uint8_t acaba_de_detonar, acaba_de_ser_plantada, acaba_de_ser_desactivada;
+   socket.recvall(&acaba_de_detonar, sizeof(acaba_de_detonar));
+   socket.recvall(&acaba_de_ser_plantada, sizeof(acaba_de_ser_plantada));
+   socket.recvall(&acaba_de_ser_desactivada, sizeof(acaba_de_ser_desactivada));
+
+   snapshot.bomba_en_suelo.pos_x = static_cast<float>(bomba_pos_x) / 100.0f;
+   snapshot.bomba_en_suelo.pos_y = static_cast<float>(bomba_pos_y) / 100.0f;
+   snapshot.bomba_en_suelo.tiempo_para_detonar = static_cast<int>(tiempo_para_detonar);
+   snapshot.bomba_en_suelo.acaba_de_detonar = (acaba_de_detonar == 0x01);
+   snapshot.bomba_en_suelo.acaba_de_ser_plantada = (acaba_de_ser_plantada == 0x01);
+   snapshot.bomba_en_suelo.acaba_de_ser_desactivada = (acaba_de_ser_desactivada == 0x01);
+
    /*RECIBO TIEMPO*/
    uint16_t tiempo_restante;
    socket.recvall(&tiempo_restante, sizeof(tiempo_restante));
@@ -148,7 +186,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    /*RECIBO EQUIPO GANADOR DE LA RONDA ACTUAL SI ES QUE HAY*/
    uint8_t equipo_ganador;
    socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
-   snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 
+   snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador);
+   /*RECIBO SI TERMINO PARTIDA*/
+   uint8_t termino_partida;
+   socket.recvall(&termino_partida, sizeof(termino_partida));
+   snapshot.termino_partida = (termino_partida == 0x01); 
    return snapshot;
 }
 
@@ -171,11 +213,14 @@ void ProtocoloCliente::enviar_crear_partida(std::string username) {
    }
 }
 
-void ProtocoloCliente::enviar_unirse_partida(int id_partida) {
+void ProtocoloCliente::enviar_unirse_partida(int id_partida, std::string& nombre) {
    std::vector<uint8_t> buffer; 
    uint8_t comando = PREFIJO_UNIRSE_PARTIDA;
    buffer.push_back(comando);
    push_back_uint16(buffer, (uint16_t)id_partida);
+   uint16_t largo_nombre = static_cast<uint16_t>(nombre.size());
+   push_back_uint16(buffer, largo_nombre);
+   buffer.insert(buffer.end(), nombre.begin(), nombre.end());
    if (!socket.sendall(buffer.data(), buffer.size())) {
       throw std::runtime_error("Error al enviar el comando de unirse a partida");
    }
@@ -221,6 +266,18 @@ std::string ProtocoloCliente::recibir_mapa() {
    std::string yaml_serializado(buffer.begin(), buffer.end());
 
    return yaml_serializado;
+}
+
+std::string ProtocoloCliente::recibir_mensaje() {
+    uint8_t len_bytes[2];
+    socket.recvall(len_bytes, 2);
+
+    uint16_t largo = (len_bytes[0] << 8) | len_bytes[1];
+
+    std::vector<uint8_t> buffer(largo);
+    socket.recvall(buffer.data(), largo);
+
+    return std::string(buffer.begin(), buffer.end());
 }
 
 std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista_mapas() {

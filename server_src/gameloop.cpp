@@ -246,6 +246,8 @@ void GameLoop::chequear_estados_jugadores(){
         j->reiniciar_compras();
         if (j->esta_disparando())
             j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
+        if (j->get_equipo() == TT && j->tiene_la_bomba()) 
+            j->set_puede_plantar(mapa.verificar_zona_bombas(j->getX(), j->getY()));
     }
 }
 
@@ -347,14 +349,14 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 break;
             case ACCION_SOBRE_BOMBA:
                 if (comando.estado_bomba == ACCIONANDO) {
-                    if (!bomba_plantada && jugador->get_equipo() == TT /*&&
-                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())*/) {
+                    if (!bomba_plantada && jugador->get_equipo() == TT &&
+                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())) {
                         jugador->empezar_a_plantar();
                         jugador_plantando = jugador;
                         tiempo_inicio_plantado = std::chrono::steady_clock::now();
                         std::cout << "Jugador " << jugador->getId() << " comenzó a plantar la bomba." << std::endl;
-                    }else if(bomba_plantada && jugador->get_equipo() == CT/*&&
-                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())*/) {
+                    }else if(bomba_plantada && jugador->get_equipo() == CT &&
+                        mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())) {
                         //Desactivar bomba
                         jugador->empezar_a_desactivar();
                         jugador_desactivando = jugador;
@@ -578,6 +580,10 @@ void GameLoop::realizar_cambio_equipo_si_es_necesario() {
     }
 }
 
+bool GameLoop::chequear_si_termino_partida() {
+    return ronda_actual > cant_rondas;
+}
+
 void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador){
     auto t_inicio = std::chrono::steady_clock::now();
     while (true) {
@@ -588,7 +594,8 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
         // Seguí enviando snapshots para que el cliente pueda actualizar sonidos/animaciones
         Snapshot snapshot(
             jugadores, balas_disparadas, armas_en_suelo, info_bomba,
-            t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador
+            t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador,
+            chequear_si_termino_partida()
         );
         
         queues_jugadores.broadcast(snapshot);
@@ -603,7 +610,6 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
     realizar_cambio_equipo_si_es_necesario();
     volver_jugadores_a_spawn();
     cargar_dinero_por_eliminaciones();
-    
 }
 
 bool GameLoop::esperando_jugadores() {
@@ -656,15 +662,15 @@ bool GameLoop::jugar_ronda(bool esperando) {
             eq_ganador = se_termino_ronda();
             if (esperando) {
                 chequear_si_completaron_equipos(eq_ganador, en_juego);
-                } else {
+            } else {
                 chequear_si_equipo_gano(eq_ganador, en_juego);
                 if (!en_juego) break;
-                }
+            }
             auto t_actual = std::chrono::steady_clock::now();
             auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
             int t_restante = tiempo_max_ronda - t_transcurrido;
             t_restante = (!esperando) ? t_restante : tiempo_max_ronda;
-            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba, t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador);
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba, t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador, false);
             queues_jugadores.broadcast(snapshot);
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } catch (const ClosedQueue &) {
@@ -684,5 +690,7 @@ void GameLoop::run() {
     jugar_ronda(true);
     while (activo) {
         jugar_ronda(false);
+        if (chequear_si_termino_partida()) 
+            activo = false;
     }
 }

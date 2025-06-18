@@ -73,6 +73,7 @@ struct InfoJugador {
     bool esta_moviendose;
     bool esta_disparando;
     bool tiene_bomba;
+    bool esta_en_zona_de_plantar;
     bool esta_plantando_bomba;
     bool esta_desactivando_bomba;
     bool puede_comprar_ya;
@@ -113,11 +114,12 @@ struct Snapshot {
     InfoRondas rondas_info;
     int tiempo_restante;
     enum Equipo equipo_ganador;
+    bool termino_partida;
 
     Snapshot() : info_jugadores(), balas_disparadas() {}
 
     Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas,BombaEnSuelo bomba_suelta, auto& t_restante, int rondas_ct, int rondas_tt, 
-        int ronda_actual, int total_rondas, enum Equipo equipo_ganador) {
+        int ronda_actual, int total_rondas, enum Equipo equipo_ganador, bool termino_partida) {
         for (const auto& jugador_ptr : jugadores) {
             InfoJugador info_jugador;
             info_jugador.id = jugador_ptr->getId();
@@ -134,6 +136,7 @@ struct Snapshot {
             info_jugador.esta_moviendose = jugador_ptr->esta_moviendose();
             info_jugador.esta_disparando = jugador_ptr->esta_disparando();
             info_jugador.tiene_bomba = jugador_ptr->posee_bomba();
+            info_jugador.esta_en_zona_de_plantar = jugador_ptr->puede_plantar_bomba_ya();
             info_jugador.esta_plantando_bomba = jugador_ptr->esta_plantando_bomba();
             info_jugador.esta_desactivando_bomba = jugador_ptr->esta_desactivando_bomba();
             info_jugador.puede_comprar_ya = jugador_ptr->puede_comprar_ahora();
@@ -180,6 +183,7 @@ struct Snapshot {
         rondas_info_actual.total_rondas = total_rondas;
         this->rondas_info = rondas_info_actual;
         this->equipo_ganador = equipo_ganador;
+        this->termino_partida = termino_partida;
     }
 
 

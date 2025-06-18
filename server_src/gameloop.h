@@ -66,6 +66,7 @@ class GameLoop : public Thread {
     void esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador);
     void asignar_bomba_si_es_necesario(bool esperando);
     void colocar_armas_del_mapa();
+    bool chequear_si_termino_partida();
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);

@@ -1,9 +1,13 @@
-#ifndef ARMADEFUEGO_H
-#define ARMADEFUEGO_H
+#ifndef ARMA_DE_FUEGO_H
+#define ARMA_DE_FUEGO_H
 
 #include <string>
 #include <random>
 #include "arma.h"
+
+class Ak47;
+class m3;
+class Awp;
 
 class ArmaDeFuego: public Arma {
 protected:
@@ -14,6 +18,8 @@ public:
 ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_danio, int max_danio, bool es_automatica, int municion_inicial, int municion_max, int cadencia)
     : Arma(nombre, precision, alcance, min_danio, max_danio, es_automatica, cadencia),
       municion_actual(municion_inicial), municion_max(municion_max){}
+
+    static ArmaDeFuego* crearArma(const std::string& nombre);
 
     virtual ~ArmaDeFuego() = default;
 

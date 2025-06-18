@@ -1,4 +1,4 @@
-#include "armaDeFuego.h"
+#include "arma_de_fuego.h"
 
 class Awp : public ArmaDeFuego {
 
@@ -18,30 +18,9 @@ public:
         Configuracion::get<int>("balas_max_awp"),
         1470) {}
 
-    int accion(float distancia) override {
-        if (municion_actual <= 0) return 0;
-        if (distancia > alcance) return 0; 
-        if (distancia*2.5>=alcance) precision = 1;
-        std::random_device rd; std::mt19937 gen(rd());
-        std::uniform_real_distribution<> hit(0.0, 1.0);
-        if (hit(gen) <= precision) {
-            return max_danio;
-        }
-        return 0;
-    }
+    int accion(float distancia) override;
 
-    bool puedeAccionar()  override {
-        auto ahora = std::chrono::steady_clock::now();
-        auto tiempo_transcurrido = std::chrono::duration_cast<std::chrono::milliseconds>(ahora - ultima_accion);
-        if (tiempo_transcurrido.count() >= cadencia_accion_ms && municion_actual > 0){
-            municion_actual--;
-            ultima_accion = std::chrono::steady_clock::now();
-            return true;
-        }
-        return false;
-    }
+    bool puedeAccionar() override;
 
-    enum ArmaEnMano getCodigoArma() const override {
-        return AWP;
-    }
+    enum ArmaEnMano getCodigoArma() const override { return AWP; }
 };

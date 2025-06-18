@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 30
+#define BYTES_JUGADORES 31
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 #define RW_CLOSE 2
@@ -97,15 +97,16 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.esta_moviendose = (buffer[18] == 0x01);
       info_jugador.esta_disparando = (buffer[19] == 0x01);
       info_jugador.tiene_bomba = (buffer[20] == 0x01);
-      info_jugador.esta_plantando_bomba = (buffer[21] == 0x01);
-      info_jugador.esta_desactivando_bomba = (buffer[22]== 0x01);
-      info_jugador.puede_comprar_ya = (buffer[23] == 0x01); // Enviar si el jugador puede comprar ya
-      info_jugador.acaba_de_comprar_arma = (buffer[24] == 0x01); // Enviar si el jugador acaba de comprar arma
-      info_jugador.acaba_de_comprar_balas = (buffer[25] == 0x01); // Enviar si el jugador acaba de comprar balas
-      info_jugador.balas = static_cast<int>(buffer[26]); // Enviar la cantidad de balas del jugador
-      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[27]); // Enviar las eliminaciones de esta ronda
-      info_jugador.eliminaciones_totales = static_cast<int>(buffer[28]); // Enviar las eliminaciones totales del jugador
-      info_jugador.muertes = static_cast<int>(buffer[29]); // Enviar las muertes del jugador
+      info_jugador.esta_en_zona_de_plantar = (buffer[21] == 0x01); // Enviar si el jugador está en zona de plantar
+      info_jugador.esta_plantando_bomba = (buffer[22] == 0x01);
+      info_jugador.esta_desactivando_bomba = (buffer[23]== 0x01);
+      info_jugador.puede_comprar_ya = (buffer[24] == 0x01); // Enviar si el jugador puede comprar ya
+      info_jugador.acaba_de_comprar_arma = (buffer[25] == 0x01); // Enviar si el jugador acaba de comprar arma
+      info_jugador.acaba_de_comprar_balas = (buffer[26] == 0x01); // Enviar si el jugador acaba de comprar balas
+      info_jugador.balas = static_cast<int>(buffer[27]); // Enviar la cantidad de balas del jugador
+      info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[28]); // Enviar las eliminaciones de esta ronda
+      info_jugador.eliminaciones_totales = static_cast<int>(buffer[29]); // Enviar las eliminaciones totales del jugador
+      info_jugador.muertes = static_cast<int>(buffer[30]); // Enviar las muertes del jugador
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
@@ -185,7 +186,11 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    /*RECIBO EQUIPO GANADOR DE LA RONDA ACTUAL SI ES QUE HAY*/
    uint8_t equipo_ganador;
    socket.recvall(&equipo_ganador, sizeof(equipo_ganador));
-   snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador); 
+   snapshot.equipo_ganador = static_cast<enum Equipo>(equipo_ganador);
+   /*RECIBO SI TERMINO PARTIDA*/
+   uint8_t termino_partida;
+   socket.recvall(&termino_partida, sizeof(termino_partida));
+   snapshot.termino_partida = (termino_partida == 0x01); 
    return snapshot;
 }
 

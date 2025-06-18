@@ -55,6 +55,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(esta_disparando); // Enviar si el jugador está disparando
         uint8_t tiene_bomba = j.tiene_bomba ? 0x01 : 0x00;
         buffer.push_back(tiene_bomba); // Enviar si el jugador tiene la bomba
+        uint8_t esta_en_zona_de_plantar = j.esta_en_zona_de_plantar ? 0x01 : 0x00;
+        buffer.push_back(esta_en_zona_de_plantar); // Enviar si el jugador está en zona de plantar
         uint8_t esta_plantando_bomba = j.esta_plantando_bomba ? 0x01 : 0x00;
         buffer.push_back(esta_plantando_bomba); // Enviar si el jugador está plantando bomba
         uint8_t esta_desactivando_bomba = j.esta_desactivando_bomba ? 0x01 : 0x00;
@@ -108,6 +110,7 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.ronda_actual)); // Enviar ronda actual
     buffer.push_back(static_cast<uint8_t>(snapshot.rondas_info.total_rondas)); // Enviar total de rondas
     buffer.push_back(static_cast<uint8_t>(snapshot.equipo_ganador)); // Enviar el equipo ganador
+    buffer.push_back(snapshot.termino_partida ? 0x01 : 0x00); // Enviar si la partida terminó
     skt.sendall(buffer.data(), buffer.size());
     return true;
 }

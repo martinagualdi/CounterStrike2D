@@ -866,7 +866,7 @@ void Dibujador::dibujar_hud() {
     dibujar_salud(jugador_principal->vida);
     dibujar_tiempo(snapshot.tiempo_restante);
     if(jugador_principal->puede_comprar_ya) dibujar_simbolo_mercado();
-    //if(jugador_principal->tiene_bomba && jugador_principal->esta_en_zona_de_detonar())
+    if(jugador_principal->tiene_bomba && jugador_principal->esta_en_zona_de_plantar)
         dibujar_simbolo_zona_detonar();
     if(jugador_principal->arma_en_mano != CUCHILLO){
         dibujar_balas_hud(jugador_principal->balas);

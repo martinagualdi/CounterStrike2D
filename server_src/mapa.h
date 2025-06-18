@@ -8,6 +8,12 @@
 
 typedef enum {FONDO, OBSTACULO, PISO, ARMA, INICIO_CT, INICIO_TT, ZONA_BOMBAS} TipoElementoMapa;
 
+struct ArmaDefaultDelMapa {
+    std::string nombre;
+    int x;
+    int y;
+};
+
 struct Area{
     int x;
     int y;
@@ -35,6 +41,7 @@ private:
     std::vector<ElementoDeMapa> elementos;
     std::string inicio_mapa_dto;
     int cantidad_zonas_bombas = 0;
+    std::vector<ArmaDefaultDelMapa> armas_en_suelo;
 
     Area definir_inicio(const int x, const int y, const int ancho, const int alto);
 
@@ -51,6 +58,7 @@ public:
     bool en_posicion_de_bomba_b(float pos_x, float pos_y);
     bool verificar_zona_bombas(float pos_x, float pos_y);
     int verificar_cantidad_zonas_bombas() const { return cantidad_zonas_bombas; }
+    std::vector<ArmaDefaultDelMapa> get_armas_default() const { return armas_en_suelo; }
 };
 
 #endif

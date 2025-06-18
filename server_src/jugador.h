@@ -8,7 +8,7 @@
 #include "m3.h"
 #include "awp.h"
 #include "bomba.h"
-#include "armaDeFuego.h"
+#include "arma_de_fuego.h"
 #include "../common_src/enums_jugador.h"
 #include "../common_src/comando_dto.h"
 

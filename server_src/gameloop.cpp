@@ -94,8 +94,14 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
             float distancia = std::sqrt(dx * dx + dy * dy);
             if (!esperando) {
                 jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
-                if (!jugador->esta_vivo())
+                if (!jugador->esta_vivo()) {
                     jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
+                    ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
+                    if (arma_que_suelta) {
+                        ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); // Deja su arma principal en el suelo
+                        armas_en_suelo.push_back(arma);
+                    }
+                }
             }
             return true;
         }
@@ -547,59 +553,29 @@ void GameLoop::chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en
         eq_ganador = NONE;
 }
 
-bool GameLoop::jugar_ronda(bool esperando) {
-    bool en_juego = true;
-    std::cout << "Iniciando ronda " << ronda_actual << std::endl;
-    auto t_inicio = std::chrono::steady_clock::now();
-    if (!esperando) {
-        // Buscar jugadores TT vivos y sin bomba
-        std::vector<Jugador*> tts_sin_bomba;
-        for (Jugador* jugador : equipo_tt) {
-            if (jugador->esta_vivo() && !jugador->posee_bomba()) {
-                tts_sin_bomba.push_back(jugador);
+void GameLoop::realizar_cambio_equipo_si_es_necesario() {
+    if (rondas_por_equipo + 1 == ronda_actual) {
+        int aux;
+        aux = cant_min_ct;
+        cant_min_ct = cant_min_tt;
+        cant_min_tt = aux;
+        aux = rondas_ganadas_ct;
+        rondas_ganadas_ct = rondas_ganadas_tt;
+        rondas_ganadas_tt = aux;
+        for (Jugador *jugador : jugadores) {
+            if (jugador->get_equipo() == CT) {
+                jugador->establecer_equipo(TT);
+                equipo_tt.push_back(jugador);
+                equipo_ct.erase(std::remove(equipo_ct.begin(), equipo_ct.end(), jugador), equipo_ct.end());
+            } else if (jugador->get_equipo() == TT) {
+                jugador->establecer_equipo(CT);
+                equipo_ct.push_back(jugador);
+                equipo_tt.erase(std::remove(equipo_tt.begin(), equipo_tt.end(), jugador), equipo_tt.end());
             }
-        }
-        if (!tts_sin_bomba.empty()) {
-            // Asignar la bomba a un TT aleatorio
-            size_t idx = static_cast<size_t>(std::rand()) % tts_sin_bomba.size();
-            tts_sin_bomba[idx]->asignar_bomba();
+            std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(jugador->get_equipo());
+            jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]);
         }
     }
-    enum Equipo eq_ganador = NONE;
-    while (activo && en_juego) {
-        try {
-            chequear_estados_jugadores();
-            if (!esperando)
-                chequear_si_pueden_comprar(t_inicio);
-            ejecucion_comandos_recibidos();
-            disparar_rafagas_restantes();
-            chequear_colisiones(esperando);
-            chequear_bomba_desactivada();
-            chequear_bomba_plantada();            
-            eq_ganador = se_termino_ronda();
-            if (esperando) {
-                chequear_si_completaron_equipos(eq_ganador, en_juego);
-                } else {
-                chequear_si_equipo_gano(eq_ganador, en_juego);
-                if (!en_juego) break;
-                }
-            auto t_actual = std::chrono::steady_clock::now();
-            auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
-            int t_restante = tiempo_max_ronda - t_transcurrido;
-
-            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba,(esperando) ? tiempo_max_ronda : t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador);
-            queues_jugadores.broadcast(snapshot);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        } catch (const ClosedQueue &) {
-            return false;
-        }
-    }
-    constexpr int tiempo_entre_rondas = 4;
-    int t_restante = 0; // o el valor que quieras mostrar en el cliente
-     
-    esperar_entre_rondas(tiempo_entre_rondas, t_restante, eq_ganador);
-
-    return true;
 }
 
 void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador){
@@ -622,7 +598,9 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
     }
+    armas_en_suelo.clear();
     reiniciar_estado_bomba();
+    realizar_cambio_equipo_si_es_necesario();
     volver_jugadores_a_spawn();
     cargar_dinero_por_eliminaciones();
     
@@ -631,6 +609,74 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
 bool GameLoop::esperando_jugadores() {
     return (equipo_ct.size() < static_cast<size_t>(cant_min_ct) ||
             equipo_tt.size() < static_cast<size_t>(cant_min_tt));
+}
+
+void GameLoop::asignar_bomba_si_es_necesario(bool esperando) {
+    if (!esperando) {
+        // Buscar jugadores TT vivos y sin bomba
+        std::vector<Jugador*> tts_sin_bomba;
+        for (Jugador* jugador : equipo_tt) {
+            if (jugador->esta_vivo() && !jugador->posee_bomba()) {
+                tts_sin_bomba.push_back(jugador);
+            }
+        }
+        if (!tts_sin_bomba.empty()) {
+            // Asignar la bomba a un TT aleatorio
+            size_t idx = static_cast<size_t>(std::rand()) % tts_sin_bomba.size();
+            tts_sin_bomba[idx]->asignar_bomba();
+        }
+    }
+}
+
+void GameLoop::colocar_armas_del_mapa() {
+    std::vector<ArmaDefaultDelMapa> armas_default = mapa.get_armas_default();
+    for (const auto& arma_default : armas_default) {
+        ArmaDeFuego* arma = ArmaDeFuego::crearArma(arma_default.nombre);
+        armas_en_suelo.push_back(ArmaEnSuelo(arma, arma_default.x, arma_default.y));
+    }
+}
+
+bool GameLoop::jugar_ronda(bool esperando) {
+    bool en_juego = true;
+    std::cout << "Iniciando ronda " << ronda_actual << std::endl;
+    auto t_inicio = std::chrono::steady_clock::now();
+    asignar_bomba_si_es_necesario(esperando);
+    colocar_armas_del_mapa();
+    enum Equipo eq_ganador = NONE;
+    while (activo && en_juego) {
+        try {
+            chequear_estados_jugadores();
+            if (!esperando)
+                chequear_si_pueden_comprar(t_inicio);
+            ejecucion_comandos_recibidos();
+            disparar_rafagas_restantes();
+            chequear_colisiones(esperando);
+            chequear_bomba_desactivada();
+            chequear_bomba_plantada();            
+            eq_ganador = se_termino_ronda();
+            if (esperando) {
+                chequear_si_completaron_equipos(eq_ganador, en_juego);
+                } else {
+                chequear_si_equipo_gano(eq_ganador, en_juego);
+                if (!en_juego) break;
+                }
+            auto t_actual = std::chrono::steady_clock::now();
+            auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
+            int t_restante = tiempo_max_ronda - t_transcurrido;
+            t_restante = (!esperando) ? t_restante : tiempo_max_ronda;
+            Snapshot snapshot(jugadores, balas_disparadas, armas_en_suelo, info_bomba, t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador);
+            queues_jugadores.broadcast(snapshot);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        } catch (const ClosedQueue &) {
+            return false;
+        }
+    }
+    constexpr int tiempo_entre_rondas = 4;
+    int t_restante = 0; // o el valor que quieras mostrar en el cliente
+     
+    esperar_entre_rondas(tiempo_entre_rondas, t_restante, eq_ganador);
+
+    return true;
 }
 
 void GameLoop::run() {

@@ -25,6 +25,22 @@ Mapa::Mapa(std::string yamlPath) {
             tipo = PISO;
         } else if(tipo_str == "arma"){
             tipo = PISO;
+            /* HAY QUE MODIFICAR PARA QUE SE MUESTRE EL PISO Y ARRIBA EL ARMA, AGREGAR EL ARMA AL VECTOR DE ARMASDEFAULTENMAPA */
+            std::string aux = nodo["imagen"].as<std::string>();
+            const std::string prefix = "gfx/weapons/";
+            const std::string suffix = "_m.bmp";
+            size_t start = aux.find(prefix);
+            size_t end = aux.find(suffix);
+            std::string arma;
+            if (start != std::string::npos && end != std::string::npos) {
+                start += prefix.length();
+                arma = aux.substr(start, end - start);
+            }
+            ArmaDefaultDelMapa arma_default;
+            arma_default.nombre = arma;
+            arma_default.x = nodo["x"].as<int>();
+            arma_default.y = alto_mapa - nodo["y"].as<int>();
+            armas_en_suelo.push_back(arma_default);
         }
         elemento.tipo = tipo;
         elementos.push_back(elemento);
@@ -50,6 +66,7 @@ Mapa::Mapa(std::string yamlPath) {
             }
         }
     }
+    
     std::stringstream dto;
     dto << data;
     this->inicio_mapa_dto = dto.str();

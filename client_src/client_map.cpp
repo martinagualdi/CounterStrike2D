@@ -38,11 +38,11 @@ struct Mapa ClientMap::parsearMapa() {
         if (tipo_str == "obstaculo") tipo = OBSTACULO;
         else if (tipo_str == "piso") tipo = PISO;
         else if (tipo_str == "arma") tipo = ARMA;
+        else if (tipo_str == "bombsite") tipo = BOMBSITE;
         else continue;
 
         mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
     }
-
     return mapa;
 }
 

@@ -1,6 +1,7 @@
 #include "editor_main_window.h"
 #include "draggable_label.h" 
 #include "clickable_label.h" 
+#include "../common_src/ruta_base.h"
 
 #include <yaml-cpp/yaml.h>
 #include <QVBoxLayout>
@@ -54,11 +55,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     mainLayout->addLayout(topBarLayout);
 
-    // Parte superior
     topWidget = new TopWidget;
     mainLayout->addWidget(topWidget);
 
-    //Pestañas
     QTabWidget* tabWidget = new QTabWidget;
     tabWidget->setFixedHeight(140);
 
@@ -67,14 +66,19 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QString dirPath;
     };
 
+    QString basePath = "/var/CounterStrike2D/assets/";
+
     TabInfo tabs[] = {
-        { "Fondos", "gfx/backgrounds/" },
-        { "Azteca", "gfx/aztec/" },
-        { "Dust",  "gfx/dust/" },
-        { "Inferno", "gfx/inferno/" },
-        { "Armas", "gfx/weapons/" },
-        { "Proteccion anti disparos", "gfx/proteccion_disparos/" },
+        { "Fondos", QString::fromStdString(RUTA_IMAGENES("backgrounds/")) },
+        { "Azteca", QString::fromStdString(RUTA_IMAGENES("aztec/")) },
+        { "Dust", QString::fromStdString(RUTA_IMAGENES("dust/")) },
+        { "Inferno", QString::fromStdString(RUTA_IMAGENES("inferno/")) },
+        { "Armas", QString::fromStdString(RUTA_IMAGENES("weapons/")) },
+        { "Proteccion anti disparos", QString::fromStdString(RUTA_IMAGENES("proteccion_disparos/")) },
     };
+
+
+    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp"};
 
     for (const auto& tab : tabs) {
         QScrollArea* scrollArea = new QScrollArea;
@@ -95,6 +99,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QStringList images = dir.entryList(filters, QDir::Files);
 
         for (const QString& imgName : images) {
+            if (tab.name == "Armas" && !armasPermitidas.contains(imgName))
+                continue;
+
             QString fullPath = dir.absoluteFilePath(imgName);
 
             QPixmap pixmap;
@@ -106,12 +113,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 for (int y = 0; y < img.height(); ++y) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
-                        if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
-                        }
+                        if (pixel == magenta)
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));
                     }
                 }
-
                 pixmap = QPixmap::fromImage(img);
             } else {
                 pixmap = QPixmap(fullPath);
@@ -145,6 +150,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         scrollArea->setWidget(container);
         tabWidget->addTab(scrollArea, tab.name);
     }
+
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);
@@ -234,8 +240,6 @@ void MainWindow::guardarMapa() {
 
     QTextStream out(&file);
     QString fondoPath = topWidget->getFondoPath();
-    if (fondoPath.startsWith('/'))
-        fondoPath.remove(0, 1);
     out << "fondo: " << fondoPath << "\n";
     out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
     out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
@@ -244,9 +248,7 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-        QString rutaRelativa = path.mid(e.path.indexOf("/gfx"));
-        if (rutaRelativa.startsWith('/'))
-            rutaRelativa.remove(0, 1);
+        QString rutaRelativa = path.mid(e.path.indexOf("/var"));
         out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
@@ -291,9 +293,8 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
     if (!fondo.startsWith('/'))
         fondo.prepend('/');
-    QString basePath = QCoreApplication::applicationDirPath();
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(basePath + fondo);
+    topWidget->setBackgroundPath(fondo);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
@@ -303,8 +304,7 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
         QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
         int x = elemento["x"].as<int>();
         int y = elemento["y"].as<int>();
-        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
-        topWidget->agregarElemento(fullPath, x, y);
+        topWidget->agregarElemento(imagen, x, y);
     }
 
     const auto& zonas = root["zonas"];

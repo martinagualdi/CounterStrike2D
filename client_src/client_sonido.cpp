@@ -1,4 +1,5 @@
 #include "client_sonido.h"
+#include "../common_src/ruta_base.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -13,35 +14,28 @@ Sonido::Sonido(const int client_id) :
     client_id(client_id),
     snapshot(),
     mixer(FRECUENCIA, MIX_DEFAULT_FORMAT, CANALES, TAM_BUFFER),
-    pickup("client_src/sfx/items/pickup.wav"),
-    compra_balas("client_src/sfx/items/ammo.wav"),
-    bomb_has_been_planted("client_src/sfx/radio/bombpl.ogg"),
-    bomb_has_been_defused("client_src/sfx/radio/bombdef.ogg"),
-    bomb_detonada("client_src/sfx/weapons/c4_explode.wav"),
-    bomb_beep("client_src/sfx/weapons/c4.wav"),
-    accionando_sobre_bomba("client_src/sfx/weapons/c4_disarm.wav"),
+    pickup(RUTA_SONIDO("items/pickup.wav").c_str()),
+    compra_balas(RUTA_SONIDO("items/ammo.wav").c_str()),
     equipo_win(),
     disparo_arma(),
-    pasos(),
-    equipo_ganador_anterior(NONE),
-    paso_actual(0),
-    ultimo_tick(0),
-    last_beep_ticks(0),
-    delay_pasos(250)
-    {   
-        equipo_win.emplace_back("client_src/sfx/radio/ctwin.ogg");
-        equipo_win.emplace_back("client_src/sfx/radio/terwin.ogg"); 
-        disparo_arma.emplace_back("client_src/sfx/weapons/ak47.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/m3.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/awp.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/knife_slash.wav");
-        disparo_arma.emplace_back("client_src/sfx/weapons/glock18.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt1.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt2.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt3.wav");
-        pasos.emplace_back("client_src/sfx/player/pl_dirt4.wav");
-        mixer.AllocateChannels(32);
-    }
+    pasos()
+{   
+    equipo_win.emplace_back(RUTA_SONIDO("radio/ctwin.ogg").c_str());
+    equipo_win.emplace_back(RUTA_SONIDO("radio/terwin.ogg").c_str()); 
+
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/knife_slash.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/glock18.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/ak47.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/m3.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/awp.wav").c_str());
+
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt1.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt2.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt3.wav").c_str());
+    pasos.emplace_back(RUTA_SONIDO("player/pl_dirt4.wav").c_str());
+
+    mixer.AllocateChannels(32);
+}
 
 int Sonido::volumen_segun_distancia(float x_jugador, float y_jugador, float x_sonido, float y_sonido) {
     float dx = x_jugador - x_sonido;
@@ -56,7 +50,6 @@ int Sonido::volumen_segun_distancia(float x_jugador, float y_jugador, float x_so
     float factor = 1.0f - (distancia - DISTANCIA_MIN) / (DISTANCIA_MAX - DISTANCIA_MIN);
     return static_cast<int>(MIX_MAX_VOLUME * factor);
 }
-
 
 void Sonido::reproducirPasos() {
     const InfoJugador* principal = snapshot.getJugadorPorId(client_id);

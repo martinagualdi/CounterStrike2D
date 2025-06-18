@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
+#include <QCoreApplication>
 
 EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
     auto* topWidget = new TopWidget;
@@ -15,7 +16,11 @@ EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
 }
 
 void EditorSeleccionMapa::seleccionarArchivo() {
-    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa", "editor/mapas", "Archivos YAML (*.yaml)");
+    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa",
+                                            "/var/CounterStrike2D/editor/mapas",
+                                            "Archivos YAML (*.yaml)");
+
+
     if (!ruta.isEmpty())
         emit mapaSeleccionado(ruta);
 

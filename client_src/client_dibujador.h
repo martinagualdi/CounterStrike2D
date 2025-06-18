@@ -11,15 +11,15 @@
 #include <SDL2pp/Font.hh>
 #include <SDL2pp/SDL2pp.hh>
 
-#define ANCHO_MIN 960
-#define ALTO_MIN 720
-#define CANT_PLAYERS 4
-
 using namespace SDL2pp; 
 
 class Dibujador{
 private:
     const int client_id;
+    int ancho_ventana;
+    int alto_ventana;
+    int ancho_real;
+    int alto_real;
     Renderer& renderer;
     EventHandler& eventHandler;
     Queue<Snapshot>& cola_recibidor;
@@ -105,8 +105,17 @@ private:
     int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);
     
 public:
-    explicit Dibujador(const int id, Renderer& renderer, struct Mapa mapa, 
-                EventHandler& handler, Queue<Snapshot>& cola_recibidor);
+    explicit Dibujador(
+    const int id,
+    Renderer& renderer,
+    struct Mapa mapa,
+    EventHandler& handler, 
+    Queue<Snapshot>& cola_recibidor,
+    int ancho_ventana,
+    int alto_ventana,
+    int ancho_real,
+    int alto_real
+    );
     void renderizar(Snapshot& snapshot);
     Dibujador(const Dibujador&) = delete;
     Dibujador& operator=(const Dibujador&) = delete;

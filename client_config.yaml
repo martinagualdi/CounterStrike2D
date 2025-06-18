@@ -1,0 +1,4 @@
+ancho_ventana: 960
+alto_ventana: 720
+fullscreen: true ## false -> Dimension fija, true -> Fullscreen
+fps: 30

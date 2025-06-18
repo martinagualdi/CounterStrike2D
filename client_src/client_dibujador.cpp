@@ -23,9 +23,21 @@
 #define CANT_ARMAS_MERCADO 3
 #define CANT_SKINS_PLAYER 4
 #define FADE_SPEED 100.0f
+#define CANT_PLAYERS 4
 
-Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHandler& handler, Queue<Snapshot>& cola_recibidor) : 
+Dibujador::Dibujador(const int id, Renderer& renderer, 
+    struct Mapa mapa,
+    EventHandler& handler,
+    Queue<Snapshot>& cola_recibidor,
+    int ancho_ventana,
+    int alto_ventana,
+    int ancho_real,
+    int alto_real) : 
     client_id(id),
+    ancho_ventana(ancho_ventana),
+    alto_ventana(alto_ventana),
+    ancho_real(ancho_real),
+    alto_real(alto_real),
     renderer(renderer),
     eventHandler(handler),
     cola_recibidor(cola_recibidor),
@@ -36,8 +48,8 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
     explosion_en_progreso(false),
     explosion_alpha(0.0f),
     explosion_last_ticks(0),
-    fuente("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_GRANDE),
-    fuenteChica("client_src/gfx/fonts/sourcesans.ttf", ALTO_MIN * ESCALA_LETRA_CHICA),
+    fuente("client_src/gfx/fonts/sourcesans.ttf", alto_ventana * ESCALA_LETRA_GRANDE),
+    fuenteChica("client_src/gfx/fonts/sourcesans.ttf", alto_ventana * ESCALA_LETRA_CHICA),
     amarillo(Color(255, 255, 0)),
     blanco(Color(255, 255, 255)),
     verde(Color(100, 220, 100)),
@@ -166,8 +178,8 @@ void Dibujador::convertir_a_pantalla(float pos_x, float pos_y, float& x_pixel, f
     const InfoJugador* jugador_principal = snapshot.getJugadorPorId(client_id);
     if (!jugador_principal) return;
 
-    float centro_x = ANCHO_MIN / 2.0f;
-    float centro_y = ALTO_MIN / 2.0f;
+    float centro_x = ancho_ventana  / 2.0f;
+    float centro_y = alto_ventana / 2.0f;
 
     x_pixel = pos_x - jugador_principal->pos_x + centro_x;
     y_pixel = - pos_y + jugador_principal->pos_y + centro_y;
@@ -266,7 +278,17 @@ void Dibujador::dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arm
 void Dibujador::dibujar_sight() {
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    Rect dst(mouseX - TAM_SIGHT / 2, mouseY - TAM_SIGHT / 2, TAM_SIGHT, TAM_SIGHT);
+
+    float escala = std::min(ancho_real / float(ancho_ventana), alto_real / (float)alto_ventana);
+    float offset_x = (ancho_real -float(ancho_ventana) * escala) / 2.0f;
+    float offset_y = (alto_real - (float)alto_ventana * escala) / 2.0f;
+
+    // Mouse a sistema lógico
+    float mouseX_logico = (mouseX - offset_x) / escala;
+    float mouseY_logico = (mouseY - offset_y) / escala;
+
+    // Dibuja el sight en sistema lógico
+    Rect dst(mouseX_logico - TAM_SIGHT / 2, mouseY_logico - TAM_SIGHT / 2, TAM_SIGHT, TAM_SIGHT);
     renderer.Copy(sight, sprite_sight, dst);
 }
 
@@ -312,13 +334,13 @@ void Dibujador::dibujar_salud(int salud) {
     int cant_digitos_salud = static_cast<int>(digitos_salud.size());
 
     Rect sprite_salud(sprites_simbolos_hud[SALUD]);
-    Rect salud_dst(0, ALTO_MIN - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
+    Rect salud_dst(0, alto_ventana - TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD, TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprite_salud, salud_dst);
 
     for(int i = 0; i < cant_digitos_salud; i++){
         Rect sprite_digito(sprites_numeros_hud[digitos_salud[i]]);
         int x = TAM_SIMBOLOS_HUD + i * (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD));
-        Rect dst(x, ALTO_MIN - TAM_SIMBOLOS_HUD, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
+        Rect dst(x, alto_ventana - TAM_SIMBOLOS_HUD, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
         renderer.Copy(numeros_hud, sprite_digito, dst);
     }
 
@@ -328,8 +350,8 @@ void Dibujador::dibujar_tiempo(int tiempo_restante) {
 
     Rect sprite_reloj(sprites_simbolos_hud[TIEMPO]);
     Rect reloj_dst;
-    reloj_dst.SetX((ANCHO_MIN / 2) - OFFSET_TIEMPO);
-    reloj_dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    reloj_dst.SetX((ancho_ventana  / 2) - OFFSET_TIEMPO);
+    reloj_dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     reloj_dst.SetW(TAM_SIMBOLOS_HUD);
     reloj_dst.SetH(TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprite_reloj, reloj_dst);
@@ -340,10 +362,10 @@ void Dibujador::dibujar_tiempo(int tiempo_restante) {
     std::vector<int> digitos_minutos = separar_digitos_tiempo(minutos);
     std::vector<int> digitos_segundos = separar_digitos_tiempo(segundos);
 
-    int pos_x = ANCHO_MIN / 2 - OFFSET_TIEMPO + TAM_SIMBOLOS_HUD;
+    int pos_x = ancho_ventana  / 2 - OFFSET_TIEMPO + TAM_SIMBOLOS_HUD;
 
     Rect tiempo_dst;
-    tiempo_dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    tiempo_dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     tiempo_dst.SetW(ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD));
     tiempo_dst.SetH(TAM_SIMBOLOS_HUD);
 
@@ -356,7 +378,7 @@ void Dibujador::dibujar_tiempo(int tiempo_restante) {
 
     Rect dos_puntos_dst;
     dos_puntos_dst.SetX(pos_x);
-    dos_puntos_dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    dos_puntos_dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     dos_puntos_dst.SetW(TAM_SIMBOLOS_HUD);
     dos_puntos_dst.SetH(TAM_SIMBOLOS_HUD);
     renderer.Copy(numeros_hud, sprites_numeros_hud[DOS_PUNTOS], dos_puntos_dst);
@@ -378,13 +400,13 @@ void Dibujador::dibujar_saldo(int saldo, bool arma_con_balas) {
     int x, y;
     
     if(arma_con_balas)
-        y = ALTO_MIN - OFFSET_SALDO * TAM_SIMBOLOS_HUD;
+        y = alto_ventana - OFFSET_SALDO * TAM_SIMBOLOS_HUD;
     else
-        y = ALTO_MIN - TAM_SIMBOLOS_HUD;
+        y = alto_ventana - TAM_SIMBOLOS_HUD;
 
     for(int i = 0; i < cant_digitos_dinero; i++){
         Rect sprite_digito(sprites_numeros_hud[digitos_dinero[cant_digitos_dinero - i - 1]]);
-        x = ANCHO_MIN - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
+        x = ancho_ventana  - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
         Rect dst(x , y, ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD), TAM_SIMBOLOS_HUD);
         renderer.Copy(numeros_hud, sprite_digito, dst);
     }
@@ -403,8 +425,8 @@ void Dibujador::dibujar_balas_hud(int balas) {
 
     for (int i = 0; i < cant_digitos_balas; i++){
         Rect sprite_digito(sprites_numeros_hud[digitos_balas[cant_digitos_balas - i - 1]]);
-        int x = ANCHO_MIN - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
-        int y = ALTO_MIN - TAM_SIMBOLOS_HUD;
+        int x = ancho_ventana  - (ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD)) * (i + 1);
+        int y = alto_ventana - TAM_SIMBOLOS_HUD;
         int w = ANCHO_NUMEROS_HUD - (64 - TAM_SIMBOLOS_HUD);
         int h = TAM_SIMBOLOS_HUD;
         Rect dst(x, y, w, h);
@@ -421,8 +443,8 @@ Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
 void Dibujador::dibujar_simbolo_mercado() {
 
     Rect dst;
-    dst.SetX(static_cast<int>(ANCHO_MIN * 5/8));
-    dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    dst.SetX(static_cast<int>(ancho_ventana  * 5/8));
+    dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     dst.SetW(TAM_SIMBOLOS_HUD);
     dst.SetH(TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprites_simbolos_hud[MERCADO], dst);
@@ -432,8 +454,8 @@ void Dibujador::dibujar_simbolo_mercado() {
 void Dibujador::dibujar_simbolo_tiene_bomba() {
 
     Rect dst;
-    dst.SetX(static_cast<int>(ANCHO_MIN * 5/8) + TAM_SIMBOLOS_HUD);
-    dst.SetY(ALTO_MIN - TAM_SIMBOLOS_HUD);
+    dst.SetX(static_cast<int>(ancho_ventana  * 5/8) + TAM_SIMBOLOS_HUD);
+    dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     dst.SetW(TAM_SIMBOLOS_HUD);
     dst.SetH(TAM_SIMBOLOS_HUD);
     renderer.Copy(simbolos_hud, sprites_simbolos_hud[ZONA_BOMBA], dst);
@@ -449,8 +471,8 @@ void Dibujador::dibujar_mantenga_presionado(bool activar) {
     int alto_mensaje = mantenga_presionado.GetHeight();
 
     Rect dst;
-    dst.SetX((ANCHO_MIN / 2) - ancho_mensaje / 2);
-    dst.SetY((ALTO_MIN / 3) - alto_mensaje/ 2);
+    dst.SetX((ancho_ventana  / 2) - ancho_mensaje / 2);
+    dst.SetY((alto_ventana / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
     renderer.Copy(mantenga_presionado, NullOpt, dst);
@@ -459,10 +481,10 @@ void Dibujador::dibujar_mantenga_presionado(bool activar) {
 
 void Dibujador::dibujar_cuadro_negro_transparente(Texture& titulo) {
 
-    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
-    int altoCuadro = ALTO_MIN - OFFSET_TRANSPARENTE;
-    int x = (ANCHO_MIN - anchoCuadro) / 2;
-    int y = (ALTO_MIN - altoCuadro) / 2; 
+    int anchoCuadro = ancho_ventana - OFFSET_TRANSPARENTE;
+    int altoCuadro = alto_ventana - OFFSET_TRANSPARENTE;
+    int x = (ancho_ventana  - anchoCuadro) / 2;
+    int y = (alto_ventana - altoCuadro) / 2; 
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
     renderer.SetDrawColor(0, 0, 0, 180);
@@ -478,8 +500,8 @@ void Dibujador::dibujar_mercado() {
     Texture titulo(renderer, fuente.RenderText_Blended("Comprar Armas", amarillo));
     dibujar_cuadro_negro_transparente(titulo);
 
-    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
-    int x = (ANCHO_MIN - anchoCuadro) / 2;
+    int anchoCuadro = ancho_ventana  - OFFSET_TRANSPARENTE;
+    int x = (ancho_ventana  - anchoCuadro) / 2;
 
     std::vector <Texture> textos;
     textos.push_back(crearTextoArma("[1] AK-47       ", 150));
@@ -502,7 +524,7 @@ void Dibujador::dibujar_mercado() {
         }
     }
 
-    int y_inicial = (ALTO_MIN - alto_total) / 2;
+    int y_inicial = (alto_ventana - alto_total) / 2;
     int y_pos = y_inicial;
 
     for (int i = 0; i < CANT_ARMAS_MERCADO; i++) {
@@ -511,10 +533,10 @@ void Dibujador::dibujar_mercado() {
         renderer.Copy(textos[i], NullOpt, dst_texto);
 
         Rect dst_arma;
-        dst_arma.SetX(ANCHO_MIN / 2 + 30);
+        dst_arma.SetX(ancho_ventana  / 2 + 30);
         dst_arma.SetY(y_pos);
-        dst_arma.SetW(ANCHO_MIN * ESCALA_ANCHO_ARMAS);
-        dst_arma.SetH(ALTO_MIN * ESCALA_ALTO_ARMAS);
+        dst_arma.SetW(ancho_ventana  * ESCALA_ANCHO_ARMAS);
+        dst_arma.SetH(alto_ventana * ESCALA_ALTO_ARMAS);
         renderer.Copy(armas_mercado_y_tiradas[i], NullOpt, dst_arma);
 
         int alto_texto = textos[i].GetHeight();
@@ -543,8 +565,8 @@ void Dibujador::dibujar_seleccionar_skin() {
     std::vector<Texture>& players = es_tt ? tt_players : ct_players;
 
     dibujar_cuadro_negro_transparente(textos_skin[0]);
-    int anchoCuadro = ANCHO_MIN - OFFSET_TRANSPARENTE;
-    int x = (ANCHO_MIN - anchoCuadro) / 2; 
+    int anchoCuadro = ancho_ventana  - OFFSET_TRANSPARENTE;
+    int x = (ancho_ventana  - anchoCuadro) / 2; 
 
     int alto_total = 0;
     for (int i = 0; i < CANT_SKINS_PLAYER; i++) {
@@ -557,7 +579,7 @@ void Dibujador::dibujar_seleccionar_skin() {
     }
 
     int x_inicial = x + OFFSET_NOMBRE_ARMAS;
-    int y_inicial = (ALTO_MIN - alto_total) / 2;
+    int y_inicial = (alto_ventana - alto_total) / 2;
     int y_pos = y_inicial + 30;
 
     for(int i = 0; i < CANT_SKINS_PLAYER; i++){
@@ -565,7 +587,7 @@ void Dibujador::dibujar_seleccionar_skin() {
         renderer.Copy(nombres[i], NullOpt, dst_nombre);
 
         int tam_skin = static_cast<int>(TAM_PLAYER * 1.5);
-        Rect dst_skin(ANCHO_MIN / 2 + ANCHO_MIN/4, y_pos, tam_skin, tam_skin);
+        Rect dst_skin(ancho_ventana  / 2 + ancho_ventana /4, y_pos, tam_skin, tam_skin);
         renderer.Copy(players[i], sprites_player[DOS_MANOS], dst_skin);
 
         int alto_texto = nombres[i].GetHeight();
@@ -615,7 +637,7 @@ void Dibujador::dibujar_explosion_bomba() {
 
         renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
         renderer.SetDrawColor(255, 255, 255, static_cast<Uint8>(explosion_alpha));
-        renderer.FillRect(0, 0, ANCHO_MIN, ALTO_MIN);
+        renderer.FillRect(0, 0, ancho_ventana , alto_ventana);
 
         explosion_alpha -= FADE_SPEED * delta_time;
         if (explosion_alpha <= 0.0f) {
@@ -633,8 +655,8 @@ void Dibujador::dibujar_mensaje_ganador() {
     int alto_mensaje = mensajes_ganadores[ganador].GetHeight();
 
     Rect dst;
-    dst.SetX((ANCHO_MIN / 2) - ancho_mensaje / 2);
-    dst.SetY((ALTO_MIN / 3) - alto_mensaje/ 2);
+    dst.SetX((ancho_ventana  / 2) - ancho_mensaje / 2);
+    dst.SetY((alto_ventana / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
     renderer.Copy(mensajes_ganadores[ganador], NullOpt, dst);
@@ -646,8 +668,8 @@ void Dibujador::dibujar_mensaje_bomba_plantada() {
     int alto_mensaje = mensaje_bomba_plantada.GetHeight();
 
     Rect dst;
-    dst.SetX((ANCHO_MIN / 2) - ancho_mensaje / 2);
-    dst.SetY((ALTO_MIN / 3) - alto_mensaje/ 2);
+    dst.SetX((ancho_ventana  / 2) - ancho_mensaje / 2);
+    dst.SetY((alto_ventana / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
     renderer.Copy(mensaje_bomba_plantada, NullOpt, dst);
@@ -674,21 +696,21 @@ void Dibujador::dibujar_vision_de_campo(float angulo_jugador) {
 
     renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
     renderer.SetDrawColor(0, 0, 0, 160);  // Fondo oscuro
-    renderer.FillRect(0, 0, ANCHO_MIN, ALTO_MIN);
+    renderer.FillRect(0, 0, ancho_ventana , alto_ventana);
 
     // 2. Círculo más claro (más transparente)
     renderer.SetDrawColor(0, 0, 0, 0); // o probá con 40, 60, 80
 
     int radio_centro = 55;
-    rellenarCirculoStencil(ANCHO_MIN / 2, ALTO_MIN / 2, radio_centro);
+    rellenarCirculoStencil(ancho_ventana  / 2, alto_ventana / 2, radio_centro);
     float angulo_fov = 90.0f;
     float direccion_centro = fmodf(angulo_jugador, 360.0f);
     if (direccion_centro < 0) direccion_centro += 360.0f;
-    float radio = std::sqrt(ANCHO_MIN * ANCHO_MIN + ALTO_MIN * ALTO_MIN);
+    float radio = std::sqrt(ancho_ventana  * ancho_ventana  + alto_ventana * alto_ventana);
 
     std::vector<SDL_Point> puntos;
-    int cx = ANCHO_MIN / 2;
-    int cy = ALTO_MIN / 2;
+    int cx = ancho_ventana  / 2;
+    int cy = alto_ventana / 2;
     puntos.push_back({cx, cy});
     float desde = direccion_centro - angulo_fov / 2.0f;
     float hasta = direccion_centro + angulo_fov / 2.0f;
@@ -750,8 +772,8 @@ void Dibujador::dibujar_estadisticas() {
     int alto_minimo = 250;
     int alto = std::max(alto_calculado, alto_minimo);
 
-    int x = (ANCHO_MIN-ancho)/2;
-    int y = (ALTO_MIN-alto)/2;
+    int x = (ancho_ventana - ancho)/2;
+    int y = (alto_ventana-alto)/2;
 
     int y_fila_inicial = y + 40;
 
@@ -844,8 +866,8 @@ void Dibujador::dibujar_mapa() {
         else if(elemento.tipo == OBSTACULO || elemento.tipo == PISO){
             float x_pixel, y_pixel;
             convertir_a_pantalla(elemento.dst.x, -elemento.dst.y, x_pixel, y_pixel);
-            if (x_pixel + elemento.dst.w >= 0 && x_pixel <= ANCHO_MIN &&
-                y_pixel + elemento.dst.h >= 0 && y_pixel <= ALTO_MIN) {
+            if (x_pixel + elemento.dst.w >= 0 && x_pixel <= ancho_ventana  &&
+                y_pixel + elemento.dst.h >= 0 && y_pixel <= alto_ventana) {
                 Rect dst(x_pixel, y_pixel, elemento.dst.w, elemento.dst.h);
                 renderer.Copy(*elemento.texture, NullOpt, dst);
             }
@@ -862,8 +884,8 @@ void Dibujador::dibujar_esperando_jugadores() {
     int alto_mensaje = esperando_jugadores[i].GetHeight();
 
     Rect dst_esperando;
-    dst_esperando.SetX((ANCHO_MIN / 2) -  esperando_jugadores[0].GetWidth() / 2);
-    dst_esperando.SetY((ALTO_MIN / 3) -  esperando_jugadores[0].GetWidth() / 2);
+    dst_esperando.SetX((ancho_ventana  / 2) -  esperando_jugadores[0].GetWidth() / 2);
+    dst_esperando.SetY((alto_ventana / 3) -  esperando_jugadores[0].GetWidth() / 2);
     dst_esperando.SetW(ancho_mensaje);
     dst_esperando.SetH(alto_mensaje);
     renderer.Copy(esperando_jugadores[i], NullOpt, dst_esperando);

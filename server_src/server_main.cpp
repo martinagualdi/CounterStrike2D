@@ -6,7 +6,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "server.h"
-#include "configuracion.h"
+#include "../common_src/configuracion.h"
 
 #define MIN_ARGUMNENTOS_SERVIDOR 2
 #define RET_ERROR 1

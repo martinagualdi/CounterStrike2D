@@ -10,12 +10,18 @@ sudo apt-get install libyaml-cpp-dev
 ```sh
 make
 ```
-
+###### **Para correr el instalador:**
+```sh
+make install
+```
+###### **Para eliminar instalaciones:**
+```sh
+make uninstall
+```
 ###### **Para borrar los ejecutables:**
 ```sh
 make clean
 ```
-
 ###### **Para ejecutar el servidor:**
 ```sh
 ./server configuracion.yaml
@@ -85,9 +91,10 @@ En ambos casos tener las siguientes consideraciones:
 
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
-Para guardar un mapa se debe presionar el boton de **Guardar** y seleccionar la carpeta **editor/mapas** (la cual se abre por default al presionar el boton). Al guardar un mapa se guardarán dos cosas: un **.yaml** y un **.jpg**, este ultimo es una imagen que se usaŕa de previsualizacion para la seleccion de mapa en el cliente. 
+Para guardar un mapa se debe presionar el boton de **Guardar** y se abrirá automaticamente la carpeta **editor/mapas**. Al guardar un mapa se guardarán dos cosas: un **.yaml** y un **.jpg**, este ultimo es una imagen que se usaŕa de previsualizacion para la seleccion de mapa en el cliente. 
 
-Para que un mapa pueda ser utilizado en el juego, su respectivo .yml y .jpg deben ser movidos **manualmente** al servidor en la carpeta **mapas_disponibles**.
+Al confirmar el guardado, ambos archivos se copiarán automaticamente en **server_src/mapas_disponibles**. 
+**OBS:** en caso de estar ejecutando el editor con la aplicacion generada por el instalador, los archivos tambien se copiarán en las rutas correspondientes para ser utilizadas tanto por el editor como por el server desde este modo sin necesidad de recompilar. 
 
 Al momento de editar un mapa ya existe se abre automaticamente esa carpeta (del editor) para que se seleccione el mapa deseado (el .yaml). Al finalizar la edición se debe guardar con el mismo nombre para reemplazar ambos archivos existentes por los nuevos que contienen los cambios realizados. 
 
@@ -110,5 +117,25 @@ Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion 
 - Hacer **click en la esquina inferior derecha** para redimencionar la zona. 
 
 - Hacer **doble click** en el centro de la zona para cambiarle el tipo a la misma.
+
+#### Instalador
+
+Al correr el debido comando el instalador hará cosas:
+
+1. make clean
+2. make
+3. Correr tests con valgrind
+4. Instalar todas las dependencias
+5. Posicionar 3 ejecutables en el escritorio con icono de aplicacion. 
+
+###### Para ejecutar el juego: 
+
+Hacer doble click en el icono del server y luego en el del cliente, es importante mantener el orden. De esta manera el juego funcionará igual que en modo developer. 
+
+###### Para ejecutar el editor: 
+
+Hacer doble click en el icono del editor, luego funcionará igual que en modo developer. 
+
+**IMPORTANTE:** en caso de que los iconos de aplicacion aparezcan con una **cruz** y un mensaje de que no permiten ser lanzadas, hacer click derecho sobre los mismos y habilitar dicho permiso (**allow launching**).
 
 

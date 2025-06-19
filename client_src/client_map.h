@@ -27,6 +27,7 @@ struct ElementoMapa{
     std::shared_ptr<Texture> texture;
     SDL_Rect dst;
     TipoElementoMapa tipo;
+    int prioridad;
 };
 
 class ClientMap {
@@ -36,6 +37,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Texture>> cache;
     struct Mapa mapa;
     std::shared_ptr<Texture> cargarTextura(const char* path);
+    void ordenarElementosPorPrioridad(std::vector<ElementoMapa>& elementos);
 
 public:
     explicit ClientMap(const std::string& map_str, Renderer& renderer);

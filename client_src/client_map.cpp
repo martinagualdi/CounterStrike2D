@@ -19,7 +19,8 @@ struct Mapa ClientMap::parsearMapa() {
     std::shared_ptr<Texture> tex = cargarTextura(path_fondo);
     SDL_Rect rect {0, 0, mapa.ancho_mapa_max, mapa.alto_mapa_max};
     TipoElementoMapa tipo = FONDO;
-    mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
+    int prioridad = 0;
+    mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo, prioridad});
 
     for (const auto& nodo : data["elementos"]) {
         if (!nodo["imagen"]) continue;
@@ -34,6 +35,8 @@ struct Mapa ClientMap::parsearMapa() {
         rect.w = nodo["ancho"].as<int>();
         rect.h = nodo["alto"].as<int>();
 
+        int prioridad = nodo["prioridad"].as<int>();
+
         std::string tipo_str = nodo["tipo"].as<std::string>();
         TipoElementoMapa tipo;
         if (tipo_str == "obstaculo") tipo = OBSTACULO;
@@ -42,9 +45,21 @@ struct Mapa ClientMap::parsearMapa() {
         else if (tipo_str == "bombsite") tipo = BOMBSITE;
         else continue;
 
-        mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo});
+        mapa.elementos.emplace_back(ElementoMapa{tex, rect, tipo, prioridad});
     }
+
+    ordenarElementosPorPrioridad(mapa.elementos);
+
     return mapa;
+}
+
+void ClientMap::ordenarElementosPorPrioridad(std::vector<ElementoMapa> &elementos) {
+
+    std::sort(elementos.begin(), elementos.end(), 
+    [](const ElementoMapa& a, const ElementoMapa& b) {
+        return a.prioridad < b.prioridad;
+    });
+
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {

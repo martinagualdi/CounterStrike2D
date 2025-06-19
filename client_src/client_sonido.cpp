@@ -15,19 +15,29 @@ Sonido::Sonido(const int client_id) :
     snapshot(),
     mixer(FRECUENCIA, MIX_DEFAULT_FORMAT, CANALES, TAM_BUFFER),
     pickup(RUTA_SONIDO("items/pickup.wav").c_str()),
-    compra_balas(RUTA_SONIDO("items/ammo.wav").c_str()),
+    compra_balas(RUTA_SONIDO("items/ammo.wav")),
+    bomb_has_been_planted(RUTA_SONIDO("radio/bombpl.ogg")),
+    bomb_has_been_defused(RUTA_SONIDO("radio/bombdef.ogg")),
+    bomb_detonada(RUTA_SONIDO("weapons/c4_explode.wav")),
+    bomb_beep(RUTA_SONIDO("weapons/c4.wav")),
+    accionando_sobre_bomba(RUTA_SONIDO("weapons/c4_disarm.wav")),
     equipo_win(),
     disparo_arma(),
-    pasos()
+    pasos(),
+    equipo_ganador_anterior(NONE),
+    paso_actual(0),
+    ultimo_tick(0),
+    last_beep_ticks(0),
+    delay_pasos(250)
 {   
     equipo_win.emplace_back(RUTA_SONIDO("radio/ctwin.ogg").c_str());
     equipo_win.emplace_back(RUTA_SONIDO("radio/terwin.ogg").c_str()); 
 
-    disparo_arma.emplace_back(RUTA_SONIDO("weapons/knife_slash.wav").c_str());
-    disparo_arma.emplace_back(RUTA_SONIDO("weapons/glock18.wav").c_str());
     disparo_arma.emplace_back(RUTA_SONIDO("weapons/ak47.wav").c_str());
     disparo_arma.emplace_back(RUTA_SONIDO("weapons/m3.wav").c_str());
     disparo_arma.emplace_back(RUTA_SONIDO("weapons/awp.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/knife_slash.wav").c_str());
+    disparo_arma.emplace_back(RUTA_SONIDO("weapons/glock18.wav").c_str());
 
     pasos.emplace_back(RUTA_SONIDO("player/pl_dirt1.wav").c_str());
     pasos.emplace_back(RUTA_SONIDO("player/pl_dirt2.wav").c_str());

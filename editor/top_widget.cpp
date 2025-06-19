@@ -108,7 +108,7 @@ void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
 }
 
 QString TopWidget::getFondoPath() const {
-    int idx = fondoPath.indexOf("/var");
+    int idx = fondoPath.indexOf("gfx/");
     if (idx != -1) {
         return fondoPath.mid(idx);
     }
@@ -132,6 +132,7 @@ QList<ElementoMapa> TopWidget::getElementos() const {
                     QPixmap pix = pixmapItem->pixmap();
                     elem.ancho = pix.width();
                     elem.alto = pix.height();
+                    elem.prioridad = item->zValue();
 
                     elementos.append(elem);
                 }
@@ -268,6 +269,7 @@ int TopWidget::zValueParaTipo(const QString& tipo) const {
     if (tipo == "obstaculo") return 2;
     if (tipo == "bombsite") return 3;
     if (tipo == "zona") return 4;
+    if (tipo == "arma") return 5;
     return 1;
 }
 
@@ -314,6 +316,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setZValue(zValueParaTipo(tipo));
             item->setData(2, pix.width());
             item->setData(3, pix.height());
+            item->setData(4, item->zValue());
 
             scene()->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
@@ -345,6 +348,7 @@ void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
         item->setData(1, "piso");
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
         scene()->addItem(item);
     }
 }
@@ -526,6 +530,7 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         item->setData(1, "bombsite");
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }
@@ -560,6 +565,7 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setZValue(zValueParaTipo(tipo));
         item->setData(2, pixmap.width());
         item->setData(3, pixmap.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }

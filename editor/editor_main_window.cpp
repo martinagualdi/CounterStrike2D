@@ -234,7 +234,7 @@ void MainWindow::guardarMapa() {
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "No se pudo abrir el archivo para escribir.";
+        qWarning() << "No se pudo abrir el archivo para escribir:" << file.errorString();
         return;
     }
 
@@ -248,13 +248,15 @@ void MainWindow::guardarMapa() {
     auto elementos = topWidget->getElementos();
     for (const auto& e : elementos) {
         QString path = e.path;
-        QString rutaRelativa = path.mid(e.path.indexOf("/var"));
+        int pos = path.indexOf("gfx/");
+        QString rutaRelativa = (pos != -1) ? path.mid(pos + 1) : path;
         out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
         out << "    ancho: " << e.ancho << "\n";
         out << "    alto: " << e.alto << "\n";
+        out << "    prioridad: " << e.prioridad << "\n";
     }
 
     out << "zonas:\n";
@@ -279,7 +281,7 @@ void MainWindow::guardarMapa() {
     if (!thumbnail.save(thumbPath, "JPG")) {
         qWarning() << "No se pudo guardar la miniatura del mapa.";
     }
-    
+
     QApplication::quit();
 }
 
@@ -290,21 +292,19 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     int alto  = root["alto_max_mapa"] ? root["alto_max_mapa"].as<int>() : 2048;
     topWidget->setTamanioMapaDesdeYAML(ancho, alto);
 
-    QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
-    if (!fondo.startsWith('/'))
-        fondo.prepend('/');
+    QString fondoRel = QString::fromStdString(root["fondo"].as<std::string>());
+    QString fondoPath = RUTA_BASE_IMAGENES + fondoRel;
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(fondo);
+    topWidget->setBackgroundPath(fondoPath);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-        if (!imagen.startsWith('/'))
-            imagen.prepend('/');
+        QString imagenRel = QString::fromStdString(elemento["imagen"].as<std::string>());
+        QString imagenPath = RUTA_BASE_IMAGENES + imagenRel;
         QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
         int x = elemento["x"].as<int>();
         int y = elemento["y"].as<int>();
-        topWidget->agregarElemento(imagen, x, y);
+        topWidget->agregarElemento(imagenPath, x, y);
     }
 
     const auto& zonas = root["zonas"];
@@ -331,5 +331,4 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
 
         topWidget->agregarZona(rect, tipoZona, id);
     }
-
 }

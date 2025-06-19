@@ -1,4 +1,5 @@
 #include "client_map.h"
+#include "../common_src/ruta_base.h"
 
 ClientMap::ClientMap(const std::string& map_str, Renderer& renderer) : 
     map_str(map_str),
@@ -47,19 +48,21 @@ struct Mapa ClientMap::parsearMapa() {
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {
-    auto it = cache.find(path);
+    std::string path_completo = std::string(RUTA_BASE_IMAGENES) + path;
+
+    auto it = cache.find(path_completo);
     if (it != cache.end())
         return it->second;
 
     try {
-        auto surface = IMG_Load(path);
+        auto surface = IMG_Load(path_completo.c_str());
         if (!surface) {
-            std::cerr << "No se pudo cargar la imagen: " << path << " - " << IMG_GetError() << std::endl;
+            std::cerr << "No se pudo cargar la imagen: " << path_completo << " - " << IMG_GetError() << std::endl;
             return nullptr;
         }
 
         auto texture = std::make_shared<Texture>(renderer, Surface(surface));
-        cache[path] = texture;
+        cache[path_completo] = texture;
         return texture;
 
     } catch (const std::exception& e) {

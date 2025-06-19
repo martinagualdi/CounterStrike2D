@@ -25,61 +25,74 @@
 #define CANT_SKINS_PLAYER 4
 #define FADE_SPEED 100.0f
 
-Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHandler& handler, Queue<Snapshot>& cola_recibidor)
-    : client_id(id),
-      renderer(renderer),
-      eventHandler(handler),
-      cola_recibidor(cola_recibidor),
-      mapa(mapa),
-      parseador(),
-      snapshot(),
-      fuente(RUTA_IMAGENES("fonts/sourcesans.ttf").c_str(), ALTO_MIN * ESCALA_LETRA_GRANDE),
-      fuenteChica(RUTA_IMAGENES("fonts/sourcesans.ttf").c_str(), ALTO_MIN * ESCALA_LETRA_CHICA),
-      amarillo(Color(255, 255, 0)),
-      fondo_transparente([&renderer]() {
-          SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
-          Surface surface(rawSurface);
-          Uint32 negroConAlpha = SDL_MapRGBA(surface.Get()->format, 0, 0, 0, 180);
-          surface.FillRect(NullOpt, negroConAlpha);
-          return Texture(renderer, surface);
-      }()),
-      balas(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("shells.png").c_str())))),
-      cs2d(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("gametitle.png").c_str())))),
-      dropped_bomb(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb_d.bmp").c_str())))),
-      player_legs(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("player/legs.bmp").c_str())))),
-      muerto(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("player/muerto.png").c_str())))),
-      simbolos_hud([&renderer]() {
-          Surface s(IMG_Load(RUTA_IMAGENES("hud_symbols.bmp").c_str()));
-          s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
-          Texture t(renderer, s);
-          t.SetAlphaMod(128);
-          t.SetColorMod(29, 140, 31);
-          return t;
-      }()),
-      numeros_hud([&renderer]() {
-          Surface s(IMG_Load(RUTA_IMAGENES("hud_nums.bmp").c_str()));
-          s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
-          Texture t(renderer, s);
-          t.SetAlphaMod(128);
-          t.SetColorMod(29, 140, 31);
-          return t;
-      }()),
-      sight([&renderer]() {
-          Surface s(IMG_Load(RUTA_IMAGENES("pointer.bmp").c_str()));
-          s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 255, 0, 255));
-          return Texture(renderer, s);
-      }()),
-      armas([&renderer]() {
-          std::vector<SDL2pp::Texture> textures;
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/knife.bmp").c_str())));
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/glock.bmp").c_str())));
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/ak47.bmp").c_str())));
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/m3.bmp").c_str())));
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/awp.bmp").c_str())));
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb.bmp").c_str())));
-          return textures;
-      }()),
-      armas_mercado([&renderer]() {
+Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHandler& handler, Queue<Snapshot>& cola_recibidor) : 
+    client_id(id),
+    renderer(renderer),
+    eventHandler(handler),
+    cola_recibidor(cola_recibidor),
+    mapa(mapa),
+    parseador(),
+    snapshot(),
+    estado_bomba_anterior(SIN_PLANTAR),
+    explosion_en_progreso(false),
+    explosion_alpha(0.0f),
+    explosion_last_ticks(0),
+    fuente(RUTA_IMAGENES("fonts/sourcesans.ttf"), ALTO_MIN * ESCALA_LETRA_GRANDE),
+    fuenteChica(RUTA_IMAGENES("fonts/sourcesans.ttf"), ALTO_MIN * ESCALA_LETRA_CHICA),
+    amarillo(Color(255, 255, 0)),
+    blanco(Color(255,255,255)),
+    verde(Color(100,220,100)),
+    rojo(Color(200,80,80)),
+    amarillento(Color(240,180,50)),
+    celeste(Color(80,200,255)),
+    mensaje_bomba_plantada(renderer, fuenteChica.RenderText_Blended("¡La bomba ha sido plantada!", amarillo)),
+    mantenga_presionado_activar(renderer, fuenteChica.RenderText_Blended
+    ("Mantenga presionado hasta finalizar el activado", amarillo)),
+    mantenga_presionado_desactivar(renderer, fuenteChica.RenderText_Blended
+    ("Mantenga presionado hasta finalizar el desactivado", amarillo)),
+    fondo_transparente([&renderer]() {
+        SDL_Surface* rawSurface = SDL_CreateRGBSurfaceWithFormat(0, 100, 100, 32, SDL_PIXELFORMAT_RGBA8888);
+        Surface surface(rawSurface);
+        Uint32 negroConAlpha = SDL_MapRGBA(surface.Get()->format, 0, 0, 0, 180);
+        surface.FillRect(NullOpt, negroConAlpha);
+        return Texture(renderer, surface);
+    }()),
+    balas(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("shells.png").c_str())))),
+    cs2d(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("gametitle.png").c_str())))),
+    player_legs(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("player/legs.bmp").c_str())))),
+    muerto(Texture(renderer, Surface(IMG_Load(RUTA_IMAGENES("player/muerto.png").c_str())))),
+    simbolos_hud([&renderer]() {
+        Surface s(IMG_Load(RUTA_IMAGENES("hud_symbols.bmp").c_str()));
+        s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
+        Texture t(renderer, s);
+        t.SetAlphaMod(128);
+        t.SetColorMod(29, 140, 31);
+        return t;
+    }()),
+    numeros_hud([&renderer]() {
+        Surface s(IMG_Load(RUTA_IMAGENES("hud_nums.bmp").c_str()));
+        s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 0, 0, 0));
+        Texture t(renderer, s);
+        t.SetAlphaMod(128);
+        t.SetColorMod(29, 140, 31);
+        return t;
+    }()),
+    sight([&renderer]() {
+        Surface s(IMG_Load(RUTA_IMAGENES("pointer.bmp").c_str()));
+        s.SetColorKey(true, SDL_MapRGB(s.Get()->format, 255, 0, 255));
+        return Texture(renderer, s);
+    }()),
+    armas([&renderer]() {
+        std::vector<SDL2pp::Texture> textures;
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/ak47.bmp").c_str())));
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/m3.bmp").c_str())));
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/awp.bmp").c_str())));
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb.bmp").c_str())));
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/knife.bmp").c_str())));
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/glock.bmp").c_str())));
+        return textures;
+    }()),
+      armas_mercado_y_tiradas([&renderer]() {
           Surface ak47(IMG_Load(RUTA_IMAGENES("weapons/ak47_m.bmp").c_str()));
           ak47.SetColorKey(true, SDL_MapRGB(ak47.Get()->format, 255, 0, 255));
 
@@ -93,35 +106,36 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
           textures.emplace_back(renderer, ak47);
           textures.emplace_back(renderer, m3);
           textures.emplace_back(renderer, awp);
+          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb_d.bmp").c_str())));
           return textures;
       }()),
-      ct_players([&renderer]() {
-          std::vector<SDL2pp::Texture> textures;
-          for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
-              std::string path = RUTA_IMAGENES("player/ct" + std::to_string(i) + ".bmp");
-              textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
-          }
-          return textures;
-      }()),
-      tt_players([&renderer]() {
-          std::vector<SDL2pp::Texture> textures;
-          for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
-              std::string path = RUTA_IMAGENES("player/t" + std::to_string(i) + ".bmp");
-              textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
-          }
-          return textures;
-      }()),
-      textos_skin(),
-      ct_nombres(),
-      tt_nombres(),
-      esperando_jugadores(),
-      sprite_arma(parseador.obtener_sprite_arma()),
-      sprite_bala(parseador.obtener_sprite_bala()),
-      sprite_sight(parseador.obtener_sprite_sight()),
-      sprites_player(parseador.obtener_sprites_jugador()),
-      sprites_player_legs(parseador.obtener_sprites_pies_jugador()),
-      sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
-      sprites_numeros_hud(parseador.obtener_sprites_numeros_hud()) 
+    ct_players([&renderer]() {
+        std::vector<SDL2pp::Texture> textures;
+        for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
+            std::string path = RUTA_IMAGENES("player/ct" + std::to_string(i) + ".bmp");
+            textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
+        }
+        return textures;
+    }()),
+    tt_players([&renderer]() {
+        std::vector<SDL2pp::Texture> textures;
+        for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {
+            std::string path = RUTA_IMAGENES("player/t" + std::to_string(i) + ".bmp");
+            textures.emplace_back(renderer, Surface(IMG_Load(path.c_str())));
+        }
+        return textures;
+    }()),
+    textos_skin(),
+    ct_nombres(),
+    tt_nombres(),
+    esperando_jugadores(),
+    sprite_arma(parseador.obtener_sprite_arma()),
+    sprite_bala(parseador.obtener_sprite_bala()),
+    sprite_sight(parseador.obtener_sprite_sight()),
+    sprites_player(parseador.obtener_sprites_jugador()),
+    sprites_player_legs(parseador.obtener_sprites_pies_jugador()),
+    sprites_simbolos_hud(parseador.obtener_sprites_simbolos_hud()),
+    sprites_numeros_hud(parseador.obtener_sprites_numeros_hud()) 
 {
     inicializar_textos();
 }

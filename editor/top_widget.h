@@ -19,6 +19,7 @@ struct ElementoMapa {
     QString tipo;
     int ancho;
     int alto;
+    int prioridad;
 };
 
 struct ZonaMapa {

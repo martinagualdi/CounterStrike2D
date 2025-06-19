@@ -37,3 +37,4 @@ public:
 
     enum ArmaEnMano getCodigoArma() const override { return AK_47; }
 };
+#endif

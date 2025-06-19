@@ -93,6 +93,7 @@ private:
     void limpiarPreviewZona();
     void eliminarZona(ZonaRectItem* zonaItem);
     int pedirDimensionMapa(const QString& titulo, const QString& label, int valorPorDefecto);
+    void eliminarPisoEnCelda(int x, int y);
 
 signals:
     void zonaCreada(const QString& tipo, const QRectF& zona);

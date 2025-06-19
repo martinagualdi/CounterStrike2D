@@ -310,8 +310,10 @@ void TopWidget::dropEvent(QDropEvent* event) {
             else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
 
                 tipo = "obstaculo";
-            else if(path.contains("piso"))
+            else if(path.contains("piso")){
+                eliminarPisoEnCelda(x, y);
                 tipo = "piso";
+            }
 
             item->setData(0, path);
             item->setData(1, tipo);
@@ -330,6 +332,21 @@ void TopWidget::dropEvent(QDropEvent* event) {
     event->acceptProposedAction();
 }
 
+void TopWidget::eliminarPisoEnCelda(int x, int y) {
+    const QList<QGraphicsItem*> items = scene()->items();
+    for (QGraphicsItem* item : items) {
+        if (item->zValue() == zValueParaTipo("piso") && item->data(1).toString() == "piso") {
+            QPointF pos = item->pos();
+            if (int(pos.x()) == x && int(pos.y()) == y) {
+                scene()->removeItem(item);
+                delete item;
+                break;
+            }
+        }
+    }
+}
+
+
 void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
     QPointF scenePos = mapToScene(pos);
     int x = int(scenePos.x()) / gridSize * gridSize;
@@ -338,6 +355,8 @@ void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
 
     if (celdasPintadas.contains(celda))
         return;
+
+    eliminarPisoEnCelda(x, y);
 
     celdasPintadas.insert(celda);
 

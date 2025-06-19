@@ -92,23 +92,23 @@ Dibujador::Dibujador(const int id, Renderer& renderer, struct Mapa mapa, EventHa
         textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/glock.bmp").c_str())));
         return textures;
     }()),
-      armas_mercado_y_tiradas([&renderer]() {
-          Surface ak47(IMG_Load(RUTA_IMAGENES("weapons/ak47_m.bmp").c_str()));
-          ak47.SetColorKey(true, SDL_MapRGB(ak47.Get()->format, 255, 0, 255));
+    armas_mercado_y_tiradas([&renderer]() {
+        Surface ak47(IMG_Load(RUTA_IMAGENES("weapons/ak47_m.bmp").c_str()));
+        ak47.SetColorKey(true, SDL_MapRGB(ak47.Get()->format, 255, 0, 255));
 
-          Surface m3(IMG_Load(RUTA_IMAGENES("weapons/m3_m.bmp").c_str()));
-          m3.SetColorKey(true, SDL_MapRGB(m3.Get()->format, 255, 0, 255));
+        Surface m3(IMG_Load(RUTA_IMAGENES("weapons/m3_m.bmp").c_str()));
+        m3.SetColorKey(true, SDL_MapRGB(m3.Get()->format, 255, 0, 255));
 
-          Surface awp(IMG_Load(RUTA_IMAGENES("weapons/awp_m.bmp").c_str()));
-          awp.SetColorKey(true, SDL_MapRGB(awp.Get()->format, 255, 0, 255));
+        Surface awp(IMG_Load(RUTA_IMAGENES("weapons/awp_m.bmp").c_str()));
+        awp.SetColorKey(true, SDL_MapRGB(awp.Get()->format, 255, 0, 255));
 
-          std::vector<SDL2pp::Texture> textures;
-          textures.emplace_back(renderer, ak47);
-          textures.emplace_back(renderer, m3);
-          textures.emplace_back(renderer, awp);
-          textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb_d.bmp").c_str())));
-          return textures;
-      }()),
+        std::vector<SDL2pp::Texture> textures;
+        textures.emplace_back(renderer, ak47);
+        textures.emplace_back(renderer, m3);
+        textures.emplace_back(renderer, awp);
+        textures.emplace_back(renderer, Surface(IMG_Load(RUTA_IMAGENES("weapons/bomb_d.bmp").c_str())));
+        return textures;
+    }()),
     ct_players([&renderer]() {
         std::vector<SDL2pp::Texture> textures;
         for (int i = 1; i <= CANT_SKINS_PLAYER; ++i) {

@@ -23,6 +23,9 @@
 #include <QApplication>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -218,10 +221,11 @@ bool MainWindow::zonasValidadas(){
 
 void MainWindow::guardarMapa() {
     if (!zonasValidadas()) return;
+
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        "editor/mapas",
+        RUTA_BASE_EDITOR,
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
@@ -282,8 +286,40 @@ void MainWindow::guardarMapa() {
         qWarning() << "No se pudo guardar la miniatura del mapa.";
     }
 
+    // ============================
+    // COPIAR A RUTA LOCAL DEL PROYECTO
+    // ============================
+#ifdef INSTALADO
+    QString nombreArchivo = QFileInfo(fileName).fileName();
+
+    // Obtener ruta absoluta al proyecto a partir de __FILE__
+    QString rutaProyectoLocal = QString(__FILE__);
+    rutaProyectoLocal.chop(QString("editor/editor_main_window.cpp").length());
+    QString rutaEditorMapasLocal = rutaProyectoLocal + "editor/mapas";
+
+    QDir().mkpath(rutaEditorMapasLocal);
+
+    QString destinoYaml = rutaEditorMapasLocal + "/" + nombreArchivo;
+    QFile::remove(destinoYaml);
+    if (!QFile::copy(fileName, destinoYaml)) {
+        qWarning() << "Error al copiar YAML a ruta local del proyecto.";
+    } else {
+        qDebug() << "YAML copiado correctamente a:" << destinoYaml;
+    }
+
+    QString destinoThumb = destinoYaml;
+    destinoThumb.replace(".yaml", ".jpg");
+    QFile::remove(destinoThumb);
+    if (!QFile::copy(thumbPath, destinoThumb)) {
+        qWarning() << "Error al copiar miniatura a ruta local del proyecto.";
+    } else {
+        qDebug() << "Miniatura copiada correctamente a:" << destinoThumb;
+    }
+#endif
+
     QApplication::quit();
 }
+
 
 void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());

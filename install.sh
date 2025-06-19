@@ -25,11 +25,14 @@ sudo mkdir -p /usr/share/pixmaps
 sudo mkdir -p /var/$TP_NAME/editor/mapas
 sudo mkdir -p /var/$TP_NAME/server/mapas_disponibles
 
+sudo rm -rf /var/$TP_NAME/editor/mapas/*
+
 sudo cp ./client /usr/bin/$TP_NAME-client
 sudo cp ./server /usr/bin/$TP_NAME-server
 sudo cp ./taller_editor /usr/bin/$TP_NAME-editor
 sudo cp -r editor/mapas /var/$TP_NAME/editor/
 sudo cp -r server_src/mapas_disponibles/* /var/$TP_NAME/server/mapas_disponibles/
+
 
 sudo cp configuracion.yaml /etc/$TP_NAME/
 if [ -d config ]; then
@@ -52,7 +55,7 @@ Type=Application
 Name=CounterStrike2D Editor
 Exec=/usr/bin/$TP_NAME-editor
 Icon=$TP_NAME-editor
-Terminal=false
+Terminal=true
 Categories=Game;
 EOF
 

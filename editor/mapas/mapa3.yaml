@@ -1,0 +1,23 @@
+fondo: gfx/backgrounds/mars.png
+ancho_max_mapa: 640
+alto_max_mapa: 640
+elementos:
+zonas:
+  - tipo: inicio_ct
+    x: 35
+    y: 28
+    ancho: 577
+    alto: 111
+    id: "5df6344f-d9da-488d-bbbf-18141891051c"
+  - tipo: inicio_tt
+    x: 39
+    y: 192
+    ancho: 573
+    alto: 123
+    id: "8af379e0-e9b1-4c90-be62-fb7de476cec2"
+  - tipo: zona_bombas
+    x: 48
+    y: 368
+    ancho: 555
+    alto: 113
+    id: "9aa77498-72d3-472b-a94a-e86fac939d4e"

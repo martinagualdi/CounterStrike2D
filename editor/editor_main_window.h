@@ -15,6 +15,7 @@ public:
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     bool zonasValidadas();
+    void copiarMapaA(const QString& destinoDirectorio, const QString& origenYaml, const QString& origenJpg, const QString& nombreArchivo);
 private:
     TopWidget* topWidget;
     QString backgroundPath;

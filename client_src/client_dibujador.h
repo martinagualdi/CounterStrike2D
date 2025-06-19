@@ -26,7 +26,7 @@ private:
     struct Mapa mapa;
     ParseadorSpriteSheets parseador;
     Snapshot snapshot;
-    bool estado_bomba_anterior;
+    enum EstadoBombaRonda estado_bomba_anterior;
     bool explosion_en_progreso;
     float explosion_alpha;
     Uint32 explosion_last_ticks;
@@ -39,6 +39,8 @@ private:
     Color amarillento;
     Color celeste;
     Texture mensaje_bomba_plantada;
+    Texture mantenga_presionado_activar;
+    Texture mantenga_presionado_desactivar;
     Texture fondo_transparente;
     Texture balas;
     Texture cs2d;
@@ -63,7 +65,6 @@ private:
     std::vector<SDL_Rect> sprites_player_legs;
     std::vector<SDL_Rect> sprites_simbolos_hud;
     std::vector<SDL_Rect> sprites_numeros_hud;
-
     std::vector<int> separar_digitos(int n);
     std::vector<int> separar_digitos_tiempo(int n);
     void inicializar_textos();
@@ -84,6 +85,8 @@ private:
     void dibujar_arma(float x, float y, float angulo, enum ArmaEnMano arma_actual);
     void dibujar_sight();
     void dibujar_simbolo_mercado();
+    void dibujar_simbolo_zona_detonar();
+    void dibujar_mantenga_presionado(bool activar);
     void dibujar_hud();
     void dibujar_mercado();
     void dibujar_mapa();
@@ -93,6 +96,7 @@ private:
     void dibujar_explosion_bomba();
     void dibujar_mensaje_ganador();
     void dibujar_mensaje_bomba_plantada();
+    void dibujar_bomba_plantada();
     void dibujar_vision_de_campo();
     void dibujar_estadisticas();
     void dibujar_estadisticas_jugador(std::vector<int>& col_x, 

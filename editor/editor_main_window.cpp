@@ -1,6 +1,7 @@
 #include "editor_main_window.h"
 #include "draggable_label.h" 
 #include "clickable_label.h" 
+#include "../common_src/ruta_base.h"
 
 #include <yaml-cpp/yaml.h>
 #include <QVBoxLayout>
@@ -22,6 +23,9 @@
 #include <QApplication>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -54,11 +58,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
 
     mainLayout->addLayout(topBarLayout);
 
-    // Parte superior
     topWidget = new TopWidget;
     mainLayout->addWidget(topWidget);
 
-    //Pestañas
     QTabWidget* tabWidget = new QTabWidget;
     tabWidget->setFixedHeight(140);
 
@@ -67,14 +69,19 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QString dirPath;
     };
 
+    QString basePath = "/var/CounterStrike2D/assets/";
+
     TabInfo tabs[] = {
-        { "Fondos", "gfx/backgrounds/" },
-        { "Azteca", "gfx/aztec/" },
-        { "Dust",  "gfx/dust/" },
-        { "Inferno", "gfx/inferno/" },
-        { "Armas", "gfx/weapons/" },
-        { "Proteccion anti disparos", "gfx/proteccion_disparos/" },
+        { "Fondos", QString::fromStdString(RUTA_IMAGENES("backgrounds/")) },
+        { "Azteca", QString::fromStdString(RUTA_IMAGENES("aztec/")) },
+        { "Dust", QString::fromStdString(RUTA_IMAGENES("dust/")) },
+        { "Inferno", QString::fromStdString(RUTA_IMAGENES("inferno/")) },
+        { "Armas", QString::fromStdString(RUTA_IMAGENES("weapons/")) },
+        { "Proteccion anti disparos", QString::fromStdString(RUTA_IMAGENES("proteccion_disparos/")) },
     };
+
+
+    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp"};
 
     for (const auto& tab : tabs) {
         QScrollArea* scrollArea = new QScrollArea;
@@ -95,6 +102,9 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QStringList images = dir.entryList(filters, QDir::Files);
 
         for (const QString& imgName : images) {
+            if (tab.name == "Armas" && !armasPermitidas.contains(imgName))
+                continue;
+
             QString fullPath = dir.absoluteFilePath(imgName);
 
             QPixmap pixmap;
@@ -106,12 +116,10 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 for (int y = 0; y < img.height(); ++y) {
                     for (int x = 0; x < img.width(); ++x) {
                         QRgb pixel = img.pixel(x, y);
-                        if ((pixel == magenta)) {
-                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));//Transparente, filtrando el magenta
-                        }
+                        if (pixel == magenta)
+                            img.setPixelColor(x, y, QColor(0, 0, 0, 0));
                     }
                 }
-
                 pixmap = QPixmap::fromImage(img);
             } else {
                 pixmap = QPixmap(fullPath);
@@ -145,6 +153,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         scrollArea->setWidget(container);
         tabWidget->addTab(scrollArea, tab.name);
     }
+
     mainLayout->addWidget(tabWidget);
     setAcceptDrops(true);
     topWidget->setAcceptDrops(true);
@@ -210,49 +219,77 @@ bool MainWindow::zonasValidadas(){
     return true;
 }
 
+void MainWindow::copiarMapaA(const QString& destinoDirectorio, const QString& origenYaml, const QString& origenJpg, const QString& nombreArchivo) {
+    QDir dir(destinoDirectorio);
+    dir.mkpath(".");
+
+    QString destinoYaml = dir.filePath(nombreArchivo);  // arma correctamente la ruta sin importar si termina en "/"
+    QFile::remove(destinoYaml);
+    if (!QFile::copy(origenYaml, destinoYaml)) {
+        qWarning() << "Error al copiar YAML a" << destinoYaml;
+    } else {
+        qDebug() << "YAML copiado correctamente a:" << destinoYaml;
+    }
+
+    QString destinoThumb = destinoYaml;
+    destinoThumb.replace(".yaml", ".jpg");
+    QFile::remove(destinoThumb);
+    if (!QFile::copy(origenJpg, destinoThumb)) {
+        qWarning() << "Error al copiar miniatura a" << destinoThumb;
+    } else {
+        qDebug() << "Miniatura copiada correctamente a:" << destinoThumb;
+    }
+}
+
 void MainWindow::guardarMapa() {
     if (!zonasValidadas()) return;
+
+    QString rutaProyecto = QString(__FILE__);
+    rutaProyecto.chop(QString("editor/editor_main_window.cpp").length());
+
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        "editor/mapas",
+        rutaProyecto + "editor/mapas",
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
-    if (fileName.isEmpty())
-        return;
-
+    if (fileName.isEmpty()) return;
     if (!fileName.endsWith(".yaml", Qt::CaseInsensitive)) {
         fileName += ".yaml";
     }
 
+    QString nombreArchivo = QFileInfo(fileName).fileName();
+
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "No se pudo abrir el archivo para escribir.";
+        qWarning() << "No se pudo abrir el archivo para escribir:" << file.errorString();
+        QMessageBox::critical(this, "Error", "No se pudo guardar el mapa:\n" + file.errorString());
         return;
     }
 
     QTextStream out(&file);
+
     QString fondoPath = topWidget->getFondoPath();
-    if (fondoPath.startsWith('/'))
-        fondoPath.remove(0, 1);
-    out << "fondo: " << fondoPath << "\n";
+    int posFondo = fondoPath.indexOf("gfx/");
+    QString fondoRelativo = (posFondo != -1) ? fondoPath.mid(posFondo + 4) : fondoPath;
+    out << "fondo: " << fondoRelativo << "\n";
+
     out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
     out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
     out << "elementos:\n";
 
-    auto elementos = topWidget->getElementos();
-    for (const auto& e : elementos) {
+    for (const auto& e : topWidget->getElementos()) {
         QString path = e.path;
-        QString rutaRelativa = path.mid(e.path.indexOf("/gfx"));
-        if (rutaRelativa.startsWith('/'))
-            rutaRelativa.remove(0, 1);
+        int pos = path.indexOf("gfx/");
+        QString rutaRelativa = (pos != -1) ? path.mid(pos + 4) : path;
         out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
         out << "    tipo: " << e.tipo << "\n";
         out << "    ancho: " << e.ancho << "\n";
         out << "    alto: " << e.alto << "\n";
+        out << "    prioridad: " << e.prioridad << "\n";
     }
 
     out << "zonas:\n";
@@ -272,12 +309,22 @@ void MainWindow::guardarMapa() {
     // ============================
     QString thumbPath = fileName;
     thumbPath.replace(".yaml", ".jpg");
-
     QImage thumbnail = topWidget->generarMiniatura();
     if (!thumbnail.save(thumbPath, "JPG")) {
         qWarning() << "No se pudo guardar la miniatura del mapa.";
     }
-    
+
+    // ============================
+    // COPIAS ADICIONALES
+    // ============================
+
+    #ifdef INSTALADO
+        copiarMapaA(RUTA_BASE_EDITOR, fileName, thumbPath, nombreArchivo);
+        copiarMapaA(RUTA_SERVER_BASE, fileName, thumbPath, nombreArchivo);
+    #endif
+
+    copiarMapaA(rutaProyecto + "server_src/mapas_disponibles", fileName, thumbPath, nombreArchivo);
+
     QApplication::quit();
 }
 
@@ -288,23 +335,19 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     int alto  = root["alto_max_mapa"] ? root["alto_max_mapa"].as<int>() : 2048;
     topWidget->setTamanioMapaDesdeYAML(ancho, alto);
 
-    QString fondo = QString::fromStdString(root["fondo"].as<std::string>());
-    if (!fondo.startsWith('/'))
-        fondo.prepend('/');
-    QString basePath = QCoreApplication::applicationDirPath();
+    QString fondoRel = QString::fromStdString(root["fondo"].as<std::string>());
+    QString fondoPath = RUTA_BASE_IMAGENES + fondoRel;
     topWidget->setDropMode(DropMode::FONDO);
-    topWidget->setBackgroundPath(basePath + fondo);
+    topWidget->setBackgroundPath(fondoPath);
 
     const auto& elementos = root["elementos"];
     for (const auto& elemento : elementos) {
-        QString imagen = QString::fromStdString(elemento["imagen"].as<std::string>());
-        if (!imagen.startsWith('/'))
-            imagen.prepend('/');
+        QString imagenRel = QString::fromStdString(elemento["imagen"].as<std::string>());
+        QString imagenPath = RUTA_BASE_IMAGENES + imagenRel;
         QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
         int x = elemento["x"].as<int>();
         int y = elemento["y"].as<int>();
-        QString fullPath = QCoreApplication::applicationDirPath() + imagen;
-        topWidget->agregarElemento(fullPath, x, y);
+        topWidget->agregarElemento(imagenPath, x, y);
     }
 
     const auto& zonas = root["zonas"];
@@ -331,5 +374,4 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
 
         topWidget->agregarZona(rect, tipoZona, id);
     }
-
 }

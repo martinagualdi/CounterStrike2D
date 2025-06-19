@@ -16,6 +16,13 @@ project(taller_tp
     LANGUAGES CXX
     )
 
+option(INSTALADO "Compilar con rutas instaladas" OFF)
+
+if(INSTALADO)
+    message(STATUS "Compilando con INSTALADO=ON")
+    add_compile_definitions(INSTALADO)
+endif()
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Multimedia MultimediaWidgets)
 set(CMAKE_AUTOMOC ON)

@@ -3,8 +3,8 @@
 #include <QApplication>
 #include <iostream>
 
+char cwd[1024];
 int main(int argc, char* argv[]){
-
     try{
         QApplication app(argc, argv);
         Inicio inicio;

@@ -16,6 +16,13 @@ target_sources(server
     mapa.cpp
     municion.cpp
     configuracion.cpp
+    awp.cpp
+    ak47.cpp
+    m3.cpp
+    glock.cpp
+    cuchillo.cpp
+    bomba.cpp
+    arma_de_fuego.cpp
     PUBLIC
     # .h files
     acceptor.h
@@ -34,7 +41,7 @@ target_sources(server
     municion.h
     ak47.h
     arma.h
-    armaDeFuego.h
+    arma_de_fuego.h
     awp.h
     bomba.h
     cuchillo.h

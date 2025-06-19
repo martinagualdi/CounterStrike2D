@@ -1,6 +1,7 @@
 #include "top_widget.h"
 #include "zona_rect_item.h"
 #include "grid_pixmap_item.h"
+#include "../common_src/ruta_base.h"
 #include <QMimeData>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
@@ -30,10 +31,9 @@ int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, i
     dialog.setComboBoxItems(opciones);
     dialog.setWindowTitle(titulo);
     dialog.setLabelText(label);
-    dialog.setOption(QInputDialog::UseListViewForComboBoxItems); // activa scroll automático
+    dialog.setOption(QInputDialog::UseListViewForComboBoxItems);
     dialog.setTextValue(QString::number(valorPorDefecto));
 
-    // Estilo opcional (como tenías antes)
     QString estilo = R"(
         QInputDialog {
             background-color: #2c2c2c;
@@ -103,12 +103,14 @@ bool TopWidget::estaPincelActivo() const {
 }
 
 void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
+    maxAncho = ancho;
+    maxAlto = alto;
     setSceneRect(0, 0, ancho, alto);
     tamanioEstablecidoDesdeYAML = true;
 }
 
 QString TopWidget::getFondoPath() const {
-    int idx = fondoPath.indexOf("/gfx");
+    int idx = fondoPath.indexOf("gfx/");
     if (idx != -1) {
         return fondoPath.mid(idx);
     }
@@ -132,6 +134,7 @@ QList<ElementoMapa> TopWidget::getElementos() const {
                     QPixmap pix = pixmapItem->pixmap();
                     elem.ancho = pix.width();
                     elem.alto = pix.height();
+                    elem.prioridad = item->zValue();
 
                     elementos.append(elem);
                 }
@@ -268,6 +271,7 @@ int TopWidget::zValueParaTipo(const QString& tipo) const {
     if (tipo == "obstaculo") return 2;
     if (tipo == "bombsite") return 3;
     if (tipo == "zona") return 4;
+    if (tipo == "arma") return 5;
     return 1;
 }
 
@@ -314,6 +318,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setZValue(zValueParaTipo(tipo));
             item->setData(2, pix.width());
             item->setData(3, pix.height());
+            item->setData(4, item->zValue());
 
             scene()->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
@@ -345,6 +350,7 @@ void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
         item->setData(1, "piso");
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
         scene()->addItem(item);
     }
 }
@@ -507,13 +513,11 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         return z.tipo == "zona_bombas";
     });
 
-    QString basePath = QCoreApplication::applicationDirPath();
     QString imagenRelativa = (cantidad == 0)
-        ? "/gfx/plantacion_bombas/plantacion1.png"
-        : "/gfx/plantacion_bombas/plantacion2.png";
-    QString imagenAbsoluta = basePath + imagenRelativa;
+        ? QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion1.png"))
+        : QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion2.png"));
     
-    QPixmap pix(imagenAbsoluta);
+    QPixmap pix(imagenRelativa);
     if (!pix.isNull()) {
         QPointF centro = rect.center();
         QPointF pos = centro - QPointF(pix.width() / 2, pix.height() / 2);
@@ -526,6 +530,7 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         item->setData(1, "bombsite");
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }
@@ -560,6 +565,7 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setZValue(zValueParaTipo(tipo));
         item->setData(2, pixmap.width());
         item->setData(3, pixmap.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }

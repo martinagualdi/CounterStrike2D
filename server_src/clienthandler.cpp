@@ -1,6 +1,9 @@
 #include "clienthandler.h"
-
+#include "../common_src/ruta_base.h"
 #include "../common_src/liberror.h"
+#include <utility>
+#include <filesystem>
+#include <syslog.h>
 
 ClientHandler::ClientHandler(Socket s, MonitorPartidas& monitor_partidas, int id): 
     skt(std::move(s)),

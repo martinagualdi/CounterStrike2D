@@ -219,6 +219,28 @@ bool MainWindow::zonasValidadas(){
     return true;
 }
 
+void MainWindow::copiarMapaA(const QString& destinoDirectorio, const QString& origenYaml, const QString& origenJpg, const QString& nombreArchivo) {
+    QDir dir(destinoDirectorio);
+    dir.mkpath(".");
+
+    QString destinoYaml = dir.filePath(nombreArchivo);  // arma correctamente la ruta sin importar si termina en "/"
+    QFile::remove(destinoYaml);
+    if (!QFile::copy(origenYaml, destinoYaml)) {
+        qWarning() << "Error al copiar YAML a" << destinoYaml;
+    } else {
+        qDebug() << "YAML copiado correctamente a:" << destinoYaml;
+    }
+
+    QString destinoThumb = destinoYaml;
+    destinoThumb.replace(".yaml", ".jpg");
+    QFile::remove(destinoThumb);
+    if (!QFile::copy(origenJpg, destinoThumb)) {
+        qWarning() << "Error al copiar miniatura a" << destinoThumb;
+    } else {
+        qDebug() << "Miniatura copiada correctamente a:" << destinoThumb;
+    }
+}
+
 void MainWindow::guardarMapa() {
     if (!zonasValidadas()) return;
 
@@ -229,9 +251,7 @@ void MainWindow::guardarMapa() {
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
-    if (fileName.isEmpty())
-        return;
-
+    if (fileName.isEmpty()) return;
     if (!fileName.endsWith(".yaml", Qt::CaseInsensitive)) {
         fileName += ".yaml";
     }
@@ -243,17 +263,20 @@ void MainWindow::guardarMapa() {
     }
 
     QTextStream out(&file);
+
     QString fondoPath = topWidget->getFondoPath();
-    out << "fondo: " << fondoPath << "\n";
+    int posFondo = fondoPath.indexOf("gfx/");
+    QString fondoRelativo = (posFondo != -1) ? fondoPath.mid(posFondo + 4) : fondoPath;
+    out << "fondo: " << fondoRelativo << "\n";
+
     out << "ancho_max_mapa: " << topWidget->getMaxAncho() << "\n";
     out << "alto_max_mapa: " << topWidget->getMaxAlto() << "\n";
     out << "elementos:\n";
 
-    auto elementos = topWidget->getElementos();
-    for (const auto& e : elementos) {
+    for (const auto& e : topWidget->getElementos()) {
         QString path = e.path;
         int pos = path.indexOf("gfx/");
-        QString rutaRelativa = (pos != -1) ? path.mid(pos + 1) : path;
+        QString rutaRelativa = (pos != -1) ? path.mid(pos + 4) : path;
         out << "  - imagen: " << rutaRelativa << "\n";
         out << "    x: " << int(e.posicion.x()) << "\n";
         out << "    y: " << int(e.posicion.y()) << "\n";
@@ -280,44 +303,26 @@ void MainWindow::guardarMapa() {
     // ============================
     QString thumbPath = fileName;
     thumbPath.replace(".yaml", ".jpg");
-
     QImage thumbnail = topWidget->generarMiniatura();
     if (!thumbnail.save(thumbPath, "JPG")) {
         qWarning() << "No se pudo guardar la miniatura del mapa.";
     }
 
     // ============================
-    // COPIAR A RUTA LOCAL DEL PROYECTO
+    // COPIAS ADICIONALES
     // ============================
-#ifdef INSTALADO
     QString nombreArchivo = QFileInfo(fileName).fileName();
+    QString rutaProyecto = QString(__FILE__);
+    rutaProyecto.chop(QString("editor/editor_main_window.cpp").length());
 
-    // Obtener ruta absoluta al proyecto a partir de __FILE__
-    QString rutaProyectoLocal = QString(__FILE__);
-    rutaProyectoLocal.chop(QString("editor/editor_main_window.cpp").length());
-    QString rutaEditorMapasLocal = rutaProyectoLocal + "editor/mapas";
+    #ifdef INSTALADO
+        copiarMapaA(rutaProyecto + "editor/mapas", fileName, thumbPath, nombreArchivo);
+        copiarMapaA(RUTA_SERVER_BASE, fileName, thumbPath, nombreArchivo);
+    #endif
 
-    QDir().mkpath(rutaEditorMapasLocal);
+    copiarMapaA(rutaProyecto + "server_src/mapas_disponibles", fileName, thumbPath, nombreArchivo);
 
-    QString destinoYaml = rutaEditorMapasLocal + "/" + nombreArchivo;
-    QFile::remove(destinoYaml);
-    if (!QFile::copy(fileName, destinoYaml)) {
-        qWarning() << "Error al copiar YAML a ruta local del proyecto.";
-    } else {
-        qDebug() << "YAML copiado correctamente a:" << destinoYaml;
-    }
-
-    QString destinoThumb = destinoYaml;
-    destinoThumb.replace(".yaml", ".jpg");
-    QFile::remove(destinoThumb);
-    if (!QFile::copy(thumbPath, destinoThumb)) {
-        qWarning() << "Error al copiar miniatura a ruta local del proyecto.";
-    } else {
-        qDebug() << "Miniatura copiada correctamente a:" << destinoThumb;
-    }
-#endif
-
-    QApplication::quit();
+    //QApplication::quit();
 }
 
 

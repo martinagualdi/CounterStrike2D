@@ -511,13 +511,11 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         return z.tipo == "zona_bombas";
     });
 
-    QString basePath = QCoreApplication::applicationDirPath();
     QString imagenRelativa = (cantidad == 0)
         ? QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion1.png"))
         : QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion2.png"));
-    QString imagenAbsoluta = basePath + imagenRelativa;
     
-    QPixmap pix(imagenAbsoluta);
+    QPixmap pix(imagenRelativa);
     if (!pix.isNull()) {
         QPointF centro = rect.center();
         QPointF pos = centro - QPointF(pix.width() / 2, pix.height() / 2);

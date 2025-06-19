@@ -167,7 +167,6 @@ void Dibujador::inicializar_textos() {
     mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("Los Counter-Terrorist han ganado!", amarillo));
     mensajes_ganadores.emplace_back(renderer, fuenteChica.RenderText_Blended("Los Terroristas han ganado!", amarillo));
 
-    
 }
 
 float Dibujador::convertir_angulo(float angulo){
@@ -190,15 +189,10 @@ void Dibujador::dibujar_jugadores() {
     for(const InfoJugador& jugador : snapshot.info_jugadores){
 
         if(!jugador.esta_vivo) continue;
-
         float x_pixel, y_pixel;
         convertir_a_pantalla(jugador.pos_x, jugador.pos_y, x_pixel, y_pixel);
-        
         float angulo_sdl = convertir_angulo(jugador.angulo);
-
-        if(jugador.esta_moviendose)
-            dibujar_pies(x_pixel, y_pixel, angulo_sdl);
-    
+        if(jugador.esta_moviendose) dibujar_pies(x_pixel, y_pixel, angulo_sdl);
         enum SkinTipos skin = jugador.skin_tipo;
         enum ArmaEnMano arma = jugador.arma_en_mano;
         enum Equipo equipo = jugador.equipo;
@@ -283,11 +277,9 @@ void Dibujador::dibujar_sight() {
     float offset_x = (ancho_real -float(ancho_ventana) * escala) / 2.0f;
     float offset_y = (alto_real - (float)alto_ventana * escala) / 2.0f;
 
-    // Mouse a sistema lógico
     float mouseX_logico = (mouseX - offset_x) / escala;
     float mouseY_logico = (mouseY - offset_y) / escala;
 
-    // Dibuja el sight en sistema lógico
     Rect dst(mouseX_logico - TAM_SIGHT / 2, mouseY_logico - TAM_SIGHT / 2, TAM_SIGHT, TAM_SIGHT);
     renderer.Copy(sight, sprite_sight, dst);
 }
@@ -350,7 +342,7 @@ void Dibujador::dibujar_tiempo(int tiempo_restante) {
 
     Rect sprite_reloj(sprites_simbolos_hud[TIEMPO]);
     Rect reloj_dst;
-    reloj_dst.SetX((ancho_ventana  / 2) - OFFSET_TIEMPO);
+    reloj_dst.SetX((ancho_ventana / 2) - OFFSET_TIEMPO);
     reloj_dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     reloj_dst.SetW(TAM_SIMBOLOS_HUD);
     reloj_dst.SetH(TAM_SIMBOLOS_HUD);
@@ -443,7 +435,7 @@ Texture Dibujador::crearTextoArma(std::string nombre, int precio) {
 void Dibujador::dibujar_simbolo_mercado() {
 
     Rect dst;
-    dst.SetX(static_cast<int>(ancho_ventana  * 5/8));
+    dst.SetX(static_cast<int>(ancho_ventana * 5/8));
     dst.SetY(alto_ventana - TAM_SIMBOLOS_HUD);
     dst.SetW(TAM_SIMBOLOS_HUD);
     dst.SetH(TAM_SIMBOLOS_HUD);
@@ -471,7 +463,7 @@ void Dibujador::dibujar_mantenga_presionado(bool activar) {
     int alto_mensaje = mantenga_presionado.GetHeight();
 
     Rect dst;
-    dst.SetX((ancho_ventana  / 2) - ancho_mensaje / 2);
+    dst.SetX((ancho_ventana / 2) - ancho_mensaje / 2);
     dst.SetY((alto_ventana / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
@@ -529,7 +521,11 @@ void Dibujador::dibujar_mercado() {
 
     for (int i = 0; i < CANT_ARMAS_MERCADO; i++) {
 
-        Rect dst_texto(x + OFFSET_NOMBRE_ARMAS, y_pos, textos[i].GetWidth(), textos[i].GetHeight());
+        Rect dst_texto;
+        dst_texto.SetX(x + OFFSET_NOMBRE_ARMAS);
+        dst_texto.SetY(y_pos);
+        dst_texto.SetW(textos[i].GetWidth());
+        dst_texto.SetH(textos[i].GetHeight());
         renderer.Copy(textos[i], NullOpt, dst_texto);
 
         Rect dst_arma;
@@ -668,7 +664,7 @@ void Dibujador::dibujar_mensaje_bomba_plantada() {
     int alto_mensaje = mensaje_bomba_plantada.GetHeight();
 
     Rect dst;
-    dst.SetX((ancho_ventana  / 2) - ancho_mensaje / 2);
+    dst.SetX((ancho_ventana / 2) - ancho_mensaje / 2);
     dst.SetY((alto_ventana / 3) - alto_mensaje/ 2);
     dst.SetW(ancho_mensaje);
     dst.SetH(alto_mensaje);
@@ -766,7 +762,8 @@ void Dibujador::dibujar_estadisticas() {
     int altura_fila = 30;
 
     // Cantidad de filas: jugadores + títulos (ajustá +3/+6 según cuántos títulos/subtítulos dibujás)
-    int filas = snapshot.info_jugadores.size() + 6; // 6 si sumás: 2 títulos de equipo, 2 filas de columnas, y algún espacio extra
+    int filas = snapshot.info_jugadores.size() + 6; 
+    // 6 si sumás: 2 títulos de equipo, 2 filas de columnas, y algún espacio extra
 
     int alto_calculado = 40 + filas * altura_fila + 20; // 40 arriba, 20 abajo
     int alto_minimo = 250;
@@ -796,7 +793,7 @@ void Dibujador::dibujar_estadisticas() {
     std::vector<int> col_x = {x+20, x+230, x+320, x+400};
     int fila = 0;
 
-    // --- Counter-Terrorists ---
+    //  Counter-Terrorists
     Texture t_ct(renderer, fuenteChica.RenderText_Blended("Counter-Terrorists", celeste));
     Rect dst_titulo_ct(x+20, y_fila_inicial+fila*altura_fila, t_ct.GetWidth(), t_ct.GetHeight());
     renderer.Copy(t_ct, NullOpt, dst_titulo_ct);
@@ -811,7 +808,7 @@ void Dibujador::dibujar_estadisticas() {
     fila++;
 
     dibujar_estadisticas_jugador(col_x, y_fila_inicial, fila, altura_fila, CT);
-    fila++; // Espacio entre equipos
+    fila++;
     Texture t_tt(renderer, fuenteChica.RenderText_Blended("Terrorists", amarillento));
     Rect dst_titulo_tt(x+20, y_fila_inicial+fila*altura_fila, t_tt.GetWidth(), t_tt.GetHeight());
     renderer.Copy(t_tt, NullOpt, dst_titulo_tt);
@@ -884,8 +881,8 @@ void Dibujador::dibujar_esperando_jugadores() {
     int alto_mensaje = esperando_jugadores[i].GetHeight();
 
     Rect dst_esperando;
-    dst_esperando.SetX((ancho_ventana  / 2) -  esperando_jugadores[0].GetWidth() / 2);
-    dst_esperando.SetY((alto_ventana / 3) -  esperando_jugadores[0].GetWidth() / 2);
+    dst_esperando.SetX((ancho_ventana / 2) - esperando_jugadores[0].GetWidth() / 2);
+    dst_esperando.SetY((alto_ventana / 3) - esperando_jugadores[0].GetWidth() / 2);
     dst_esperando.SetW(ancho_mensaje);
     dst_esperando.SetH(alto_mensaje);
     renderer.Copy(esperando_jugadores[i], NullOpt, dst_esperando);

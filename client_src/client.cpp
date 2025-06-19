@@ -10,7 +10,7 @@
 #include "client_event_handler.h"
 
 #define CLIENT_CONFIG_PATH "client_config.yaml"
-#define CS2D_TITLE "Counter Strike 2D"
+#define CS2D_TITLE "Counter-Strike 2D"
 using namespace SDL2pp;
 
 #define DEFAULT_ANCHO 960

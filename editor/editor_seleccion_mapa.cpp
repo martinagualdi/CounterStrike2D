@@ -1,4 +1,5 @@
 #include "editor_seleccion_mapa.h"
+#include "../common_src/ruta_base.h"
 #include "top_widget.h"
 
 #include <yaml-cpp/yaml.h>
@@ -17,12 +18,14 @@ EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
 
 void EditorSeleccionMapa::seleccionarArchivo() {
     QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa",
-                                            "/var/CounterStrike2D/editor/mapas",
-                                            "Archivos YAML (*.yaml)");
+                                                RUTA_BASE_EDITOR,
+                                                "Archivos YAML (*.yaml)");
 
-
-    if (!ruta.isEmpty())
+    if (!ruta.isEmpty()) {
+        QString nombreArchivo = QFileInfo(ruta).fileName();
         emit mapaSeleccionado(ruta);
+    }
 
     close();
 }
+

@@ -103,6 +103,8 @@ bool TopWidget::estaPincelActivo() const {
 }
 
 void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
+    maxAncho = ancho;
+    maxAlto = alto;
     setSceneRect(0, 0, ancho, alto);
     tamanioEstablecidoDesdeYAML = true;
 }

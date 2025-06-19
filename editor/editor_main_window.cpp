@@ -244,10 +244,13 @@ void MainWindow::copiarMapaA(const QString& destinoDirectorio, const QString& or
 void MainWindow::guardarMapa() {
     if (!zonasValidadas()) return;
 
+    QString rutaProyecto = QString(__FILE__);
+    rutaProyecto.chop(QString("editor/editor_main_window.cpp").length());
+
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Guardar mapa",
-        RUTA_BASE_EDITOR,
+        rutaProyecto + "editor/mapas",
         "Archivos YAML (*.yaml);;Todos los archivos (*)"
     );
 
@@ -256,9 +259,12 @@ void MainWindow::guardarMapa() {
         fileName += ".yaml";
     }
 
+    QString nombreArchivo = QFileInfo(fileName).fileName();
+
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning() << "No se pudo abrir el archivo para escribir:" << file.errorString();
+        QMessageBox::critical(this, "Error", "No se pudo guardar el mapa:\n" + file.errorString());
         return;
     }
 
@@ -311,20 +317,16 @@ void MainWindow::guardarMapa() {
     // ============================
     // COPIAS ADICIONALES
     // ============================
-    QString nombreArchivo = QFileInfo(fileName).fileName();
-    QString rutaProyecto = QString(__FILE__);
-    rutaProyecto.chop(QString("editor/editor_main_window.cpp").length());
 
     #ifdef INSTALADO
-        copiarMapaA(rutaProyecto + "editor/mapas", fileName, thumbPath, nombreArchivo);
+        copiarMapaA(RUTA_BASE_EDITOR, fileName, thumbPath, nombreArchivo);
         copiarMapaA(RUTA_SERVER_BASE, fileName, thumbPath, nombreArchivo);
     #endif
 
     copiarMapaA(rutaProyecto + "server_src/mapas_disponibles", fileName, thumbPath, nombreArchivo);
 
-    //QApplication::quit();
+    QApplication::quit();
 }
-
 
 void MainWindow::cargarDesdeYAML(const QString& ruta) {
     YAML::Node root = YAML::LoadFile(ruta.toStdString());

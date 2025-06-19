@@ -25,12 +25,11 @@ sudo mkdir -p /usr/share/pixmaps
 sudo mkdir -p /var/$TP_NAME/editor/mapas
 sudo mkdir -p /var/$TP_NAME/server/mapas_disponibles
 
-sudo chown "$SUDO_USER":"$SUDO_USER" /var/CounterStrike2D/server/mapas_disponibles
-sudo chmod u+w /var/CounterStrike2D/server/mapas_disponibles
-
-
 sudo rm -rf /var/$TP_NAME/editor/mapas/*
 sudo rm -rf /var/$TP_NAME/server/mapas_disponibles/*
+
+sudo chmod 777 /var/$TP_NAME/editor/mapas
+sudo chmod 777 /var/$TP_NAME/server/mapas_disponibles
 
 sudo cp ./client /usr/bin/$TP_NAME-client
 sudo cp ./server /usr/bin/$TP_NAME-server

@@ -28,6 +28,7 @@ void Client::iniciar() {
     int result = lobby.exec();
     if (result == QDialog::Accepted) {
         std::string mapa_inicial = protocolo.recibir_mapa();
+        InfoConfigClient infoConfig = protocolo.recibir_configuracion_inicial();
         hilo_enviador.start();
         hilo_recibidor.start();
         Configuracion::cargar_path(CLIENT_CONFIG_PATH);
@@ -53,7 +54,7 @@ void Client::iniciar() {
         ClientMap mapa(mapa_inicial, renderer);
         EventHandler eventHandler(cola_enviador, cliente_id, ancho_ventana, alto_ventana);
         Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(),
-         eventHandler, cola_recibidor, default_ancho, default_alto, ancho_ventana, alto_ventana);
+         eventHandler, cola_recibidor, default_ancho, default_alto, ancho_ventana, alto_ventana, infoConfig);
         Sonido sonido(cliente_id);
 
         int ms_per_frame = 1000 / fps;

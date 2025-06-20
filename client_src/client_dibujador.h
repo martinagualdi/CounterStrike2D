@@ -1,6 +1,7 @@
 #ifndef CLIENT_DIBUJADOR_H
 #define CLIENT_DIBUJADOR_H
 
+#include "../common_src/comando_dto.h"
 #include "../common_src/queue.h"
 #include "../common_src/snapshot.h"
 #include "client_event_handler.h"
@@ -20,6 +21,7 @@ private:
     int alto_ventana;
     int ancho_real;
     int alto_real;
+    InfoConfigClient infoConfig;
     Renderer& renderer;
     EventHandler& eventHandler;
     Queue<Snapshot>& cola_recibidor;
@@ -117,7 +119,8 @@ public:
     int ancho_ventana,
     int alto_ventana,
     int ancho_real,
-    int alto_real
+    int alto_real,
+    InfoConfigClient infoConfig
     );
     void renderizar(Snapshot& snapshot);
     Dibujador(const Dibujador&) = delete;

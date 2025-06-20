@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdint>
 #include "enums_jugador.h"
-#include "../server_src/configuracion.h"
+#include "configuracion.h"
 
 enum Tipo {
     MOVIMIENTO, 

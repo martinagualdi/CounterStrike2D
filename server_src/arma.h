@@ -5,7 +5,7 @@
 #include <random>
 #include <chrono>
 
-#include "configuracion.h" 
+#include "../common_src/configuracion.h" 
 #include "../common_src/enums_jugador.h"
 
 class Arma {

@@ -4,6 +4,7 @@ target_sources(taller_common
     resolver.cpp
     resolvererror.cpp
     socket.cpp
+    configuracion.cpp
     PUBLIC
     comando_dto.h
     liberror.h
@@ -14,4 +15,5 @@ target_sources(taller_common
     snapshot.h
     socket.h
     thread.h
+    configuracion.h
     )

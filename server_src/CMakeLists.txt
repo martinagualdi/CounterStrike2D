@@ -47,5 +47,4 @@ target_sources(server
     cuchillo.h
     glock.h
     m3.h
-    configuracion.h
     )

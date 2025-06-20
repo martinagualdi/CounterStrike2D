@@ -11,6 +11,8 @@ class EventHandler {
 private:
     Queue<ComandoDTO>& cola_enviador;
     const int client_id;
+    int ancho_ventana;
+    int alto_ventana;
     bool mercado_abierto;
     bool puede_comprar;
     bool skin_seleccionado;
@@ -29,7 +31,8 @@ private:
     float calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse);
 
 public:
-    explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
+    EventHandler(Queue<ComandoDTO>& cola_enviador, 
+        const int client_id, int ancho_ventana, int alto_ventana);
     void manejarEventos(bool& isRunning, bool puede_comprar);
     bool mercadoAbierto() const;
     bool puedeMostrarEstadisticas() const;

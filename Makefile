@@ -2,7 +2,7 @@
 
 build:
 	mkdir -p build/
-	RUTA_BASE="" cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DINSTALADO=OFF $(EXTRA_GENERATE)
+	RUTA_BASE="" cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DTALLER_TESTS=ON -DINSTALADO=OFF $(EXTRA_GENERATE)
 	cmake --build  build/ $(EXTRA_COMPILE)
 
 run-tests:

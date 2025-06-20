@@ -27,7 +27,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Multimedia MultimediaWidgets)
 set(CMAKE_AUTOMOC ON)
 
-option(TALLER_TESTS "Enable / disable tests." OFF)
+option(TALLER_TESTS "Enable / disable tests." ON)
 option(TALLER_CLIENT "Enable / disable client program." ON)
 option(TALLER_SERVER "Enable / disable server program." ON)
 option(TALLER_EDITOR "Enable / disable editor program." ON)
@@ -222,21 +222,23 @@ if(TALLER_TESTS)
     FetchContent_MakeAvailable(googletest)
     include(GoogleTest)
 
-    add_executable(taller_tests)
-
-    add_dependencies(taller_tests taller_common)
-
-    target_sources(taller_tests
-        PRIVATE
+    add_executable(taller_tests
+        tests/tests_protocolo.cpp
         client_src/client_protocol.cpp
         server_src/server_protocol.cpp
-        common_src/socket.cpp
-        common_src/snapshot.h
-        server_src/municion.h
-        server_src/arma.h
-        server_src/jugador.h
-        server_src/ak47.h
+        server_src/jugador.cpp
+        server_src/ak47.cpp
+        server_src/glock.cpp
+        server_src/m3.cpp
+        server_src/awp.cpp
+        server_src/bomba.cpp
+        server_src/cuchillo.cpp
+        server_src/configuracion.cpp
+        server_src/municion.cpp
     )
+
+
+    add_dependencies(taller_tests taller_common)
 
     target_include_directories(taller_tests PUBLIC .)
 

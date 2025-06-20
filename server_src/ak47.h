@@ -1,3 +1,5 @@
+#ifndef AK_47_H
+#define AK_47_H
 #include "arma_de_fuego.h"
 
 class Ak47 : public ArmaDeFuego {

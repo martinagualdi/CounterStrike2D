@@ -17,12 +17,12 @@ void Acceptor::run() {
     MonitorPartidas monitor;
     while (aceptando_clientes) {
         try {
-
             Socket peer = skt.accept();
             ClientHandler *client = new ClientHandler(std::move(peer), monitor, id);
             client->iniciar();
             clients.push_back(client);
             id++;
+            recolectar();
         } catch (const LibError &e) {
             if (!aceptando_clientes) {
                 syslog(LOG_INFO, "%s%s. No hay clientes esperando a ser aceptados\n",
@@ -35,6 +35,7 @@ void Acceptor::run() {
             break;
         }
     }
+    monitor.eliminar_todas_las_partidas();
 }
 
 void Acceptor::eliminar_cliente(ClientHandler *client) {
@@ -43,8 +44,10 @@ void Acceptor::eliminar_cliente(ClientHandler *client) {
 }
 
 void Acceptor::recolectar() {
+    std::cout << "[Acceptor] Recolectando clientes muertos..." << std::endl;
     clients.remove_if([this](ClientHandler *c) {
         if (c->is_dead()) {
+            std::cout << "[Acceptor] El cliente con id " << c->get_id() << " ha terminado su ejecucion porque esta muerto." << std::endl;
             eliminar_cliente(c);
             return true;
         }
@@ -61,7 +64,10 @@ Acceptor::~Acceptor() {
         eliminar_cliente(c);
     }
     clients.clear();
+    std::cout << "[Acceptor] Destruyendo Acceptor..." << std::endl;
     skt.shutdown(RW_CLOSE);
     skt.close();
+    std::cout << "[Acceptor] El Acceptor ha terminado su ejecucion, va a hacer join." << std::endl;
     this->join();
+    std::cout << "[Acceptor] Se joineo" << std::endl;
 }

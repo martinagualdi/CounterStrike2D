@@ -62,16 +62,24 @@ class GameLoop : public Thread {
     void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego);
     void chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego);
     void explosion();
+    void realizar_cambio_equipo_si_es_necesario();
     void esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador);
+    void asignar_bomba_si_es_necesario(bool esperando);
+    void colocar_armas_del_mapa();
+    bool chequear_si_termino_partida();
 
   public:
-    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);
+    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, bool activa, std::string yaml_partida);
 
     void agregar_jugador_a_partida(const int id, std::string& nombre);
 
     std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
 
     virtual void run() override;
+
+    void eliminar_jugador_de_partida(int id_jugador);
+
+    ~GameLoop() override;
 };
 
 #endif

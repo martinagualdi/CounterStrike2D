@@ -8,7 +8,7 @@
 #include "m3.h"
 #include "awp.h"
 #include "bomba.h"
-#include "armaDeFuego.h"
+#include "arma_de_fuego.h"
 #include "../common_src/enums_jugador.h"
 #include "../common_src/comando_dto.h"
 
@@ -30,6 +30,7 @@ class Jugador {
     bool moviendose;
     bool disparando;
     bool tiene_bomba;
+    bool puede_plantar_bomba;
     bool plantando_bomba;
     bool desactivando_bomba;
     bool puede_comprar;
@@ -61,6 +62,7 @@ class Jugador {
       moviendose(false), 
       disparando(false), 
       tiene_bomba(false),
+      puede_plantar_bomba(false),
       plantando_bomba(false),
       puede_comprar(true),
       acaba_de_comprar_arma(false),
@@ -114,6 +116,9 @@ class Jugador {
     int get_eliminaciones_totales() const { return eliminaciones_totales; }
     bool posee_bomba(){return tiene_bomba;}
     int get_muertes() const { return muertes; }
+    bool tiene_la_bomba() const { return tiene_bomba; }
+    void set_puede_plantar(bool puede_plantar) { this->puede_plantar_bomba = puede_plantar; }
+    bool puede_plantar_bomba_ya() const { return puede_plantar_bomba; }
 
     // Logicas
     void disparar();

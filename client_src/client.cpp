@@ -72,6 +72,12 @@ void Client::iniciar() {
                 Snapshot snapshot = snapshots.back();
                 dibujador.renderizar(snapshot);
                 puede_comprar = snapshot.getJugadorPorId(cliente_id)->puede_comprar_ya;
+                if (snapshot.termino_partida) {
+                    ComandoDTO comando = {};
+                    comando.tipo = DESCONECTAR;
+                    cola_enviador.try_push(comando);
+                    return;
+                }
             }
             //std::cout << "Voy a manejar eventos..." << std::endl;
             eventHandler.manejarEventos(clienteActivo, puede_comprar);

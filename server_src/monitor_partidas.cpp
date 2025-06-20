@@ -46,3 +46,19 @@ Queue<ComandoDTO>* MonitorPartidas::obtener_queue_de_partida(int id_partida) {
     }
     return nullptr;
 }
+
+void MonitorPartidas::eliminar_jugador_de_partida(int id_partida, int id_jugador) {
+    std::lock_guard<std::mutex> lock(mtx);
+    auto it = partidas.find(id_partida);
+    if (it != partidas.end()) {
+        if (it->second->eliminar_jugador(id_jugador)) {
+            partidas.erase(it);
+            std::cout << "[MonitorPartidas] Partida con id " << id_partida << " eliminada, ya no quedan jugadores." << std::endl;
+        }
+    }
+}
+
+void MonitorPartidas::eliminar_todas_las_partidas() {
+    std::lock_guard<std::mutex> lock(mtx);
+    partidas.clear();
+}

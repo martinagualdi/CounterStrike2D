@@ -16,3 +16,4 @@ T Configuracion::get(const std::string& campo) {
 template std::string Configuracion::get<std::string>(const std::string& campo);
 template int Configuracion::get<int>(const std::string& campo);
 template float Configuracion::get<float>(const std::string& campo);
+template bool Configuracion::get<bool>(const std::string& campo);

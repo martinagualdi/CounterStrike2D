@@ -3,12 +3,12 @@
 #include <cmath>
 #include <iostream>
 
-#define ALTO_MIN 720
-#define ANCHO_MIN 960
-
-EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, const int client_id) :
+EventHandler::EventHandler(Queue<ComandoDTO> &cola_enviador, 
+const int client_id, int ancho_ventana, int alto_ventana) :
     cola_enviador(cola_enviador),
     client_id(client_id),
+    ancho_ventana(ancho_ventana),
+    alto_ventana(alto_ventana),
     mercado_abierto(false),
     puede_comprar(false),
     skin_seleccionado(false),
@@ -173,7 +173,7 @@ bool EventHandler::skinSeleccionado() const {
 float EventHandler::procesarPuntero() { 
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
-    return calcularAngulo(ANCHO_MIN / 2, ALTO_MIN / 2, mouseX, mouseY);
+    return calcularAngulo(ancho_ventana / 2, alto_ventana / 2, mouseX, mouseY);
 }
 
 void EventHandler::procesarMouse(const SDL_Event &event)

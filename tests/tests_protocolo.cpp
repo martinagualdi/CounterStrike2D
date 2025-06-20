@@ -27,7 +27,6 @@ public:
     enum ArmaEnMano getCodigoArma() const override { return ArmaEnMano::AK_47; }
 };
 
-
 TEST(ProtocoloTest, EnviaYRecibeDisparo) {
     std::thread server_thread([]() {
         Socket server_socket(kPort);
@@ -721,5 +720,270 @@ TEST(ProtocoloTest, JugadorRecibeDanioMuere) {
 
     client_thread.join();
     server_thread.join();
+}
+
+TEST(ProtocoloTest, JugadorCambiaArmaEnMano) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        std::string nombre = "JugadorCambio";
+        Jugador jugador(5, nombre);
+
+        jugador.comprarArma(Compra::C_AK47);
+        jugador.cambiar_arma_en_mano();
+        jugador.cambiar_arma_en_mano();  
+        jugador.cambiar_arma_en_mano();
+
+        std::vector<Jugador*> jugadores = { &jugador };
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+        BombaEnSuelo bomba(0, 0, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+
+        int tiempo = 60;
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo, 0, 0, 0, 0, Equipo::NONE, false);
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        ASSERT_EQ(recibido.info_jugadores.size(), 1);
+        const auto& jugador = recibido.info_jugadores[0];
+        EXPECT_EQ(jugador.arma_en_mano, ArmaEnMano::AK_47);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(ProtocoloTest, JugadorSueltaArmaPrincipal) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        std::string nombre = "JugadorDroper";
+        Jugador jugador(6, nombre);
+        jugador.setX(100.0f);
+        jugador.setY(200.0f);
+
+        jugador.comprarArma(Compra::C_M3);
+        ArmaDeFuego* arma_suelta = jugador.soltar_arma_pricipal();
+
+        std::vector<Jugador*> jugadores = { &jugador };
+
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+        if (arma_suelta) {
+            armas.emplace_back(arma_suelta, jugador.getX(), jugador.getY());
+        }
+
+        BombaEnSuelo bomba(0, 0, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+        int tiempo = 60;
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo, 0, 0, 0, 0, Equipo::NONE, false);
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        ASSERT_EQ(recibido.armas_sueltas.size(), 1);
+        EXPECT_FLOAT_EQ(recibido.armas_sueltas[0].pos_x, 100.0f);
+        EXPECT_FLOAT_EQ(recibido.armas_sueltas[0].pos_y, 200.0f);
+        EXPECT_EQ(recibido.armas_sueltas[0].tipo_arma, ArmaEnMano::M3);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(ProtocoloTest, JugadorLevantaArmaDelSuelo) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        std::string nombre = "Recolector";
+        Jugador jugador(7, nombre);
+        jugador.setX(120.0f);
+        jugador.setY(140.0f);
+
+        // Simular arma en el suelo
+        ArmaEnSuelo arma_suelta(new Awp(), 120.0f, 140.0f);
+
+        // El jugador la recoge
+        jugador.levantar_arma(arma_suelta.arma);
+
+        std::vector<Jugador*> jugadores = { &jugador };
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;  // Ya fue recogida, así que vacía
+
+        BombaEnSuelo bomba(0, 0, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+        int tiempo = 60;
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo, 0, 0, 0, 0, Equipo::NONE, false);
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        ASSERT_EQ(recibido.info_jugadores.size(), 1);
+        const auto& j = recibido.info_jugadores[0];
+        EXPECT_EQ(j.arma_en_mano, ArmaEnMano::AWP);  // AWP debe estar equipada
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(ProtocoloTest, JugadorCambiaArmaSinPrincipal) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        std::string nombre = "SinPrincipal";
+        Jugador jugador(8, nombre);
+
+        // Inicial: Glock (secundaria)
+        jugador.cambiar_arma_en_mano();  // → cuchillo
+        jugador.cambiar_arma_en_mano();  // → Glock (secundaria)
+        jugador.cambiar_arma_en_mano();  // → cuchillo (solo alterna entre estas dos)
+
+        std::vector<Jugador*> jugadores = { &jugador };
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+        BombaEnSuelo bomba(0, 0, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+
+        int tiempo = 60;
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo, 0, 0, 0, 0, Equipo::NONE, false);
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        ASSERT_EQ(recibido.info_jugadores.size(), 1);
+        const auto& j = recibido.info_jugadores[0];
+
+        // Debería haber terminado en cuchillo después de alternar
+        EXPECT_EQ(j.arma_en_mano, ArmaEnMano::CUCHILLO);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(ProtocoloTest, JugadorDineroInicial) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+    EXPECT_EQ(jugador.get_dinero(), Configuracion::get<int>("dinero_inicial"));
+}
+
+TEST(ProtocoloTest, JugadorCompraArmaRestaDinero) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+    int dinero_inicial = jugador.get_dinero();
+    int precio_ak = Configuracion::get<int>("precio_ak47");
+
+    bool compro = jugador.comprarArma(Compra::C_AK47);
+    EXPECT_TRUE(compro);
+    EXPECT_EQ(jugador.get_dinero(), dinero_inicial - precio_ak);
+}
+
+TEST(ProtocoloTest, JugadorDinero0NoPuedeComprar) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+
+    jugador.comprarArma(Compra::C_AK47);
+    while (jugador.get_dinero() >= 5)
+        jugador.comprarBalas(BALAS_PRIMARIA);
+
+    int dinero = jugador.get_dinero();
+    EXPECT_EQ(dinero, 0);
+    EXPECT_FALSE(jugador.comprarArma(Compra::C_AK47));
+}
+
+TEST(ProtocoloTest, JugadorCompraBalasSecundariasRestaDinero) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+    int dinero_inicial = jugador.get_dinero();
+    int precio = Configuracion::get<int>("precio_municion_secundaria");
+
+    bool compro = jugador.comprarBalas(BALAS_SECUNDARIA);
+
+    EXPECT_TRUE(compro);
+    EXPECT_EQ(jugador.get_dinero(), dinero_inicial - precio);
+}
+
+TEST(ProtocoloTest, JugadorCompraBalasPrimariasSinArmaNoCompra) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+
+    bool compro = jugador.comprarBalas(BALAS_PRIMARIA);
+    EXPECT_FALSE(compro);
+}
+
+TEST(ProtocoloTest, JugadorCompraBalasPrimariasConArmaRestaDinero) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Jugador";
+    Jugador jugador(1, nombre);
+
+    jugador.comprarArma(C_AK47);
+
+    int dinero_antes = jugador.get_dinero();
+    int precio = Configuracion::get<int>("precio_municion_principal");
+
+    bool compro = jugador.comprarBalas(BALAS_PRIMARIA);
+    EXPECT_TRUE(compro);
+    EXPECT_EQ(jugador.get_dinero(), dinero_antes - precio);
+}
+
+TEST(ProtocoloTest, JugadorPuedeComprarDuranteTiempoDeCompra) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Comprador";
+    Jugador jugador(1, nombre);
+
+    jugador.en_posicion_de_compra(true);
+
+    EXPECT_TRUE(jugador.puede_comprar_ahora());
+    EXPECT_TRUE(jugador.comprarArma(C_M3));
+}
+
+TEST(ProtocoloTest, JugadorNoPuedeComprarFueraDeTiempoDeCompra) {
+    Configuracion::cargar_path("configuracion.yaml");
+    std::string nombre = "Comprador";
+    Jugador jugador(1, nombre);
+
+    jugador.en_posicion_de_compra(false);
+
+    EXPECT_FALSE(jugador.puede_comprar_ahora());
 }
 

@@ -251,6 +251,20 @@ void ServerProtocol::enviar_mapa(const std::string& yaml_serializado){
     skt.sendall((uint8_t*)yaml_serializado.data(), yaml_serializado.size());
 }
 
+void ServerProtocol::enviar_valores_de_config(InfoConfigClient config) {
+    std::vector<uint8_t> buffer;
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.precio_awp));
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.precio_ak47));
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.precio_m3));
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.opacidad));
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.angulo_vision));
+    push_back_uint16_t(buffer, static_cast<uint16_t>(config.radio_vision));
+
+    uint16_t largo = htons(static_cast<uint16_t>(buffer.size()));
+    skt.sendall(&largo, sizeof(largo));
+    skt.sendall(buffer.data(), buffer.size());
+}
+
 void ServerProtocol::enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas) {
     uint8_t cantidad = mapas.size();
     skt.sendall(&cantidad, 1);  // Enviamos la cantidad de pares (mapa, imagen)

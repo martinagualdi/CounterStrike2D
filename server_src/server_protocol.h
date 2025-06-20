@@ -31,6 +31,8 @@ public:
 
     void enviar_mapa(const std::string& yaml_serializado);
 
+    void enviar_valores_de_config(InfoConfigClient client);
+
     void enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas);
 
 };

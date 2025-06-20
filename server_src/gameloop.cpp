@@ -373,7 +373,7 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     }else if (jugador==jugador_desactivando){
                         jugador_desactivando = nullptr;
                         jugador->cancelar_desactivado_bomba();
-                        bomba->reiniciar();
+                        //bomba->reiniciar();
                         std::cout << "Jugador " << jugador->getId() << " interrumpió el desactivado de la bomba." << std::endl;
                     }
                     
@@ -437,7 +437,7 @@ void GameLoop::disparar_rafagas_restantes() {
     for (Jugador *jugador : jugadores) {
         if (jugador->get_codigo_arma_en_mano() == AK_47) {
             Ak47 *ak47 = dynamic_cast<Ak47 *>(jugador->get_arma_actual());
-            if (ak47->hay_rafaga()) {
+            if (ak47->hay_rafaga() && ak47->getBalas()>0) {
                 auto ahora = std::chrono::steady_clock::now();
                 auto& proximo = ak47->get_proximo_disparo_rafaga();
                 if (ahora >= proximo) {

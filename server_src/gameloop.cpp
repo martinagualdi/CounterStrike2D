@@ -373,7 +373,6 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     }else if (jugador==jugador_desactivando){
                         jugador_desactivando = nullptr;
                         jugador->cancelar_desactivado_bomba();
-                        //bomba->reiniciar();
                         std::cout << "Jugador " << jugador->getId() << " interrumpió el desactivado de la bomba." << std::endl;
                     }
                     

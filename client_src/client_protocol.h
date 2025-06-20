@@ -29,6 +29,7 @@ public:
     std::string recibir_mapa();
     std::string recibir_mensaje();
     std::vector<std::pair<std::string, std::string>> recibir_lista_mapas();
+    std::vector<uint16_t> recibir_precios_mercado();
 
     ProtocoloCliente(const ProtocoloCliente&) = delete;
     ProtocoloCliente& operator=(const ProtocoloCliente&) = delete;

@@ -24,7 +24,6 @@ ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_d
     virtual ~ArmaDeFuego() = default;
 
     virtual bool puede_disparar() const { return municion_actual > 0; }
-    virtual void recargar() { municion_actual = municion_max; }
     virtual void agregarMunicion(int municion) { municion_actual = municion_actual+municion; }
     virtual int getMunicion() const { return municion_actual; }
     virtual int getMunicionMax() const { return municion_max; }

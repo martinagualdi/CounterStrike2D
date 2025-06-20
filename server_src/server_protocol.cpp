@@ -116,7 +116,6 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
 }
 
 bool ServerProtocol::recibir_de_cliente(ComandoDTO& comando) {
-
     uint8_t prefijo;
     skt.recvall(&prefijo, sizeof(prefijo));
     

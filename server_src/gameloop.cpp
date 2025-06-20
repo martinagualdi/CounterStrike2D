@@ -3,13 +3,13 @@
 
 #define VELOCIDAD 0.3
 
-GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida):
+GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, bool activa, std::string yaml_partida):
     queue_comandos(queue_comandos), 
     queues_jugadores(queues_jugadores), 
     jugadores(),
     cant_min_ct(Configuracion::get<int>("cantidad_min_ct")),
     cant_min_tt(Configuracion::get<int>("cantidad_min_tt")),
-    activo(true), 
+    activo(activa), 
     balas_disparadas(), 
     ultimo_unido_ct(false), 
     mapa(yaml_partida),
@@ -693,4 +693,34 @@ void GameLoop::run() {
         if (chequear_si_termino_partida()) 
             activo = false;
     }
+    std::cout << "[Gameloop] Se termino la partida" << std::endl;
+    queue_comandos.close(); 
+}
+
+void GameLoop::eliminar_jugador_de_partida(int id_jugador) {
+    Jugador *jugador = findJugador(id_jugador);
+    if (jugador) {
+        if (jugador->get_equipo() == CT) {
+            equipo_ct.erase(std::remove(equipo_ct.begin(), equipo_ct.end(), jugador), equipo_ct.end());
+        } else if (jugador->get_equipo() == TT) {
+            equipo_tt.erase(std::remove(equipo_tt.begin(), equipo_tt.end(), jugador), equipo_tt.end());
+        }
+        jugadores.erase(std::remove(jugadores.begin(), jugadores.end(), jugador), jugadores.end());
+        delete jugador; // Liberar memoria
+        std::cout << "[Gameloop] Se elimino jugador de id: " << id_jugador << std::endl;
+    }
+}
+
+GameLoop::~GameLoop() {
+    std::cout << "[Gameloop] Destruyendo GameLoop..." << std::endl;
+    for (Jugador *jugador : jugadores) {
+        delete jugador; // Liberar memoria de los jugadores
+    }
+    for (ArmaEnSuelo &arma : armas_en_suelo) {
+        delete arma.getArma(); // Liberar memoria de las armas en el suelo
+    }
+    if (bomba) {
+        delete bomba; // Liberar memoria de la bomba si existe
+    }
+    std::cout << "[Gameloop] Se destruyo el GameLoop" << std::endl;
 }

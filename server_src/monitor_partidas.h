@@ -23,8 +23,9 @@ public:
 
     Queue<ComandoDTO>* obtener_queue_de_partida(int id_partida);
 
+    void eliminar_jugador_de_partida(int id_partida, int id_jugador);
 
-
+    void eliminar_todas_las_partidas();
 };
 
 #endif

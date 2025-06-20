@@ -17,6 +17,7 @@ private:
     std::string creador;
     Queue<ComandoDTO> queue_comandos;
     ListaQueues jugadores_queues;
+    std::atomic<bool> activa;
     GameLoop gameloop;
     int cant_jugadores = 0;
     int cant_min_ct;
@@ -37,6 +38,10 @@ public:
     Queue<ComandoDTO>& get_queue() { return this->queue_comandos; }
 
     std::string obtener_mapa();
+
+    bool eliminar_jugador(int id_jugador);
+
+    ~Partida();
 };
 
 #endif

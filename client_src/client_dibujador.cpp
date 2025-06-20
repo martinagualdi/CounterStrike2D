@@ -220,12 +220,21 @@ void Dibujador::dibujar_fondo(const ElementoMapa& elemento){
 
 void Dibujador::dibujar_balas() {
     
-    for (const InfoMunicion& bala : snapshot.balas_disparadas){
+    const float LARGO_BALA = 100.0f;
+    const float ANCHO_BALA = 20.0f;
+    
+    for (InfoMunicion& bala : snapshot.balas_disparadas) {
         float x_pixel, y_pixel;
         convertir_a_pantalla(bala.pos_x, bala.pos_y, x_pixel, y_pixel);
         float angulo_bala = convertir_angulo(bala.angulo_disparo);
-        SDL_FRect dst {x_pixel - TAM_PLAYER / 2, y_pixel - TAM_PLAYER / 2, TAM_PLAYER, TAM_PLAYER};
-        SDL_FPoint center = {TAM_PLAYER / 2, TAM_PLAYER / 2};
+        float angle_rad = bala.angulo_disparo * M_PI / 180.0f;
+        float OFFSET_ADELANTE = TAM_PLAYER; // ajustá este valor
+
+        float origen_x = x_pixel + std::cos(angle_rad) * OFFSET_ADELANTE;
+        float origen_y = y_pixel - std::sin(angle_rad) * OFFSET_ADELANTE;
+        SDL_FRect dst {origen_x - ANCHO_BALA / 2,  origen_y - LARGO_BALA / 2, ANCHO_BALA, LARGO_BALA};
+        SDL_FPoint center = {ANCHO_BALA / 2, LARGO_BALA / 2};
+
         SDL_RenderCopyExF(renderer.Get(), balas.Get(), &sprite_bala, &dst, angulo_bala, &center, SDL_FLIP_NONE);
     }
 }

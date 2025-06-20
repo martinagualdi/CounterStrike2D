@@ -10,6 +10,7 @@
 #define DISTANCIA_MAX 900.0f
 #define DISTANCIA_MIN 70.0f
 #define CANTIDAD_SONIDOS_A_LA_VEZ 4
+#define CANTIDAD_PASOS_A_LA_VEZ 6
 #define CANAL_LIBRE -1
 
 Sonido::Sonido(const int client_id) : 
@@ -63,8 +64,7 @@ void Sonido::reproducirPasos() {
     if(!principal) return;
 
     Uint32 ahora = SDL_GetTicks();
-    int cap = 6; // Máximo de pasos simultáneos que se escuchan cerca
-
+   
     for (const InfoJugador &jugador : snapshot.info_jugadores) {
         FootstepState &state = estadosPasos[jugador.id];
         if (!jugador.esta_moviendose) {
@@ -78,7 +78,6 @@ void Sonido::reproducirPasos() {
                 principal->pos_x, principal->pos_y, 
                 jugador.pos_x, jugador.pos_y);
 
-            // No reproducir ni contar si el paso no se va a escuchar
             if (volumen < 5) {
                 state.paso_actual = (state.paso_actual + 1) % pasos.size();
                 state.ultimo_tick = ahora;
@@ -93,7 +92,7 @@ void Sonido::reproducirPasos() {
                     count++;
             }
 
-            if (count < cap) {
+            if (count < CANTIDAD_PASOS_A_LA_VEZ) {
                 int canal = mixer.PlayChannel(CANAL_LIBRE, pasos[state.paso_actual], 0);
                 if (canal != -1) mixer.SetVolume(canal, volumen);
             }

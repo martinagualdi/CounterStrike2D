@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdint>
 #include "enums_jugador.h"
+#include "../server_src/configuracion.h"
 
 enum Tipo {
     MOVIMIENTO, 
@@ -50,6 +51,33 @@ struct ComandoDTO {
     enum EstadoBomba estado_bomba;
     uint8_t id_jugador;
     float angulo;
+};
+
+struct InfoConfigClient {
+    int precio_awp;
+    int precio_ak47;
+    int precio_m3;
+    int opacidad;
+    int angulo_vision;
+    int radio_vision;
+
+    explicit InfoConfigClient(bool es_server) {
+        if (es_server) {
+            precio_awp = Configuracion::get<int>("precio_awp");
+            precio_ak47 = Configuracion::get<int>("precio_ak47");
+            precio_m3 = Configuracion::get<int>("precio_m3");
+            angulo_vision = Configuracion::get<int>("angulo_cono_vision");
+            opacidad = Configuracion::get<int>("opacidad");
+            radio_vision = Configuracion::get<int>("radio_vision");
+        } else {
+            precio_awp = 0;
+            precio_ak47 = 0;
+            precio_m3 = 0;
+            opacidad = 0;
+            angulo_vision = 0;
+            radio_vision = 0;
+        }
+    }
 };
 
 #endif

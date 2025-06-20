@@ -12,6 +12,7 @@ const int client_id, int ancho_ventana, int alto_ventana) :
     mercado_abierto(false),
     puede_comprar(false),
     skin_seleccionado(false),
+    aviso_desconectar_activo(false),
     estadisticas(false),
     teclas_validas({
         SDL_SCANCODE_W,
@@ -158,6 +159,10 @@ bool EventHandler::mercadoAbierto() const {
     return mercado_abierto;
 }
 
+bool EventHandler::avisoDesconectarActivo() const {
+    return aviso_desconectar_activo;
+}
+
 bool EventHandler::puedeMostrarEstadisticas() const {
     return estadisticas;
 }
@@ -285,6 +290,36 @@ void EventHandler::procesarEstadisticas(const SDL_Event &event) {
     }
 }
 
+bool EventHandler::procesarDesconectar(const SDL_Event &event, bool& jugador_activo) {
+
+    if(event.type == SDL_QUIT){
+        ComandoDTO comando = {};
+        comando.tipo = DESCONECTAR;
+        cola_enviador.try_push(comando);
+        jugador_activo = false;   
+        return true;
+    }
+
+    if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
+        SDL_Scancode sc = event.key.keysym.scancode;
+
+        if(aviso_desconectar_activo && sc == SDL_SCANCODE_RETURN){
+            ComandoDTO comando = {};
+            comando.tipo = DESCONECTAR;
+            cola_enviador.try_push(comando);        
+            jugador_activo = false;
+            return true;
+        }
+
+        if(sc == SDL_SCANCODE_Q){
+            aviso_desconectar_activo = !aviso_desconectar_activo;
+        }
+
+    }
+
+    return false;
+}
+
 void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
 {
     SDL_Event event;
@@ -296,13 +331,8 @@ void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
 
     while(SDL_PollEvent(&event)){
         
-        if(event.type == SDL_QUIT){
-            ComandoDTO comando = {};
-            comando.tipo = DESCONECTAR;
-            cola_enviador.try_push(comando);
-            jugador_activo = false;   
+        if(procesarDesconectar(event, jugador_activo))
             return;
-        }        
 
         if(!skin_seleccionado)
             procesarSkin(event);

@@ -828,7 +828,7 @@ void Dibujador::dibujar_mapa() {
         if(elemento.tipo == FONDO){
             dibujar_fondo(elemento);
         }
-        else if(elemento.tipo == OBSTACULO || elemento.tipo == PISO){
+        else if(elemento.tipo == OBSTACULO || elemento.tipo == PISO || elemento.tipo == BOMBSITE){
             float x_pixel, y_pixel;
             convertir_a_pantalla(elemento.dst.x, -elemento.dst.y, x_pixel, y_pixel);
             if (x_pixel + elemento.dst.w >= 0 && x_pixel <= ANCHO_MIN &&

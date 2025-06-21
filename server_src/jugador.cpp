@@ -143,16 +143,22 @@ bool Jugador::comprarBalas(enum Compra tipo_bala) {
     int precio = Configuracion::get<int>(str_precio);
     switch (tipo_bala) {
         case BALAS_PRIMARIA:
-            if (dinero >= precio && arma_principal){
+            if (dinero >= precio && arma_principal && arma_principal->getMunicion() < arma_principal->getMunicionMax()) {
                 arma_principal->agregarMunicion(10);
+                if (arma_principal->getMunicion() > arma_principal->getMunicionMax()) {
+                    arma_principal->setMax();
+                }
                 dinero -= precio;
                 acaba_de_comprar_balas = true;
                 return true;
             }
             break;
         case BALAS_SECUNDARIA:
-            if (dinero >= precio){
+            if (dinero >= precio && arma_secundaria->getMunicion() < arma_secundaria->getMunicionMax()){
                 arma_secundaria->agregarMunicion(10);
+                if (arma_secundaria->getMunicion() > arma_secundaria->getMunicionMax()) {
+                    arma_secundaria->setMax();
+                }
                 dinero -= precio;
                 acaba_de_comprar_balas = true;
                 return true;

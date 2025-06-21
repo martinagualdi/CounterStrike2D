@@ -312,7 +312,6 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     }
                     jugador->disparar();
                     if (jugador->get_codigo_arma_en_mano() == CUCHILLO) {
-                        // El cuchillo no dispara, pero se puede usar para atacar
                         Municion bala_disparada(comando.id_jugador, jugador->getX(), jugador->getY(), comando.angulo);
                         bala_golpea_jugador(bala_disparada, false); // Verifica si golpea a un jugador
                         break;
@@ -333,7 +332,7 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 }
                 if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                     if (!jugador->comprarBalas(comando.compra)) {
-                        std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas o no tiene arma principal." << std::endl;
+                        std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas, no tiene arma principal o llego al maximo de balas." << std::endl;
                     }
                 } else {
                     if (!jugador->comprarArma(comando.compra)) {
@@ -590,7 +589,6 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
         auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();
         if (t_transcurrido >= segundos) break;
 
-        // Seguí enviando snapshots para que el cliente pueda actualizar sonidos/animaciones
         Snapshot snapshot(
             jugadores, balas_disparadas, armas_en_suelo, info_bomba,
             t_restante, rondas_ganadas_ct, rondas_ganadas_tt, ronda_actual, cant_rondas, eq_ganador,

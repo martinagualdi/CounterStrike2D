@@ -27,6 +27,7 @@ ArmaDeFuego(const std::string& nombre, float precision, float alcance, int min_d
     virtual void agregarMunicion(int municion) { municion_actual = municion_actual+municion; }
     virtual int getMunicion() const { return municion_actual; }
     virtual int getMunicionMax() const { return municion_max; }
+    virtual void setMax(){ municion_actual = municion_max;  }
 
     int getBalas() override {
         return municion_actual;

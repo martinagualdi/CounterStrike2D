@@ -13,7 +13,7 @@ public:
     Ak47(): ArmaDeFuego(
         "AK-47", 
         Configuracion::get<float>("precision_ak47"), 
-        1000.0f, 
+        1700.0f, 
         Configuracion::get<int>("danio_min_ak47"), 
         Configuracion::get<int>("danio_max_ak47"), 
         true,

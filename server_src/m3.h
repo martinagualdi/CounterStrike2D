@@ -1,5 +1,7 @@
-#include "arma_de_fuego.h"
+#ifndef M3_H
+#define M3_H
 
+#include "arma_de_fuego.h"
 
 class m3 : public ArmaDeFuego {
 
@@ -24,3 +26,5 @@ public:
         return M3; // Asumiendo que el M3 es un arma del jugador
     }
 };
+
+#endif

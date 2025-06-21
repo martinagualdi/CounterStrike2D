@@ -5,7 +5,11 @@
 #include "../server_src/server_protocol.h"
 #include "../server_src/municion.h"
 #include "../server_src/arma.h"
+#include "../server_src/awp.h"
+#include "../server_src/m3.h"
 #include "../server_src/ak47.h"
+#include "../server_src/glock.h"
+#include "../server_src/cuchillo.h"
 #include "../server_src/jugador.h"
 #include "../server_src/configuracion.h"
 #include "../common_src/socket.h"
@@ -118,7 +122,7 @@ TEST(ProtocoloTest, EnviaYRecibeID) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, CrearPartida) {
+TEST(PartidaTest, CrearPartida) {
     std::string username = "jugador_test";
     std::thread server_thread([&]() {
         Socket server_socket(kPort);
@@ -138,6 +142,89 @@ TEST(ProtocoloTest, CrearPartida) {
 
     client_thread.join();
     server_thread.join();
+}
+
+TEST(PartidaTest, ClienteListaPartidasCorrectamente) {
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        auto comando = proto.recibir_inicio_juego();
+        ASSERT_EQ(comando[0], "listar");
+
+        std::vector<std::string> partidas = {
+            "Inferno", "Dust2"
+        };
+        proto.enviar_lista_partidas(partidas);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        cliente.enviar_listar_partida();
+        std::string lista = cliente.recibir_lista_partidas();
+
+        // Se espera que sea un string con los mapas separados por \n
+        EXPECT_NE(lista.find("Inferno"), std::string::npos);
+        EXPECT_NE(lista.find("Dust2"), std::string::npos);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(PartidaTest, ClienteSeUneAPartidaExitosa) {
+    std::string username = "jugador_test";
+
+    std::thread server_thread([&]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        auto comando = proto.recibir_inicio_juego();
+        ASSERT_EQ(comando[0], "unirse");
+        ASSERT_EQ(comando[1], "3");  // ID de partida
+        ASSERT_EQ(comando[2], username);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([&]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        cliente.enviar_unirse_partida(3, username);  // Usa el método ya implementado
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(PartidaTest, jugadorSeleccionaSkinCorrectamente) {
+    std::thread servidor([]() {
+        Socket servidor_socket(kPort);
+        Socket conexion = servidor_socket.accept();
+        ServerProtocol proto(conexion);
+
+        ComandoDTO comando;
+        proto.recibir_de_cliente(comando);
+
+        ASSERT_EQ(comando.tipo, SELECCIONAR_SKIN);
+        EXPECT_EQ(comando.skin, SkinTipos::SKIN2);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread cliente([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        ComandoDTO comando;
+        comando.tipo = SELECCIONAR_SKIN;
+        comando.skin = SkinTipos::SKIN2;
+        cliente.enviarComando(comando);
+    });
+
+    cliente.join();
+    servidor.join();
 }
 
 TEST(ProtocoloTest, EnviaYRecibeMapa) {
@@ -161,7 +248,7 @@ TEST(ProtocoloTest, EnviaYRecibeMapa) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, EnviaYRecibeSnapshot_UnJugadorUnaBalaYArmaDummySinBombaPlantada) {
+TEST(ProtocoloTest, SnapshotUnJugadorUnaBalaYArmaDummySinBombaPlantada) {
     Configuracion::cargar_path("configuracion.yaml");
     std::thread server_thread([]() {
         Socket server_socket(kPort);
@@ -222,7 +309,7 @@ TEST(ProtocoloTest, EnviaYRecibeSnapshot_UnJugadorUnaBalaYArmaDummySinBombaPlant
     server_thread.join();
 }
 
-TEST(ProtocoloTest, Snapshot_ConJugadorYUnaBala) {
+TEST(ProtocoloTest, SnapshotConJugadorYUnaBala) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -277,7 +364,7 @@ TEST(ProtocoloTest, Snapshot_ConJugadorYUnaBala) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, Snapshot_ConAWPyBombaPlantada) {
+TEST(ProtocoloTest, SnapshotConAWPyBombaPlantada) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -417,7 +504,7 @@ TEST(ProtocoloTest, SnapshotConDosJugadoresYBombaDesactivada) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, SnapshotConBombaRecienDesactivada) {
+TEST(ArmasTest, SnapshotConBombaRecienDesactivada) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -480,7 +567,7 @@ TEST(ProtocoloTest, SnapshotConBombaRecienDesactivada) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, SnapshotConBombaPlantadaActiva) {
+TEST(ArmasTest, SnapshotConBombaPlantadaActiva) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -549,7 +636,7 @@ TEST(ProtocoloTest, SnapshotConBombaPlantadaActiva) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, SnapshotConTiempoCompleto) {
+TEST(TiempoTest, SnapshotConTiempoCompleto) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -604,7 +691,127 @@ TEST(ProtocoloTest, SnapshotConTiempoCompleto) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorVidaCompleta) {
+TEST(TiempoTest, SnapshotConTiempoCeroPartidaTerminada) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        std::string nombre = "JugadorTiempo";
+        Jugador jugador(2, nombre);
+        jugador.establecer_equipo(Equipo::CT);
+        std::vector<Jugador*> jugadores = { &jugador };
+
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+        BombaEnSuelo bomba(0.0f, 0.0f, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+
+        int tiempo_restante = 0;
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo_restante, 0, 0, 5, 12, Equipo::TT, true);
+
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        EXPECT_EQ(recibido.tiempo_restante, 0);
+        EXPECT_TRUE(recibido.termino_partida);
+        EXPECT_EQ(recibido.rondas_info.ronda_actual, 5);
+        EXPECT_EQ(recibido.rondas_info.total_rondas, 12);
+        EXPECT_EQ(recibido.equipo_ganador, Equipo::TT);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(TiempoTest, SnapshotConTiempoParcial) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        int tiempo_parcial = Configuracion::get<int>("tiempo_por_ronda") / 2;
+
+        std::string nombre = "JugadorParcial";
+        Jugador jugador(3, nombre);
+        jugador.establecer_equipo(Equipo::CT);
+        std::vector<Jugador*> jugadores = { &jugador };
+
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+        BombaEnSuelo bomba(0.0f, 0.0f, EstadoBombaRonda::SIN_PLANTAR, 0, false, false, false);
+
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo_parcial, 0, 0, 3, 12, Equipo::NONE, false);
+
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        EXPECT_GT(recibido.tiempo_restante, 0);
+        EXPECT_LT(recibido.tiempo_restante, Configuracion::get<int>("tiempo_por_ronda"));
+        EXPECT_FALSE(recibido.termino_partida);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(TiempoTest, SnapshotConBombaDesactivandoseYTiempoBajo) {
+    Configuracion::cargar_path("configuracion.yaml");
+
+    std::thread server_thread([]() {
+        Socket server_socket(kPort);
+        Socket client_conn = server_socket.accept();
+        ServerProtocol proto(client_conn);
+
+        int tiempo_bajo = 3;
+
+        std::string nombre = "JugadorFinal";
+        Jugador jugador(4, nombre);
+        jugador.establecer_equipo(Equipo::CT);
+        std::vector<Jugador*> jugadores = { &jugador };
+
+        std::vector<Municion> balas;
+        std::vector<ArmaEnSuelo> armas;
+
+        BombaEnSuelo bomba(150.0f, 120.0f, EstadoBombaRonda::PLANTADA, Configuracion::get<int>("tiempo_desactivacion_bomba"), false, false, false);
+
+        Snapshot snap(jugadores, balas, armas, bomba, tiempo_bajo, 0, 0, 8, 12, Equipo::NONE, false);
+
+        proto.enviar_a_cliente(snap);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));
+
+    std::thread client_thread([]() {
+        ProtocoloCliente cliente(kHost, kPort);
+        Snapshot recibido = cliente.recibirSnapshot();
+
+        EXPECT_EQ(recibido.tiempo_restante, 3);
+        EXPECT_EQ(recibido.bomba_en_suelo.estado_bomba, EstadoBombaRonda::PLANTADA);
+        EXPECT_FALSE(recibido.bomba_en_suelo.acaba_de_detonar);
+        EXPECT_FALSE(recibido.termino_partida);
+    });
+
+    client_thread.join();
+    server_thread.join();
+}
+
+TEST(VidaTest, JugadorVidaCompleta) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -641,7 +848,7 @@ TEST(ProtocoloTest, JugadorVidaCompleta) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorRecibeDanioRestaVida) {
+TEST(VidaTest, JugadorRecibeDanioRestaVida) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -682,7 +889,7 @@ TEST(ProtocoloTest, JugadorRecibeDanioRestaVida) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorRecibeDanioMuere) {
+TEST(VidaTest, JugadorRecibeDanioMuere) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -722,7 +929,7 @@ TEST(ProtocoloTest, JugadorRecibeDanioMuere) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorCambiaArmaEnMano) {
+TEST(ArmasTest, JugadorCambiaArmaEnMano) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -763,7 +970,7 @@ TEST(ProtocoloTest, JugadorCambiaArmaEnMano) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorSueltaArmaPrincipal) {
+TEST(ArmasTest, JugadorSueltaArmaPrincipal) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -809,7 +1016,7 @@ TEST(ProtocoloTest, JugadorSueltaArmaPrincipal) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorLevantaArmaDelSuelo) {
+TEST(ArmasTest, JugadorLevantaArmaDelSuelo) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -853,7 +1060,7 @@ TEST(ProtocoloTest, JugadorLevantaArmaDelSuelo) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorCambiaArmaSinPrincipal) {
+TEST(ArmasTest, JugadorCambiaArmaSinPrincipal) {
     Configuracion::cargar_path("configuracion.yaml");
 
     std::thread server_thread([]() {
@@ -896,14 +1103,14 @@ TEST(ProtocoloTest, JugadorCambiaArmaSinPrincipal) {
     server_thread.join();
 }
 
-TEST(ProtocoloTest, JugadorDineroInicial) {
+TEST(Dinerotests, JugadorDineroInicial) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
     EXPECT_EQ(jugador.get_dinero(), Configuracion::get<int>("dinero_inicial"));
 }
 
-TEST(ProtocoloTest, JugadorCompraArmaRestaDinero) {
+TEST(Dinerotests, JugadorCompraArmaRestaDinero) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
@@ -915,7 +1122,7 @@ TEST(ProtocoloTest, JugadorCompraArmaRestaDinero) {
     EXPECT_EQ(jugador.get_dinero(), dinero_inicial - precio_ak);
 }
 
-TEST(ProtocoloTest, JugadorDinero0NoPuedeComprar) {
+TEST(Dinerotests, JugadorDinero0NoPuedeComprar) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
@@ -929,7 +1136,7 @@ TEST(ProtocoloTest, JugadorDinero0NoPuedeComprar) {
     EXPECT_FALSE(jugador.comprarArma(Compra::C_AK47));
 }
 
-TEST(ProtocoloTest, JugadorCompraBalasSecundariasRestaDinero) {
+TEST(Dinerotests, JugadorCompraBalasSecundariasRestaDinero) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
@@ -942,7 +1149,7 @@ TEST(ProtocoloTest, JugadorCompraBalasSecundariasRestaDinero) {
     EXPECT_EQ(jugador.get_dinero(), dinero_inicial - precio);
 }
 
-TEST(ProtocoloTest, JugadorCompraBalasPrimariasSinArmaNoCompra) {
+TEST(Dinerotests, JugadorCompraBalasPrimariasSinArmaNoCompra) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
@@ -951,7 +1158,7 @@ TEST(ProtocoloTest, JugadorCompraBalasPrimariasSinArmaNoCompra) {
     EXPECT_FALSE(compro);
 }
 
-TEST(ProtocoloTest, JugadorCompraBalasPrimariasConArmaRestaDinero) {
+TEST(Dinerotests, JugadorCompraBalasPrimariasConArmaRestaDinero) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Jugador";
     Jugador jugador(1, nombre);
@@ -966,7 +1173,7 @@ TEST(ProtocoloTest, JugadorCompraBalasPrimariasConArmaRestaDinero) {
     EXPECT_EQ(jugador.get_dinero(), dinero_antes - precio);
 }
 
-TEST(ProtocoloTest, JugadorPuedeComprarDuranteTiempoDeCompra) {
+TEST(DineroTests, JugadorPuedeComprarDuranteTiempoDeCompra) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Comprador";
     Jugador jugador(1, nombre);
@@ -977,7 +1184,7 @@ TEST(ProtocoloTest, JugadorPuedeComprarDuranteTiempoDeCompra) {
     EXPECT_TRUE(jugador.comprarArma(C_M3));
 }
 
-TEST(ProtocoloTest, JugadorNoPuedeComprarFueraDeTiempoDeCompra) {
+TEST(DineroTests, JugadorNoPuedeComprarFueraDeTiempoDeCompra) {
     Configuracion::cargar_path("configuracion.yaml");
     std::string nombre = "Comprador";
     Jugador jugador(1, nombre);
@@ -985,5 +1192,55 @@ TEST(ProtocoloTest, JugadorNoPuedeComprarFueraDeTiempoDeCompra) {
     jugador.en_posicion_de_compra(false);
 
     EXPECT_FALSE(jugador.puede_comprar_ahora());
+}
+
+TEST(ArmasTest, AwpHaceDanioSiAciertaDisparo) {
+    Configuracion::cargar_path("configuracion.yaml");
+    Awp awp;
+    float distancia = 1000.0f;
+    while (!awp.puedeAccionar()) {}
+    int danio = awp.accion(distancia);
+    EXPECT_GE(danio, 0);
+    EXPECT_LE(danio, Configuracion::get<int>("danio_max_awp"));
+}
+
+TEST(ArmasTest, M3HaceDanioSiAciertaDisparo) {
+    Configuracion::cargar_path("configuracion.yaml");
+    m3 arma;
+    float distancia = 500.0f;
+    while (!arma.puedeAccionar()) {}
+    int danio = arma.accion(distancia);
+    EXPECT_GE(danio, 0);
+    EXPECT_LE(danio, Configuracion::get<int>("danio_max_m3"));
+}
+
+TEST(ArmasTest, Ak47HaceDanioSiAciertaDisparo) {
+    Configuracion::cargar_path("configuracion.yaml");
+    Ak47 ak47;
+    float distancia = 1000.0f;
+    while (!ak47.puedeAccionar()) {}
+    int danio = ak47.accion(distancia);
+    EXPECT_GE(danio, 0);
+    EXPECT_LE(danio, Configuracion::get<int>("danio_max_ak47"));
+}
+
+TEST(ArmasTest, GlockHaceDanioSiAciertaDisparo) {
+    Configuracion::cargar_path("configuracion.yaml");
+    Glock glock;
+    float distancia = 300.0f;
+    while (!glock.puedeAccionar()) {}
+    int danio = glock.accion(distancia);
+    EXPECT_GE(danio, 0);
+    EXPECT_LE(danio, Configuracion::get<int>("danio_max_glock"));
+}
+
+TEST(ArmasTest, CuchilloHaceDanioSiAciertaDisparo) {
+    Configuracion::cargar_path("configuracion.yaml");
+    Cuchillo cuchillo;
+    float distancia = 10.0f;
+    while (!cuchillo.puedeAccionar()) {}
+    int danio = cuchillo.accion(distancia);
+    EXPECT_GE(danio, Configuracion::get<int>("danio_min_cuchillo"));
+    EXPECT_LE(danio, Configuracion::get<int>("danio_max_cuchillo"));
 }
 

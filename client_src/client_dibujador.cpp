@@ -55,6 +55,7 @@ Dibujador::Dibujador(const int id, Renderer &renderer, struct Mapa mapa, EventHa
     mensaje_bomba_plantada(renderer, fuenteChica.RenderText_Blended("¡La bomba ha sido plantada!", amarillo)),
     mantenga_presionado_activar(renderer,fuenteChica.RenderText_Blended("Mantenga presionado hasta finalizar el activado", amarillo)),
     mantenga_presionado_desactivar(renderer, fuenteChica.RenderText_Blended("Mantenga presionado hasta finalizar el desactivado", amarillo)),
+    partida_finalizada(renderer, fuenteChica.RenderText_Blended("La partida ha finalizado!", amarillo)),
     balas(Texture(renderer, Surface(IMG_Load("client_src/gfx/shells.png")))),
     cs2d(Texture(renderer, Surface(IMG_Load("client_src/gfx/gametitle.png")))),
     player_legs(Texture(renderer, Surface(IMG_Load("client_src/gfx/player/legs.bmp")))),
@@ -909,6 +910,22 @@ void Dibujador::dibujar_aviso_desconectar() {
     
 }
 
+void Dibujador::dibujar_partida_finalizada() {
+
+    dibujar_estadisticas();
+
+    int ancho_mensaje = partida_finalizada.GetWidth();
+    int alto_mensaje = partida_finalizada.GetHeight();
+
+    Rect dst;
+    dst.SetX((ancho_ventana / 2) - ancho_mensaje / 2);
+    dst.SetY((alto_ventana / 8) - alto_mensaje / 2);
+    dst.SetW(ancho_mensaje);
+    dst.SetH(alto_mensaje);
+    renderer.Copy(partida_finalizada, NullOpt, dst);
+
+}
+
 void Dibujador::dibujar_hud() {
 
     const InfoJugador *jugador_principal = snapshot.getJugadorPorId(client_id);
@@ -931,12 +948,16 @@ void Dibujador::dibujar_hud() {
 void Dibujador::renderizar(Snapshot &snapshot) {
     this->snapshot = snapshot;
 
+    renderer.Clear();
+    dibujar_mapa();
+    if(snapshot.termino_partida){
+        dibujar_partida_finalizada();
+        renderer.Present();
+        return;
+    }
     const InfoJugador *principal = snapshot.getJugadorPorId(client_id);
     if (!principal)
         return;
-
-    renderer.Clear();
-    dibujar_mapa();
     dibujar_muertos();
     dibujar_armas_tiradas();
     if (snapshot.bomba_en_suelo.estado_bomba == PLANTADA)

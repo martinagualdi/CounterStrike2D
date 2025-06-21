@@ -43,6 +43,7 @@ private:
     Texture mensaje_bomba_plantada;
     Texture mantenga_presionado_activar;
     Texture mantenga_presionado_desactivar;
+    Texture partida_finalizada;
     Texture balas;
     Texture cs2d;
     Texture player_legs;
@@ -106,6 +107,7 @@ private:
     Texture crearMascaraFOV(float radio_centro, float angulo_fov, Uint8 alpha_fondo);
     void dibujar_estadisticas();
     void dibujar_aviso_desconectar();
+    void dibujar_partida_finalizada();
     void dibujar_estadisticas_jugador(std::vector<int>& col_x, 
     int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);
     

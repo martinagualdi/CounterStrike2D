@@ -336,9 +336,10 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas o no tiene arma principal." << std::endl;
                     }
                 } else {
-                    if (!jugador->comprarArma(comando.compra)) {
-                        std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar el arma." << std::endl;
-                    }
+                    ArmaDeFuego* arma_a_soltar = jugador->comprarArma(comando.compra);
+                    if (arma_a_soltar) {
+                        armas_en_suelo.push_back(ArmaEnSuelo(arma_a_soltar, jugador->getX(), jugador->getY()));
+                    } 
                 }
                 break;
             case SELECCIONAR_SKIN:
@@ -483,15 +484,25 @@ void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego) 
 }
 
 void GameLoop::reiniciar_estado_bomba(){
-    if(bomba){
-        bomba->reiniciar();
+    if(ronda_actual > 1){
+        if (bomba) {
+            bomba->reiniciar();
+            delete bomba;
+            bomba = nullptr;
+        }
         info_bomba= BombaEnSuelo(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false);
         jugador_desactivando = nullptr;
         jugador_plantando = nullptr;
-        bomba = nullptr;
         bomba_plantada = false;
         tiempo_inicio_desactivado = std::chrono::steady_clock::time_point();
         tiempo_inicio_plantado = std::chrono::steady_clock::time_point();
+        for (Jugador *jugador : jugadores) {
+            if (jugador->posee_bomba()) {
+                std::cout << "Elimino bomba de jugador" << std::endl;
+                jugador->quitar_bomba();
+                break;
+            }
+        }
     }
 }
 
@@ -506,7 +517,7 @@ void GameLoop::chequear_bomba_plantada() {
             bomba= jugador_plantando->soltar_bomba(); 
             if (bomba) {
                 info_bomba = BombaEnSuelo (jugador_plantando->getX(), jugador_plantando->getY(), PLANTADA, bomba->getTiempoParaDetonar(),
-            false, true, false);
+                false, true, false);
             }
             jugador_plantando = nullptr;
             std::cout << "Bomba plantada por el jugador " << id_jugador << std::endl;
@@ -528,7 +539,6 @@ void GameLoop::chequear_bomba_desactivada(){
             int id_jugador = jugador_desactivando->getId();
             jugador_desactivando= nullptr;
             std::cout << "Bomba desactivada por el jugador " << id_jugador<< std::endl;
-            
         }
     }else{
        if (bomba_plantada){
@@ -546,6 +556,8 @@ void GameLoop::chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en
         en_juego = false;
         ronda_actual++;
         volver_jugadores_a_spawn();
+        reiniciar_armas_jugadores();
+        reiniciar_dinero_jugadores();
     }
     for (Jugador *jugador : jugadores) {
         if (!jugador->esta_vivo())
@@ -577,6 +589,7 @@ void GameLoop::realizar_cambio_equipo_si_es_necesario() {
             std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(jugador->get_equipo());
             jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]);
         }
+        reiniciar_armas_jugadores();
     }
 }
 
@@ -604,6 +617,9 @@ void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq
         }    
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+    }
+    for (ArmaEnSuelo& arma : armas_en_suelo) {
+        delete arma.getArma();
     }
     armas_en_suelo.clear();
     reiniciar_estado_bomba();
@@ -639,6 +655,18 @@ void GameLoop::colocar_armas_del_mapa() {
     for (const auto& arma_default : armas_default) {
         ArmaDeFuego* arma = ArmaDeFuego::crearArma(arma_default.nombre);
         armas_en_suelo.push_back(ArmaEnSuelo(arma, arma_default.x, arma_default.y));
+    }
+}
+
+void GameLoop::reiniciar_armas_jugadores() {
+    for (Jugador *jugador : jugadores) {
+        jugador->reiniciar_arma();
+    }
+}
+
+void GameLoop::reiniciar_dinero_jugadores() {
+    for (Jugador *jugador : jugadores) {
+        jugador->reiniciar_dinero();
     }
 }
 

@@ -121,7 +121,7 @@ struct Snapshot {
     Snapshot(std::vector<Jugador *> &jugadores, std::vector<Municion> &balas, std::vector<ArmaEnSuelo> armas,BombaEnSuelo bomba_suelta, auto& t_restante, int rondas_ct, int rondas_tt, 
         int ronda_actual, int total_rondas, enum Equipo equipo_ganador, bool termino_partida) {
         for (const auto& jugador_ptr : jugadores) {
-            InfoJugador info_jugador;
+            InfoJugador info_jugador = {};
             info_jugador.id = jugador_ptr->getId();
             info_jugador.nombre = jugador_ptr->getNombre();
             info_jugador.pos_x = jugador_ptr->getX();
@@ -150,7 +150,7 @@ struct Snapshot {
             info_jugadores.push_back(info_jugador);
         }
         for (const auto& bala : balas) {
-            InfoMunicion info_municion;
+            InfoMunicion info_municion = {};
             info_municion.id_quien_disparo = bala.quien_disparo();
             info_municion.pos_x = bala.getPosX();
             info_municion.pos_y = bala.getPosY();
@@ -159,7 +159,7 @@ struct Snapshot {
             balas_disparadas.push_back(info_municion);
         }
         for (const auto& arma : armas) {
-            InfoArmaEnSuelo info_arma;
+            InfoArmaEnSuelo info_arma = {};
             info_arma.tipo_arma = arma.getArma()->getCodigoArma();
             info_arma.pos_x = arma.pos_x;
             info_arma.pos_y = arma.pos_y;
@@ -167,16 +167,18 @@ struct Snapshot {
 
             armas_sueltas.push_back(info_arma);
         }
-        bomba_en_suelo.pos_x = bomba_suelta.pos_x;
-        bomba_en_suelo.pos_y = bomba_suelta.pos_y;
-        bomba_en_suelo.estado_bomba = bomba_suelta.estado_bomba;
-        bomba_en_suelo.tiempo_para_detonar = bomba_suelta.tiempo_para_detonar;
-        bomba_en_suelo.acaba_de_detonar = bomba_suelta.acaba_de_detonar;
-        bomba_en_suelo.acaba_de_ser_plantada = bomba_suelta.acaba_de_ser_plantada;
-        bomba_en_suelo.acaba_de_ser_desactivada = bomba_suelta.acaba_de_ser_desactivada;
+        InfoBomba bomba = {};
+        bomba.pos_x = bomba_suelta.pos_x;
+        bomba.pos_y = bomba_suelta.pos_y;
+        bomba.estado_bomba = bomba_suelta.estado_bomba;
+        bomba.tiempo_para_detonar = bomba_suelta.tiempo_para_detonar;
+        bomba.acaba_de_detonar = bomba_suelta.acaba_de_detonar;
+        bomba.acaba_de_ser_plantada = bomba_suelta.acaba_de_ser_plantada;
+        bomba.acaba_de_ser_desactivada = bomba_suelta.acaba_de_ser_desactivada;
+        this->bomba_en_suelo = bomba;
     
         this->tiempo_restante = t_restante;
-        InfoRondas rondas_info_actual;
+        InfoRondas rondas_info_actual = {};
         rondas_info_actual.rondas_ganadas_ct = rondas_ct;
         rondas_info_actual.rondas_ganadas_tt = rondas_tt;
         rondas_info_actual.ronda_actual = ronda_actual;

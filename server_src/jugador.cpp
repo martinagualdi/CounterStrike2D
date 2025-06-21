@@ -27,8 +27,6 @@ void Jugador::asignar_bomba() {
     }
     bomba = std::make_unique<Bomba>();
     this->tiene_bomba = true;
-    
-    
 }
 
 void Jugador::cancelar_plantado_bomba() {
@@ -93,48 +91,46 @@ void Jugador::cambiar_arma_en_mano() {
     }
 }
 
-bool Jugador::comprarArma(enum Compra arma) {
+ArmaDeFuego* Jugador::comprarArma(enum Compra arma) {
     std::string str_arma = (arma == C_AK47) ? "ak47" : (arma == C_M3) ? "m3" : "awp";
     std::string str_precio = "precio_" + str_arma;
     int precio = Configuracion::get<int>(str_precio);
+    ArmaDeFuego* arma_a_soltar = nullptr;
+    if(dinero < precio) {
+        return arma_a_soltar; // No tiene suficiente dinero
+    }
     switch (arma) {
         case C_AK47:
-            if (dinero >= precio) {
-                if(!arma_principal || arma_principal->getNombre() != "AK-47"){
-                    arma_principal = std::make_unique<Ak47>();
-                    dinero -= precio;
-                    arma_en_mano = arma_principal.get();
-                    acaba_de_comprar_arma = true; 
-                    return true;
-                } 
-            }
+            if(!arma_principal || arma_principal->getNombre() != "AK-47"){
+                arma_a_soltar = soltar_arma_pricipal();
+                arma_principal = std::make_unique<Ak47>();
+                dinero -= precio;
+                arma_en_mano = arma_principal.get();
+                acaba_de_comprar_arma = true; 
+            } 
             break;
         case C_M3:
-            if (dinero >= precio) {
-                if(!arma_principal || arma_principal->getNombre() != "M3"){
-                    arma_principal = std::make_unique<m3>();
-                    dinero -= precio;
-                    arma_en_mano = arma_principal.get();
-                    acaba_de_comprar_arma = true;
-                    return true;
-                }                
-            }
+            if(!arma_principal || arma_principal->getNombre() != "M3"){
+                arma_a_soltar = soltar_arma_pricipal();
+                arma_principal = std::make_unique<m3>();
+                dinero -= precio;
+                arma_en_mano = arma_principal.get();
+                acaba_de_comprar_arma = true;
+            }                
             break;
         case C_AWP:
-            if (dinero >= precio) {
-                if(!arma_principal || arma_principal->getNombre() != "AWP"){
-                    arma_principal = std::make_unique<Awp>();
-                    dinero -= precio;
-                    arma_en_mano = arma_principal.get();
-                    acaba_de_comprar_arma = true;
-                    return true;
-                }
+            if(!arma_principal || arma_principal->getNombre() != "AWP"){
+                arma_a_soltar = soltar_arma_pricipal();
+                arma_principal = std::make_unique<Awp>();
+                dinero -= precio;
+                arma_en_mano = arma_principal.get();
+                acaba_de_comprar_arma = true;
             }
             break;
         default:
             break;
     }
-    return false;
+    return arma_a_soltar;
 }
 
 bool Jugador::comprarBalas(enum Compra tipo_bala) {
@@ -198,6 +194,20 @@ void Jugador::finalizar_ronda() {
     eliminaciones_esta_ronda = 0;
 }
 
+void Jugador::quitar_bomba() {
+    if (tiene_bomba) {
+        bomba.reset();
+        tiene_bomba = false;
+        plantando_bomba = false;
+        puede_plantar_bomba = false;
+        desactivando_bomba = false;
+        if (arma_principal) 
+            arma_en_mano = arma_principal.get(); 
+        else 
+            arma_en_mano = arma_secundaria.get(); 
+    }
+}
+
 void Jugador::definir_spawn(float x, float y) {
     this->x = x;
     this->y = y;
@@ -248,6 +258,15 @@ ArmaDeFuego* Jugador::levantar_arma(Arma* arma_del_suelo) {
     return arma_soltar; 
 }
 
+void Jugador::reiniciar_arma() {
+    arma_principal.reset();
+    arma_en_mano = arma_secundaria.get();
+}
+
+void Jugador::reiniciar_dinero() {
+    dinero = Configuracion::get<int>("dinero_inicial");
+}
+
 void Jugador::reiniciar() {
     x = spawn_x;
     y = spawn_y;
@@ -256,4 +275,12 @@ void Jugador::reiniciar() {
     vivo = true;
     moviendose = false;
     movimiento_actual = DETENER;
+}
+
+Jugador::~Jugador() {
+    // Destructor para liberar recursos si es necesario
+    arma_principal.reset();
+    arma_secundaria.reset();
+    cuchillo.reset();
+    bomba.reset();
 }

@@ -35,7 +35,7 @@ class GameLoop : public Thread {
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
     BombaEnSuelo info_bomba;
-    Bomba* bomba;
+    Bomba* bomba = nullptr;
     std::chrono::steady_clock::time_point tiempo_inicio_plantado;
     std::chrono::steady_clock::time_point tiempo_inicio_desactivado;
     Jugador* jugador_plantando = nullptr;
@@ -67,6 +67,8 @@ class GameLoop : public Thread {
     void asignar_bomba_si_es_necesario(bool esperando);
     void colocar_armas_del_mapa();
     bool chequear_si_termino_partida();
+    void reiniciar_armas_jugadores();
+    void reiniciar_dinero_jugadores();
 
   public:
     explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, bool activa, std::string yaml_partida);

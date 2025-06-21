@@ -120,7 +120,7 @@ Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion 
 
 #### Instalador
 
-Al correr el debido comando el instalador hará cosas:
+Al correr el debido comando el instalador hará 5 cosas:
 
 1. make clean
 2. make

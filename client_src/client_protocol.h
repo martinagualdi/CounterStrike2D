@@ -28,6 +28,7 @@ public:
     void enviar_mensaje(const std::string& mensaje);
     std::string recibir_mapa();
     std::string recibir_mensaje();
+    InfoConfigClient recibir_configuracion_inicial();
     std::vector<std::pair<std::string, std::string>> recibir_lista_mapas();
 
     ProtocoloCliente(const ProtocoloCliente&) = delete;

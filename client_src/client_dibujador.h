@@ -1,6 +1,7 @@
 #ifndef CLIENT_DIBUJADOR_H
 #define CLIENT_DIBUJADOR_H
 
+#include "../common_src/comando_dto.h"
 #include "../common_src/queue.h"
 #include "../common_src/snapshot.h"
 #include "client_event_handler.h"
@@ -20,6 +21,7 @@ private:
     int alto_ventana;
     int ancho_real;
     int alto_real;
+    InfoConfigClient infoConfig;
     Renderer& renderer;
     EventHandler& eventHandler;
     Queue<Snapshot>& cola_recibidor;
@@ -41,6 +43,7 @@ private:
     Texture mensaje_bomba_plantada;
     Texture mantenga_presionado_activar;
     Texture mantenga_presionado_desactivar;
+    Texture partida_finalizada;
     Texture balas;
     Texture cs2d;
     Texture player_legs;
@@ -56,6 +59,7 @@ private:
     std::vector<Texture> ct_nombres;
     std::vector<Texture> tt_nombres;
     std::vector<Texture> esperando_jugadores;
+    std::vector<Texture> aviso_desconectar;
     std::vector<Texture> mensajes_ganadores;
     SDL_Rect sprite_arma;
     SDL_Rect sprite_bala;
@@ -64,6 +68,8 @@ private:
     std::vector<SDL_Rect> sprites_player_legs;
     std::vector<SDL_Rect> sprites_simbolos_hud;
     std::vector<SDL_Rect> sprites_numeros_hud;
+    int tam_mascara_fov;
+    Texture mascara_fov;
     std::vector<int> separar_digitos(int n);
     std::vector<int> separar_digitos_tiempo(int n);
     void inicializar_textos();
@@ -98,9 +104,10 @@ private:
     void dibujar_mensaje_bomba_plantada();
     void dibujar_bomba_plantada();
     void dibujar_vision_de_campo(float angulo_jugador);
-    void rellenarPoligonoStencil(const std::vector<SDL_Point>& puntos);
-    void rellenarCirculoStencil(int cx, int cy, int r);
+    Texture crearMascaraFOV(float radio_centro, float angulo_fov, Uint8 alpha_fondo);
     void dibujar_estadisticas();
+    void dibujar_aviso_desconectar();
+    void dibujar_partida_finalizada();
     void dibujar_estadisticas_jugador(std::vector<int>& col_x, 
     int& y_fila_inicial, int& fila, int& altura_fila, enum Equipo equipo);
     
@@ -114,7 +121,8 @@ public:
     int ancho_ventana,
     int alto_ventana,
     int ancho_real,
-    int alto_real
+    int alto_real,
+    InfoConfigClient infoConfig
     );
     void renderizar(Snapshot& snapshot);
     Dibujador(const Dibujador&) = delete;

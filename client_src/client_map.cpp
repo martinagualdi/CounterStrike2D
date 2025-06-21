@@ -63,7 +63,7 @@ void ClientMap::ordenarElementosPorPrioridad(std::vector<ElementoMapa> &elemento
 }
 
 std::shared_ptr<Texture> ClientMap::cargarTextura(const char* path) {
-    std::string path_completo = std::string(RUTA_BASE_IMAGENES) + path;
+    std::string path_completo = RUTA_IMAGENES(path);
 
     auto it = cache.find(path_completo);
     if (it != cache.end())

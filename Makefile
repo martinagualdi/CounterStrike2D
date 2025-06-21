@@ -2,7 +2,7 @@
 
 build:
 	mkdir -p build/
-	RUTA_BASE="" cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DINSTALADO=OFF $(EXTRA_GENERATE)
+	RUTA_BASE="" cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Debug -DTALLER_TESTS=ON -DINSTALADO=OFF $(EXTRA_GENERATE)
 	cmake --build  build/ $(EXTRA_COMPILE)
 
 run-tests:
@@ -19,7 +19,7 @@ clean:
 
 install:
 	mkdir -p build-and-test/
-	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=debug -DINSTALADO=ON $(EXTRA_GENERATE)
+	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=debug -DTALLER_TESTS=ON -DINSTALADO=ON $(EXTRA_GENERATE)
 	cmake --build build/ $(EXTRA_COMPILE)
 	chmod +x uninstall.sh
 	sudo bash ./install.sh

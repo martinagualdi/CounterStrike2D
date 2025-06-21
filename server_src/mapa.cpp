@@ -24,10 +24,10 @@ Mapa::Mapa(std::string yamlPath) {
         } else if(tipo_str == "piso"){
             tipo = PISO;
         } else if(tipo_str == "arma"){
-            tipo = PISO;
+            tipo = ARMA;
             /* HAY QUE MODIFICAR PARA QUE SE MUESTRE EL PISO Y ARRIBA EL ARMA, AGREGAR EL ARMA AL VECTOR DE ARMASDEFAULTENMAPA */
             std::string aux = nodo["imagen"].as<std::string>();
-            const std::string prefix = "gfx/weapons/";
+            const std::string prefix = "weapons/";
             const std::string suffix = "_m.bmp";
             size_t start = aux.find(prefix);
             size_t end = aux.find(suffix);

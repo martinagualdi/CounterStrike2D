@@ -12,6 +12,7 @@ sudo apt-get install -y \
   libyaml-cpp-dev
 
 echo "[2/4] Compilando proyecto y corriendo tests..."
+#make build-and-tests
 
 echo "[3/4] Instalando archivos..."
 

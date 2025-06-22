@@ -920,10 +920,10 @@ void Dibujador::dibujar_aviso_desconectar() {
         Rect dst;
         dst.SetX((ancho_ventana / 2) - ancho_mensaje / 2);
         if(i == 0)
-            dst.SetY((alto_ventana / 3) - alto_mensaje / 2);
+            dst.SetY((alto_ventana / 6) - alto_mensaje / 2);
         else{
             int offset = aviso_desconectar[i-1].GetHeight();
-            dst.SetY((alto_ventana / 3) - alto_mensaje / 2 + offset);
+            dst.SetY((alto_ventana / 6) - alto_mensaje / 2 + offset);
         }   
         dst.SetW(ancho_mensaje);
         dst.SetH(alto_mensaje);
@@ -975,6 +975,8 @@ void Dibujador::renderizar(Snapshot &snapshot) {
     dibujar_mapa();
     if(snapshot.termino_partida){
         dibujar_partida_finalizada();
+        if(eventHandler.avisoDesconectarActivo())
+            dibujar_aviso_desconectar();
         renderer.Present();
         return;
     }

@@ -917,7 +917,7 @@ void Dibujador::dibujar_esperando_jugadores() {
 
     Rect dst_esperando;
     dst_esperando.SetX((ancho_ventana / 2) - esperando_jugadores[0].GetWidth() / 2);
-    dst_esperando.SetY((alto_ventana / 3) - esperando_jugadores[0].GetWidth() / 2);
+    dst_esperando.SetY((alto_ventana / 8) - esperando_jugadores[0].GetHeight() / 2);
     dst_esperando.SetW(ancho_mensaje);
     dst_esperando.SetH(alto_mensaje);
     renderer.Copy(esperando_jugadores[i], NullOpt, dst_esperando);

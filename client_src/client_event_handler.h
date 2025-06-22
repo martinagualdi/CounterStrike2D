@@ -11,9 +11,12 @@ class EventHandler {
 private:
     Queue<ComandoDTO>& cola_enviador;
     const int client_id;
+    int ancho_ventana;
+    int alto_ventana;
     bool mercado_abierto;
     bool puede_comprar;
     bool skin_seleccionado;
+    bool aviso_desconectar_activo;
     bool estadisticas;
     std::unordered_set<SDL_Scancode> teclas_validas;
     std::unordered_set<SDL_Scancode> teclas_presionadas;
@@ -25,13 +28,16 @@ private:
     void procesarDrop(const SDL_Event& event);
     void procesarLevantar(const SDL_Event& event);
     void procesarEstadisticas(const SDL_Event& event);
+    bool procesarDesconectar(const SDL_Event& event, bool& jugador_activo);
     float procesarPuntero();
     float calcularAngulo(float x_personaje, float y_personaje, int x_mouse, int y_mouse);
 
 public:
-    explicit EventHandler(Queue<ComandoDTO>& cola_enviador, const int client_id);
+    EventHandler(Queue<ComandoDTO>& cola_enviador, 
+        const int client_id, int ancho_ventana, int alto_ventana);
     void manejarEventos(bool& isRunning, bool puede_comprar);
     bool mercadoAbierto() const;
+    bool avisoDesconectarActivo() const;
     bool puedeMostrarEstadisticas() const;
     void cerrarMercado();
     bool skinSeleccionado() const;

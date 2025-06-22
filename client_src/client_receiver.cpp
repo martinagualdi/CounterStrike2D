@@ -7,7 +7,9 @@ void ClientReceiver::run(){
         Snapshot snapshot;
         try{
             if(should_keep_running())
-            snapshot = protocolo.recibirSnapshot(); 
+            snapshot = protocolo.recibirSnapshot();
+            if(snapshot.termino_partida)
+                this->stop();
             
         } catch (const std::exception& e){
             break;

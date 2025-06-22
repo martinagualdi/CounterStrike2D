@@ -35,7 +35,7 @@ class GameLoop : public Thread {
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
     BombaEnSuelo info_bomba;
-    Bomba* bomba;
+    Bomba* bomba = nullptr;
     std::chrono::steady_clock::time_point tiempo_inicio_plantado;
     std::chrono::steady_clock::time_point tiempo_inicio_desactivado;
     Jugador* jugador_plantando = nullptr;
@@ -49,7 +49,7 @@ class GameLoop : public Thread {
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
     bool jugar_ronda(bool esperando);
-    enum Equipo se_termino_ronda();
+    enum Equipo se_termino_ronda(auto& t_inicio);
     bool esperando_jugadores();
     void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
@@ -59,23 +59,29 @@ class GameLoop : public Thread {
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);
-    void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego);
-    void chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego);
+    void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego, auto& t_inicio);
+    void chequear_si_completaron_equipos(bool& en_juego);
     void explosion();
     void realizar_cambio_equipo_si_es_necesario();
     void esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador);
     void asignar_bomba_si_es_necesario(bool esperando);
     void colocar_armas_del_mapa();
     bool chequear_si_termino_partida();
+    void reiniciar_armas_jugadores();
+    void reiniciar_dinero_jugadores();
 
   public:
-    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, std::string yaml_partida);
+    explicit GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugadores, bool activa, std::string yaml_partida);
 
     void agregar_jugador_a_partida(const int id, std::string& nombre);
 
     std::string mapa_en_estado_inicial() const { return mapa.mapa_en_estado_inicial(); }
 
     virtual void run() override;
+
+    void eliminar_jugador_de_partida(int id_jugador);
+
+    ~GameLoop() override;
 };
 
 #endif

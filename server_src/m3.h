@@ -5,12 +5,15 @@
 
 class m3 : public ArmaDeFuego {
 
+private:
+    static constexpr float D = 100.0f; // Factor de distancia para el cálculo de daño
+
 public:
     
     m3() : ArmaDeFuego(
         "M3", 
         Configuracion::get<float>("precision_m3"), 
-        180.0f, 
+        750.0f, 
         Configuracion::get<int>("danio_min_m3"), 
         Configuracion::get<int>("danio_max_m3"), 
         false,
@@ -23,7 +26,7 @@ public:
     bool puedeAccionar() override;
 
     enum ArmaEnMano getCodigoArma() const override {
-        return M3; // Asumiendo que el M3 es un arma del jugador
+        return M3;
     }
 };
 

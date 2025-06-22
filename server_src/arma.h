@@ -5,14 +5,14 @@
 #include <random>
 #include <chrono>
 
-#include "configuracion.h" 
+#include "../common_src/configuracion.h" 
 #include "../common_src/enums_jugador.h"
 
 class Arma {
 protected:
     const std::string nombre;
     float precision; // 0.0 a 1.0
-    const float alcance;   // en unidades del juego
+    const float alcance;   
     const int min_danio;
     const int max_danio;
     const bool es_automatica;

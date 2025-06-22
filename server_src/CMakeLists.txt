@@ -15,7 +15,6 @@ target_sources(server
     jugador.cpp
     mapa.cpp
     municion.cpp
-    configuracion.cpp
     awp.cpp
     ak47.cpp
     m3.cpp
@@ -47,5 +46,4 @@ target_sources(server
     cuchillo.h
     glock.h
     m3.h
-    configuracion.h
     )

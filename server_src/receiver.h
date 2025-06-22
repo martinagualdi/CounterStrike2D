@@ -28,6 +28,7 @@ class Receiver : public Thread {
     MonitorPartidas& monitor_partidas;
     std::atomic<bool>& alive;
     int player_id;
+    int game_id;
     Queue<ComandoDTO>* queue_comandos = nullptr;
     Queue<Snapshot>& queue_enviadora;
     Sender sender;

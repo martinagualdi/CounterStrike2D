@@ -25,7 +25,9 @@ void ClientHandler::cortar_conexion() {
 ClientHandler::~ClientHandler() {
     //s.terminar_ejecucion();
     r.terminar_ejecucion();
-    queue_enviadora.close();
-    skt.shutdown(RW_CLOSE);
-    skt.close();
+    r.join();
+    std::cout << "[ClientHandler] El ClientHandler ha terminado su ejecucion." << std::endl;
+    //queue_enviadora.close();
+    //skt.shutdown(RW_CLOSE);
+    //skt.close();
 }

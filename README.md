@@ -38,6 +38,26 @@ El archivo de configuración contiene el puerto al cual conectarse, predefinido 
 ./taller_editor
 ```
 
+#### Instalador
+
+Al correr el debido comando el instalador hará 5 cosas:
+
+1. make clean
+2. make
+3. Correr tests con valgrind
+4. Instalar todas las dependencias
+5. Posicionar 3 ejecutables en el escritorio con icono de aplicacion. 
+
+###### Para ejecutar el juego: 
+
+Hacer doble click en el icono del server y luego en el del cliente, es importante mantener el orden. De esta manera el juego funcionará igual que en modo developer. 
+
+###### Para ejecutar el editor: 
+
+Hacer doble click en el icono del editor, luego funcionará igual que en modo developer. 
+
+**IMPORTANTE:** en caso de que los iconos de aplicacion aparezcan con una **cruz** y un mensaje de que no permiten ser lanzadas, hacer click derecho sobre los mismos y habilitar dicho permiso (**allow launching**).
+
 #### Lobby
 Una vez ejecutado el cliente se deberá ingresar **host**, **port** y **username** en la pantalla de inicio para conectarse. 
 De esta manera, cuando el cliente ya este correctamente conectado se podrá:
@@ -57,24 +77,157 @@ De esta manera, cuando el cliente ya este correctamente conectado se podrá:
     Se le asignaŕa automaticamente un bando y el cliente podrá elegir su skin (correspondiente al equipo) haciendo click en la imagen deseada.
     Se incorporará automaticamente a la partida con el mapa elegido por quien haya creado la misma. 
 
-#### Movimientos del jugador
-Para mover al jugador podes usar:
 
-- Teclado: **W**(arriba), **S**(abajo), **A**(derecha), **D**(izquierda). 
+### Manual de Usuario — Controles del Juego
 
-- Mouse: para rotar el frente del jugador. 
+## Movimiento del Jugador
 
-#### Comprar armas
+- **W** — Mover arriba  
+- **A** — Mover izquierda  
+- **S** — Mover abajo  
+- **D** — Mover derecha  
+- **W+A**, **W+D**, **S+A**, **S+D** — Movimiento diagonal
 
-Para comprar armas al inicio de la partida:
-- Se debe estar dentro de la zona de compra, indicada con un carrito de compras en el HUD de la pantalla.
-- Presionar tecla B.
-- Seleccionar el número de arma correspondiente.
-- Para comprar balas del arma primaria usar la coma (,)
-- Para comprar balas del arma secundaria usar el punto (.)
+## Disparo
 
-Cabe aclarar que para comprar balas no hace falta abrir el mercado. Solo para comprar armas es necesario abrirlo (apretar B).
-La idea de este mercado es simular el mismo sistema que usa el Counter-Strike real.
+- **Mouse** — Apuntar (el ángulo de disparo sigue al puntero)
+- **Click izquierdo** — Disparar el arma
+- **Rueda del mouse (scroll abajo)** — Cambiar de arma
+
+## Interacciones
+
+- **E** — Plantar o desactivar bomba  
+  - Mantener presionada para accionar la bomba, soltar para detener
+- **F** — Levantar (tomar) objetos del piso (por ejemplo, armas)
+- **G** — Dropear (tirar) el arma actual
+
+## Compra de Armas y Munición
+
+- **B** — Abrir menú de compra (solo cuando está permitido)
+    - **1** — Comprar AK47  
+    - **2** — Comprar M3  
+    - **3** — Comprar AWP  
+    - **,** (coma) — Comprar balas de arma primaria  
+    - **.** (punto) — Comprar balas de arma secundaria  
+    - **ESC** — Cerrar menú de compra sin comprar
+
+> **Nota:**  
+> Si el menú de compra está abierto, se detiene el movimiento del jugador hasta cerrarlo.
+
+---
+
+## Selección de Skin
+
+- Al inicio de la partida, elegí tu skin con:
+    - **1** — CT: Seal Force / TT: Pheonix
+    - **2** — CT: German GSG-9 / TT: L337 Krew
+    - **3** — CT: UK SAS / TT: Artic Avenger
+    - **4** — CT: French GIGN / TT: Guerrilla
+
+
+## Estadísticas de la Partida
+
+- **TAB** — Mantener presionado para mostrar las estadísticas (scoreboard).  
+  - Solta TAB para ocultarlas.
+
+## Aviso y Confirmación de Salida
+
+- **Q** — Mostrar / ocultar aviso de desconexión (confirmar antes de salir)
+- **ENTER** (cuando el aviso de desconexión está activo) — Confirmar salida
+- **Cerrar ventana** — Salir del juego
+
+
+## Otros
+
+- Si el menú de compra está abierto, solo se puede comprar hasta que se cierre (con ESC o comprando).
+- Si el jugador muere, no podrá moverse ni interactuar hasta la próxima ronda.
+
+## Resumen Rápido
+
+| Acción                      | Tecla / Botón        |
+|-----------------------------|----------------------|
+| Mover                       | W / A / S / D        |
+| Disparar                    | Click izquierdo      |
+| Apuntar                     | Mouse                |
+| Cambiar arma                | Rueda mouse (abajo)  |
+| Comprar                     | B (abrir menú)       |
+| Confirmar compra            | 1, 2, 3, ,, .        |
+| Dropear arma                | G                    |
+| Levantar objeto             | F                    |
+| Plantar/desactivar bomba    | E                    |
+| Scoreboard                  | TAB                  |
+| Seleccionar skin            | 1, 2, 3, 4           |
+| Aviso de salida             | Q                    |
+| Confirmar salida            | ENTER                |
+
+# Lógica General del Juego
+
+
+## Estructura de Partida
+
+- **Inicio:**  
+  El juego comienza cuando hay suficientes jugadores en ambos equipos (definido en el archivo de configuración).
+- **Rondas:**
+  El juego se divide en rondas. Cada ronda inicia con los jugadores en su zona de spawn y un tiempo de compra de armas limitado.
+- **Compra:**  
+  Durante el tiempo de compra, los jugadores pueden adquirir armas y munición sólo dentro de la zona de compra. No hace falta que el usuario abra la tienda para comprar balas.
+
+
+## Condiciones de Finalización de Ronda
+
+La ronda termina cuando ocurre uno de estos eventos:
+- Todos los jugadores de un equipo han muerto:
+  - Si solo quedan CT vivos y la bomba no fue plantada, ganan los CT.
+  - Si quedan TT vivos, ganan los TT.
+- **Bomba:**
+  - Si la bomba es plantada y explota, ganan los TT.
+  - Si la bomba es desactivada a tiempo por un CT, ganan los CT.
+
+
+Al finalizar la ronda:
+- Se actualizan los puntajes.
+- Se muestra el ganador.
+- Hay un intervalo antes de la próxima ronda.
+
+
+## Lógica de la Bomba
+
+- Solo un jugador TT con la bomba puede plantarla en la zona designada.
+- Plantar/desactivar requiere mantener la acción durante un tiempo.
+- Al plantar, la bomba inicia un timer para detonar.
+- Los CT pueden desactivarla en la zona correspondiente.
+- Si explota, daña a los CT cercanos.
+- Si es desactivada antes de explotar, ganan los CT.
+
+
+## Dinámica de Armas y Balas
+
+- Los jugadores pueden:
+  - Comprar armas/munición solo en tiempo y zona de compra.
+  - Cambiar, dropear y levantar armas.
+  - Disparar armas (AK47, M3, AWP, cuchillo, etc).
+- Las balas se mueven por el mapa y chequean colisiones contra paredes y jugadores.
+- Los jugadores muertos dejan caer su arma principal.
+
+
+## Gestión de Jugadores
+
+- Los jugadores se asignan alternando entre CT y TT para balancear equipos.
+- Al morir, el jugador pierde su arma principal. Esta queda en forma de drop en el piso. Otros jugadores pueden levantarla antes que se termine la ronda.
+- Al iniciar una nueva ronda, todos los jugadores reviven y vuelven a sus spawns.
+- Si un jugador se desconecta, es eliminado y se libera la memoria.
+
+## Cambio de Bandos
+
+- Tras cierta cantidad de rondas, los equipos se intercambian:
+  - CT pasa a TT y viceversa.
+  - Se reubican en el spawn del nuevo bando.
+
+## Fin de Partida
+
+- Cuando se alcanza el máximo de rondas , la partida finaliza.
+- Se informa el estado final a todos los jugadores.
+
 
 #### Uso del editor de niveles/mapas
 
@@ -117,25 +270,3 @@ Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion 
 - Hacer **click en la esquina inferior derecha** para redimencionar la zona. 
 
 - Hacer **doble click** en el centro de la zona para cambiarle el tipo a la misma.
-
-#### Instalador
-
-Al correr el debido comando el instalador hará 5 cosas:
-
-1. make clean
-2. make
-3. Correr tests con valgrind
-4. Instalar todas las dependencias
-5. Posicionar 3 ejecutables en el escritorio con icono de aplicacion. 
-
-###### Para ejecutar el juego: 
-
-Hacer doble click en el icono del server y luego en el del cliente, es importante mantener el orden. De esta manera el juego funcionará igual que en modo developer. 
-
-###### Para ejecutar el editor: 
-
-Hacer doble click en el icono del editor, luego funcionará igual que en modo developer. 
-
-**IMPORTANTE:** en caso de que los iconos de aplicacion aparezcan con una **cruz** y un mensaje de que no permiten ser lanzadas, hacer click derecho sobre los mismos y habilitar dicho permiso (**allow launching**).
-
-

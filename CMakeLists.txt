@@ -233,7 +233,7 @@ if(TALLER_TESTS)
         server_src/awp.cpp
         server_src/bomba.cpp
         server_src/cuchillo.cpp
-        server_src/configuracion.cpp
+        common_src/configuracion.cpp
         server_src/municion.cpp
     )
 

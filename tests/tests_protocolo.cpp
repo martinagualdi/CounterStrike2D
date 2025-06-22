@@ -11,7 +11,7 @@
 #include "../server_src/glock.h"
 #include "../server_src/cuchillo.h"
 #include "../server_src/jugador.h"
-#include "../server_src/configuracion.h"
+#include "../common_src/configuracion.h"
 #include "../common_src/socket.h"
 #include "../common_src/snapshot.h"
 #include "../common_src/enums_jugador.h"

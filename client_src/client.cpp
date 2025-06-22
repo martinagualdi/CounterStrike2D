@@ -1,5 +1,6 @@
 #include "client.h"
 #include "client_map.h"
+#include "../common_src/ruta_base.h"
 #include <SDL2pp/SDL2pp.hh>
 #include <SDL2/SDL.h>
 #include <QApplication>
@@ -31,7 +32,7 @@ void Client::iniciar() {
     InfoConfigClient infoConfig = protocolo.recibir_configuracion_inicial();
     hilo_enviador.start();
     hilo_recibidor.start();
-    Configuracion::cargar_path(CLIENT_CONFIG_PATH);
+    Configuracion::cargar_path(RUTA_CONFIG_CLIENT(CLIENT_CONFIG_PATH).c_str());
     int ancho_ventana = Configuracion::get<int>("ancho_ventana");
     int alto_ventana = Configuracion::get<int>("alto_ventana");
     bool fullscreen = Configuracion::get<bool>("fullscreen");

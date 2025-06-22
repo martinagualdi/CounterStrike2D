@@ -3,8 +3,8 @@ puerto: "8080"
 cantidad_min_ct: 1
 cantidad_min_tt: 1
 
-ronda_por_partida: 1
-rondas_por_bando: 0
+ronda_por_partida: 2
+rondas_por_bando: 1
 
 #segundos
 tiempo_por_ronda: 300

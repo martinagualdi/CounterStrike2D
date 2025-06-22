@@ -201,6 +201,19 @@ enum Equipo GameLoop::se_termino_ronda(auto& t_inicio) {
         return TT;
     }
 
+    if(bomba) {
+        if (bomba->fueDesactivada()){
+            rondas_ganadas_ct++;
+            return CT;
+        }
+        if (bomba->detonar()){
+            info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
+            explosion();
+            rondas_ganadas_tt++;
+            return TT;
+        }
+    }
+
     for (Jugador *jugador : jugadores) {
         if (jugador->esta_vivo()) {
             if (jugador->get_equipo() == CT) 
@@ -222,18 +235,7 @@ enum Equipo GameLoop::se_termino_ronda(auto& t_inicio) {
         }
     }
 
-    if(bomba) {
-        if (bomba->fueDesactivada()){
-            rondas_ganadas_ct++;
-            return CT;
-        }
-        if (bomba->detonar()){
-            info_bomba= BombaEnSuelo(bomba->getX(),bomba->getY(),DETONADA,0,true,false,false);
-            explosion();
-            rondas_ganadas_tt++;
-            return TT;
-        }
-    }
+
     return NONE;
 }
 

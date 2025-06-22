@@ -40,6 +40,7 @@ sudo cp -r server_src/mapas_disponibles /var/$TP_NAME/server/
 
 
 sudo cp configuracion.yaml /etc/$TP_NAME/
+sudo cp client_config.yaml /etc/$TP_NAME/
 if [ -d config ]; then
   sudo cp -r config/* /etc/$TP_NAME/
 fi

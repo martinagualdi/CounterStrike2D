@@ -49,7 +49,7 @@ class GameLoop : public Thread {
     void ejecutar_movimiento(Jugador *jugador);
     Jugador* findJugador(int id_jugador);
     bool jugar_ronda(bool esperando);
-    enum Equipo se_termino_ronda();
+    enum Equipo se_termino_ronda(auto& t_inicio);
     bool esperando_jugadores();
     void chequear_estados_jugadores();
     void chequear_si_pueden_comprar(auto t_inicio);
@@ -59,8 +59,8 @@ class GameLoop : public Thread {
     void ejecucion_comandos_recibidos();
     void disparar_rafagas_restantes();
     void chequear_colisiones(bool esperando);
-    void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego);
-    void chequear_si_completaron_equipos(enum Equipo& eq_ganador, bool& en_juego);
+    void chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego, auto& t_inicio);
+    void chequear_si_completaron_equipos(bool& en_juego);
     void explosion();
     void realizar_cambio_equipo_si_es_necesario();
     void esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador);

@@ -331,7 +331,7 @@ void EventHandler::manejarEventos(bool &jugador_activo, bool puede_comprar)
 
     while(SDL_PollEvent(&event)){
         
-        if(procesarDesconectar(event, jugador_activo))
+        if(procesarDesconectar(event, jugador_activo)) 
             return;
 
         if(!skin_seleccionado)

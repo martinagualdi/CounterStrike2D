@@ -30,6 +30,3 @@ Se han usado las siguiente bibliotecas desarrolladas por Di Paola, Martin:
 - 'LibError'.
 - 'Queue'.
 - 'Thread'.
-
-##### Sprites 
-https://9508.cercom.com.ar:62128/course/2025c1/$common/counterstrike2d_assets/assets.zip 

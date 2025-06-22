@@ -1,3 +1,6 @@
+#ifndef GLOCK_H
+#define GLOCK_H
+
 #include "arma_de_fuego.h"
 
 class Glock : public ArmaDeFuego {
@@ -24,3 +27,5 @@ public:
     }
     
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef AWP_H
+#define AWP_H
 #include "arma_de_fuego.h"
 
 class Awp : public ArmaDeFuego {
@@ -22,3 +24,5 @@ public:
 
     enum ArmaEnMano getCodigoArma() const override { return AWP; }
 };
+
+#endif

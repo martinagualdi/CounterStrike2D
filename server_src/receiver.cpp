@@ -1,4 +1,5 @@
 #include "receiver.h"
+#include "../common_src/ruta_base.h"
 
 #include <syslog.h>
 
@@ -12,7 +13,7 @@ std::vector<std::pair<std::string, std::string>> Receiver::listar_mapas_disponib
     namespace fs = std::filesystem;
     std::vector<std::pair<std::string, std::string>> mapas;
 
-    const std::string ruta = "server_src/mapas_disponibles";
+    const std::string ruta = RUTA_SERVER_BASE;
 
     for (const auto& entry : fs::directory_iterator(ruta)) {
         if (!entry.is_regular_file()) continue;
@@ -47,9 +48,8 @@ void Receiver::comunicacion_del_lobby() {
                 if (path == "cancelled") {
                     continue;
                 }
-                path = "server_src/mapas_disponibles/" + path;
-                partida_id = monitor_partidas.crear_partida(player_id, comando_inicial[1], queue_enviadora, path);
-                game_id = partida_id;
+                std::string path_completo = RUTA_SERVER_BASE + path;
+                partida_id = monitor_partidas.crear_partida(player_id, comando_inicial[1], queue_enviadora, path_completo);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocol.enviar_mapa(yaml_serializado);
                 protocol.enviar_valores_de_config(InfoConfigClient(true));

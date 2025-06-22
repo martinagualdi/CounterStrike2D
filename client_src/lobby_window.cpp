@@ -1,6 +1,7 @@
 #include "lobby_window.h"
 #include "mensaje_popup.h"
 #include "map_selection.h"
+#include "../common_src/ruta_base.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
 #include <QPixmap>
@@ -13,10 +14,9 @@
 LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& username)
     : QDialog(nullptr), protocolo(protocolo), username(username) {
 
-    this->resize(900, 700); // Tamaño más grande para parecerse a la imagen
+    this->resize(900, 700);
 
-    // Fondo
-    QPixmap fondo("client_src/gfx/backgrounds/lobby.jpg"); 
+    QPixmap fondo(QString::fromStdString(RUTA_IMAGENES("lobby/lobby.jpg")));
     if (!fondo.isNull()) {
         QPalette palette;
         palette.setBrush(QPalette::Window, QBrush(fondo.scaled(this->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
@@ -24,17 +24,13 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
         this->setAutoFillBackground(true);
     }
 
-    // Layout principal (horizontal: izquierda botones, derecha vacío)
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
-    // Layout izquierdo
     QVBoxLayout* leftLayout = new QVBoxLayout();
 
-    // Etiqueta de bienvenida
     mensajeLabel = new QLabel(QString("Bienvenido a Counter Strike 2D, %1").arg(QString::fromStdString(username)), this);
     mensajeLabel->setStyleSheet("color: white; font-weight: bold; font-size: 30px;");
 
-    // Botones más pequeños
     crearButton = new QPushButton("Crear partida", this);
     listarButton = new QPushButton("Listar partidas", this);
     unirseButton = new QPushButton("Unirse a partida", this);
@@ -60,12 +56,10 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     listarButton->setFixedSize(240, 50);
     unirseButton->setFixedSize(240, 50);
 
-    // Lista de partidas
     listaPartidas = new QListWidget(this);
     listaPartidas->setFixedWidth(240);
     listaPartidas->setStyleSheet("background-color: rgba(0, 0, 0, 100); color: white;");
 
-    // Agregar widgets al layout izquierdo
     leftLayout->addSpacing(40);
     leftLayout->addWidget(mensajeLabel);
     leftLayout->addSpacing(20);
@@ -78,7 +72,6 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mainLayout->addLayout(leftLayout);
     mainLayout->addStretch(); 
 
-    // Conexiones
     connect(crearButton, &QPushButton::clicked, this, &LobbyWindow::onCrearClicked);
     connect(listarButton, &QPushButton::clicked, this, &LobbyWindow::onListarClicked);
     connect(unirseButton, &QPushButton::clicked, this, &LobbyWindow::onUnirseClicked);
@@ -86,7 +79,8 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer = new QMediaPlayer(this);
     audioOutput = new QAudioOutput(this);
     mediaPlayer->setAudioOutput(audioOutput);
-    mediaPlayer->setSource(QUrl::fromLocalFile("client_src/sfx/gamestart.mp3"));
+    std::string path_musica = RUTA_SONIDO("gamestart.mp3");
+    mediaPlayer->setSource(QUrl::fromLocalFile(QString::fromStdString(path_musica)));
     audioOutput->setVolume(100); 
     mediaPlayer->play();
 }
@@ -123,15 +117,15 @@ void LobbyWindow::onCrearClicked() {
 
 void LobbyWindow::fadeOutAudioAndClose() {
     QTimer *fadeTimer = new QTimer(this);
-    fadeTimer->setInterval(50);  // cada 50ms
+    fadeTimer->setInterval(50);
     connect(fadeTimer, &QTimer::timeout, this, [this, fadeTimer]() {
         float vol = audioOutput->volume();
         if (vol > 0.01f) {
-            audioOutput->setVolume(vol - 0.05f);  // bajamos el volumen
+            audioOutput->setVolume(vol - 0.05f);
         } else {
             fadeTimer->stop();
             mediaPlayer->stop();
-            accept();  // cerramos el diálogo
+            accept(); 
         }
     });
     fadeTimer->start();

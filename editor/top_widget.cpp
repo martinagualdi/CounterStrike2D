@@ -1,6 +1,7 @@
 #include "top_widget.h"
 #include "zona_rect_item.h"
 #include "grid_pixmap_item.h"
+#include "../common_src/ruta_base.h"
 #include <QMimeData>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
@@ -11,6 +12,16 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QCoreApplication>
+
+#define TIPO_ARMA "arma"
+#define TIPO_SPAWNS "spawn"
+#define TIPO_ZONA_B "zona_bombas"
+#define TIPO_ZONA_CT "inicio_ct"
+#define TIPO_ZONA_TT "inicio_tt"
+#define TIPO_OBSTACULO "obstaculo"
+#define TIPO_BOMBSITE "bombsite"
+#define TIPO_PISO "piso"
+#define TIPO_OTRO "otro"
 
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
     setScene(new QGraphicsScene(this));
@@ -30,10 +41,9 @@ int TopWidget::pedirDimensionMapa(const QString& titulo, const QString& label, i
     dialog.setComboBoxItems(opciones);
     dialog.setWindowTitle(titulo);
     dialog.setLabelText(label);
-    dialog.setOption(QInputDialog::UseListViewForComboBoxItems); // activa scroll automático
+    dialog.setOption(QInputDialog::UseListViewForComboBoxItems);
     dialog.setTextValue(QString::number(valorPorDefecto));
 
-    // Estilo opcional (como tenías antes)
     QString estilo = R"(
         QInputDialog {
             background-color: #2c2c2c;
@@ -103,12 +113,14 @@ bool TopWidget::estaPincelActivo() const {
 }
 
 void TopWidget::setTamanioMapaDesdeYAML(int ancho, int alto) {
+    maxAncho = ancho;
+    maxAlto = alto;
     setSceneRect(0, 0, ancho, alto);
     tamanioEstablecidoDesdeYAML = true;
 }
 
 QString TopWidget::getFondoPath() const {
-    int idx = fondoPath.indexOf("/gfx");
+    int idx = fondoPath.indexOf("gfx/");
     if (idx != -1) {
         return fondoPath.mid(idx);
     }
@@ -132,6 +144,7 @@ QList<ElementoMapa> TopWidget::getElementos() const {
                     QPixmap pix = pixmapItem->pixmap();
                     elem.ancho = pix.width();
                     elem.alto = pix.height();
+                    elem.prioridad = item->zValue();
 
                     elementos.append(elem);
                 }
@@ -264,10 +277,11 @@ void TopWidget::keyPressEvent(QKeyEvent* event) {
 }
 
 int TopWidget::zValueParaTipo(const QString& tipo) const {
-    if (tipo == "piso") return 1;
-    if (tipo == "obstaculo") return 2;
-    if (tipo == "bombsite") return 3;
-    if (tipo == "zona") return 4;
+    if (tipo == TIPO_PISO) return 1;
+    if (tipo == TIPO_OBSTACULO) return 2;
+    if (tipo == TIPO_BOMBSITE) return 3;
+    if (tipo == TIPO_ZONA_B || tipo == TIPO_ZONA_CT || tipo == TIPO_ZONA_TT) return 4;
+    if (tipo == TIPO_ARMA) return 5;
     return 1;
 }
 
@@ -298,22 +312,22 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setPos(x, y);
             item->setZValue(1);
 
-            QString tipo = "otros";
-            if (path.contains("spawns"))
-                tipo = "spawn";
-            else if(path.contains("weapons"))
-                tipo = "arma";
+            QString tipo = TIPO_OTRO;
+            if(path.contains("weapons"))
+                tipo = TIPO_ARMA;
             else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
-
-                tipo = "obstaculo";
-            else if(path.contains("piso"))
-                tipo = "piso";
+                tipo = TIPO_OBSTACULO;
+            else if(path.contains("piso")){
+                eliminarPisoEnCelda(x, y);
+                tipo = TIPO_PISO;
+            }
 
             item->setData(0, path);
             item->setData(1, tipo);
             item->setZValue(zValueParaTipo(tipo));
             item->setData(2, pix.width());
             item->setData(3, pix.height());
+            item->setData(4, item->zValue());
 
             scene()->addItem(item);
         } else if (currentMode == DropMode::FONDO) {
@@ -325,6 +339,21 @@ void TopWidget::dropEvent(QDropEvent* event) {
     event->acceptProposedAction();
 }
 
+void TopWidget::eliminarPisoEnCelda(int x, int y) {
+    const QList<QGraphicsItem*> items = scene()->items();
+    for (QGraphicsItem* item : items) {
+        if (item->zValue() == zValueParaTipo("piso") && item->data(1).toString() == "piso") {
+            QPointF pos = item->pos();
+            if (int(pos.x()) == x && int(pos.y()) == y) {
+                scene()->removeItem(item);
+                delete item;
+                break;
+            }
+        }
+    }
+}
+
+
 void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
     QPointF scenePos = mapToScene(pos);
     int x = int(scenePos.x()) / gridSize * gridSize;
@@ -333,6 +362,8 @@ void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
 
     if (celdasPintadas.contains(celda))
         return;
+
+    eliminarPisoEnCelda(x, y);
 
     celdasPintadas.insert(celda);
 
@@ -345,6 +376,7 @@ void TopWidget::pintarPisoEnPosicion(const QPoint& pos) {
         item->setData(1, "piso");
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
         scene()->addItem(item);
     }
 }
@@ -414,7 +446,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         zonaItem->setTexto(texto);
         scene()->addItem(zonaItem);
 
-        if (tipo == "zona_bombas")
+        if (tipo == TIPO_ZONA_B)
             agregarImagenBomba(rect);
 
         ZonaMapa zona;
@@ -441,7 +473,7 @@ QString TopWidget::pedirTipoZona() {
     bool ok = false;
     QString tipo = QInputDialog::getItem(
         this, "Tipo de zona", "¿Qué zona estás marcando?",
-        { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok
+        { TIPO_ZONA_CT, TIPO_ZONA_TT, TIPO_ZONA_B }, 0, false, &ok
     );
     return ok ? tipo : "";
 }
@@ -451,12 +483,12 @@ bool TopWidget::validarCantidadZonas(const QString& tipo) {
         return z.tipo == tipo;
     });
 
-    if ((tipo == "inicio_ct" || tipo == "inicio_tt") && cantidad >= 1) {
+    if ((tipo == TIPO_ZONA_CT || tipo == TIPO_ZONA_TT) && cantidad >= 1) {
         QMessageBox::warning(this, "Zona duplicada", "Ya existe una zona de tipo " + tipo + ".");
         return false;
     }
 
-    if (tipo == "zona_bombas" && cantidad >= 2) {
+    if (tipo == TIPO_ZONA_B && cantidad >= 2) {
         QMessageBox::warning(this, "Zona duplicada", "Solo se permiten dos zonas de bombas.");
         return false;
     }
@@ -490,30 +522,28 @@ void TopWidget::conectarActualizacionRect(ZonaRectItem* item) {
 }
 
 QColor TopWidget::colorParaTipo(const QString& tipo) const {
-    if (tipo == "inicio_ct") return QColor(0, 0, 255, 50);
-    if (tipo == "inicio_tt") return QColor(0, 255, 0, 50);
-    if (tipo == "zona_bombas") return QColor(255, 0, 0, 50);
+    if (tipo == TIPO_ZONA_CT) return QColor(0, 0, 255, 50);
+    if (tipo == TIPO_ZONA_TT) return QColor(0, 255, 0, 50);
+    if (tipo == TIPO_ZONA_B) return QColor(255, 0, 0, 50);
     return QColor(100, 100, 100, 50);  // fallback
 }
 
 QString TopWidget::textoParaTipo(const QString& tipo) const {
-    if (tipo == "inicio_ct") return "CT";
-    if (tipo == "inicio_tt") return "TT";
+    if (tipo == TIPO_ZONA_CT) return "CT";
+    if (tipo == TIPO_ZONA_TT) return "TT";
     return "";
 }
 
 void TopWidget::agregarImagenBomba(const QRectF& rect) {
     int cantidad = std::count_if(zonasInicio.begin(), zonasInicio.end(), [](const ZonaMapa& z) {
-        return z.tipo == "zona_bombas";
+        return z.tipo == TIPO_ZONA_B;
     });
 
-    QString basePath = QCoreApplication::applicationDirPath();
     QString imagenRelativa = (cantidad == 0)
-        ? "/gfx/plantacion_bombas/plantacion1.png"
-        : "/gfx/plantacion_bombas/plantacion2.png";
-    QString imagenAbsoluta = basePath + imagenRelativa;
+        ? QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion1.png"))
+        : QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion2.png"));
     
-    QPixmap pix(imagenAbsoluta);
+    QPixmap pix(imagenRelativa);
     if (!pix.isNull()) {
         QPointF centro = rect.center();
         QPointF pos = centro - QPointF(pix.width() / 2, pix.height() / 2);
@@ -523,9 +553,10 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         item->setZValue(3);
 
         item->setData(0, imagenRelativa);
-        item->setData(1, "bombsite");
+        item->setData(1, TIPO_BOMBSITE);
         item->setData(2, pix.width());
         item->setData(3, pix.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }
@@ -544,22 +575,21 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setPos(x, y);
         item->setZValue(1);
 
-        QString tipo = "otros";
+        QString tipo = TIPO_OTRO;
         if (path.contains("plantacion_bombas"))
-            tipo = "bombsite";
-        else if (path.contains("spawns"))
-            tipo = "spawn";
+            tipo = TIPO_BOMBSITE;
         else if(path.contains("weapons"))
-            tipo = "arma";
+            tipo = TIPO_ARMA;
         else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
-            tipo = "obstaculo";
+            tipo = TIPO_OBSTACULO;
         else if(path.contains("piso"))
-            tipo = "piso";
+            tipo = TIPO_PISO;
         item->setData(0, path);
         item->setData(1, tipo);
         item->setZValue(zValueParaTipo(tipo));
         item->setData(2, pixmap.width());
         item->setData(3, pixmap.height());
+        item->setData(4, item->zValue());
 
         scene()->addItem(item);
     }
@@ -574,13 +604,13 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo, const QUuid
                     cantidadExistente++;
     }
 
-    if (tipo == "inicio_ct") {
+    if (tipo == TIPO_ZONA_CT) {
         color = QColor(0, 0, 255, 50);
         texto = "CT";
-    } else if (tipo == "inicio_tt") {
+    } else if (tipo == TIPO_ZONA_TT) {
         color = QColor(0, 255, 0, 50);
         texto = "TT";
-    } else if (tipo == "zona_bombas") {
+    } else if (tipo == TIPO_ZONA_B) {
         color = QColor(255, 0, 0, 50);
     }
 

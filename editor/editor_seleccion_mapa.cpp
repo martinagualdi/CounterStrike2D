@@ -1,4 +1,5 @@
 #include "editor_seleccion_mapa.h"
+#include "../common_src/ruta_base.h"
 #include "top_widget.h"
 
 #include <yaml-cpp/yaml.h>
@@ -6,6 +7,7 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QDebug>
+#include <QCoreApplication>
 
 EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
     auto* topWidget = new TopWidget;
@@ -15,9 +17,15 @@ EditorSeleccionMapa::EditorSeleccionMapa(QWidget* parent) : QWidget(parent) {
 }
 
 void EditorSeleccionMapa::seleccionarArchivo() {
-    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa", "editor/mapas", "Archivos YAML (*.yaml)");
-    if (!ruta.isEmpty())
+    QString ruta = QFileDialog::getOpenFileName(this, "Seleccionar archivo de mapa",
+                                                RUTA_BASE_EDITOR,
+                                                "Archivos YAML (*.yaml)");
+
+    if (!ruta.isEmpty()) {
+        QString nombreArchivo = QFileInfo(ruta).fileName();
         emit mapaSeleccionado(ruta);
+    }
 
     close();
 }
+

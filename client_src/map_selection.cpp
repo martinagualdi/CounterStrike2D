@@ -1,4 +1,5 @@
 #include "map_selection.h"
+#include "../common_src/ruta_base.h"
 #include <QPixmap>
 #include <QDir>
 #include <QCoreApplication>
@@ -22,7 +23,6 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     previewLabel->setMaximumSize(256, 256);
     previewLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    // Estética
     titulo->setAlignment(Qt::AlignLeft);
     titulo->setStyleSheet(R"(
         QLabel {
@@ -86,7 +86,6 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
         }
     )");
 
-    // Layouts
     QHBoxLayout* layout = new QHBoxLayout;
     layout->addWidget(listaMapas);
     layout->addWidget(previewLabel);
@@ -126,8 +125,7 @@ void MapSelectionDialog::mostrarPreview(QListWidgetItem* item) {
     QString nombreMapa = item->text();
     QString rutaMiniatura = mapaToMiniatura.value(nombreMapa);
 
-    QString basePath = QCoreApplication::applicationDirPath();
-    QString fullPath = basePath + "/server_src/mapas_disponibles/" + rutaMiniatura;
+    QString fullPath = RUTA_SERVER("") + rutaMiniatura;
 
     if (QFile::exists(fullPath)) {
         QPixmap miniatura(fullPath);

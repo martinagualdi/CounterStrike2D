@@ -3,8 +3,8 @@ puerto: "8080"
 cantidad_min_ct: 1
 cantidad_min_tt: 1
 
-ronda_por_partida: 10
-rondas_por_bando: 5
+ronda_por_partida: 1
+rondas_por_bando: 0
 
 #segundos
 tiempo_por_ronda: 300
@@ -54,8 +54,9 @@ precision_m3: 0.7
 balas_m3: 10
 balas_max_m3: 30
 
-angulo_cono_vision: 90
-opacidad: 10
+angulo_cono_vision: 45
+opacidad: 200
+radio_vision:  60   # de 60 a 100 para valores logicos 
 
 
 

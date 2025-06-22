@@ -28,6 +28,7 @@ public:
     void enviar_mensaje(const std::string& mensaje);
     std::string recibir_mapa();
     std::string recibir_mensaje();
+    InfoConfigClient recibir_configuracion_inicial();
     std::vector<std::pair<std::string, std::string>> recibir_lista_mapas();
     std::vector<uint16_t> recibir_precios_mercado();
 

@@ -52,6 +52,7 @@ void Receiver::comunicacion_del_lobby() {
                 game_id = partida_id;
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocol.enviar_mapa(yaml_serializado);
+                protocol.enviar_valores_de_config(InfoConfigClient(true));
                 break;
             } else if (comando_inicial[0] == "unirse") {
                 if (!monitor_partidas.unirse_a_partida(std::stoi(comando_inicial[1]), player_id, comando_inicial[2], queue_enviadora)) {
@@ -63,6 +64,7 @@ void Receiver::comunicacion_del_lobby() {
                 game_id = partida_id;
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
                 protocol.enviar_mapa(yaml_serializado);
+                protocol.enviar_valores_de_config(InfoConfigClient(true));
                 break;
             } else {
                 std::vector<std::string> lista_partidas = monitor_partidas.listar_partidas();

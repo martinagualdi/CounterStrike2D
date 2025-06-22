@@ -280,6 +280,31 @@ std::string ProtocoloCliente::recibir_mensaje() {
     return std::string(buffer.begin(), buffer.end());
 }
 
+InfoConfigClient ProtocoloCliente::recibir_configuracion_inicial() {
+   
+   uint16_t lenght;
+   if(!socket.recvall(&lenght, sizeof(lenght))){
+      throw std::runtime_error("Error al recibir el largo de la configuración inicial.");
+   }
+
+   lenght = ntohs(lenght);   
+   std::vector<uint8_t> buffer(lenght);
+   
+   if(!socket.recvall(buffer.data(), lenght)){
+      throw std::runtime_error("Error al recibir la configuración inicial.");
+   }
+   
+   InfoConfigClient info(false);
+   info.precio_awp = static_cast<int>(ntohs(*(uint16_t*)&buffer[0]));
+   info.precio_ak47 = static_cast<int>(ntohs(*(uint16_t*)&buffer[2]));
+   info.precio_m3 = static_cast<int>(ntohs(*(uint16_t*)&buffer[4]));
+   info.opacidad = static_cast<int>(ntohs(*(uint16_t*)&buffer[6]));
+   info.angulo_vision = static_cast<int>(ntohs(*(uint16_t*)&buffer[8]));
+   info.radio_vision = static_cast<int>(ntohs(*(uint16_t*)&buffer[10]));
+
+   return info;
+}
+
 std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista_mapas() {
     uint8_t cantidad = 0;
     socket.recvall(&cantidad, sizeof(cantidad));

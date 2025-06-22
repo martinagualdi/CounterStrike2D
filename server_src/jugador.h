@@ -64,6 +64,7 @@ class Jugador {
       tiene_bomba(false),
       puede_plantar_bomba(false),
       plantando_bomba(false),
+      desactivando_bomba(false),
       puede_comprar(true),
       acaba_de_comprar_arma(false),
       acaba_de_comprar_balas(false), 
@@ -131,7 +132,7 @@ class Jugador {
 
     void cambiar_arma_en_mano();
 
-    bool comprarArma(enum Compra arma);
+    ArmaDeFuego* comprarArma(enum Compra arma);
 
     bool comprarBalas(enum Compra tipo_bala);
 
@@ -148,15 +149,18 @@ class Jugador {
     ArmaDeFuego* soltar_arma_pricipal();
     Bomba* soltar_bomba();
 
-
     ArmaDeFuego* levantar_arma(Arma* arma_del_suelo);
     Bomba* levantar_bomba(Arma* bomba_del_suelo);
 
+    void quitar_bomba();
     void definir_spawn(float x, float y);
+
+    void reiniciar_arma();
+    void reiniciar_dinero();
 
     void reiniciar();
     
-    ~Jugador() {}
+    ~Jugador();
     
     Jugador(const Jugador &) = default;
     Jugador &operator=(const Jugador &) = default;

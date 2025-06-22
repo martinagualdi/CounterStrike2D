@@ -54,10 +54,11 @@ void Client::iniciar() {
     ClientMap mapa(mapa_inicial, renderer);
     EventHandler eventHandler(cola_enviador, cliente_id, ancho_ventana, alto_ventana);
     Dibujador dibujador(cliente_id, renderer, mapa.parsearMapa(),
-        eventHandler, cola_recibidor, default_ancho, default_alto, ancho_ventana, alto_ventana, infoConfig);        Sonido sonido(cliente_id);
+        eventHandler, cola_recibidor, default_ancho, default_alto, ancho_ventana, alto_ventana, infoConfig);
+    Sonido sonido(cliente_id);
     int ms_per_frame = 1000 / fps;
     Snapshot snapshotActual;
-    Snapshot snapshotFinal; // Guardamos el snapshot final
+    Snapshot snapshotFinal; // Guardo el snapshot final
     bool partida_terminada = false;
 
     while(clienteActivo){
@@ -87,7 +88,6 @@ void Client::iniciar() {
             }
         } else {
             dibujador.renderizar(snapshotFinal);
-            
         }
         eventHandler.manejarEventos(clienteActivo, puede_comprar);
         auto t2 = std::chrono::steady_clock::now();

@@ -41,6 +41,11 @@ void Receiver::comunicacion_del_lobby() {
     while (alive) {
         try {
             std::vector<std::string> comando_inicial = protocol.recibir_inicio_juego();
+            if (comando_inicial.empty()) {
+                std::cout << "[Receiver] El cliente ha cerrado la conexion." << std::endl;
+                alive = false;
+                return;
+            }
             if (comando_inicial[0] == "crear") {
                 std::vector<std::pair<std::string, std::string>>  mapas_disponibles = listar_mapas_disponibles();
                 protocol.enviar_lista_mapas(mapas_disponibles);
@@ -51,6 +56,7 @@ void Receiver::comunicacion_del_lobby() {
                 std::string path_completo = RUTA_SERVER_BASE + path;
                 partida_id = monitor_partidas.crear_partida(player_id, comando_inicial[1], queue_enviadora, path_completo);
                 std::string yaml_serializado = monitor_partidas.obtener_mapa_por_id(partida_id);
+                game_id = partida_id;
                 protocol.enviar_mapa(yaml_serializado);
                 protocol.enviar_valores_de_config(InfoConfigClient(true));
                 break;
@@ -106,9 +112,11 @@ void Receiver::comunicacion_de_partida() {
 void Receiver::run() {
     comunicacion_del_lobby();
     comunicacion_de_partida();
-    monitor_partidas.eliminar_jugador_de_partida(game_id, player_id);
+    if (game_id != -1) 
+        monitor_partidas.eliminar_jugador_de_partida(game_id, player_id);
     queue_enviadora.close();
-    sender.join();
+    if (game_id != -1) 
+        sender.join();
 }
 
 Receiver::~Receiver() {}

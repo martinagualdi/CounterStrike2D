@@ -4,10 +4,10 @@
 
 ### Integrantes
 
-- Federico Honda - 110766
-- Martina Gualdi - 110513
-- Santiago Varga - 110561
-- Thiago Baez - 110703
+- [Federico Honda](https://github.com/federicohonda) - 110766
+- [Martina Gualdi](https://github.com/martinagualdi) - 110513
+- [Santiago Varga](https://github.com/SantiagoVarga) - 110561
+- [Thiago Baez](https://github.com/thiagobaez) - 110703
 
 ### Corrector
 [Leonardo Giampieri Mutti](https://github.com/leogm99)

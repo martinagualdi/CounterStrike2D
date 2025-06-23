@@ -11,7 +11,7 @@
 #define DISTANCIA_MAX 900.0f
 #define DISTANCIA_MIN 70.0f
 #define CANTIDAD_SONIDOS_A_LA_VEZ 4
-#define CANTIDAD_PASOS_A_LA_VEZ 6
+#define CANTIDAD_PASOS_A_LA_VEZ 4
 #define CANAL_LIBRE -1
 
 Sonido::Sonido(const int client_id) : 

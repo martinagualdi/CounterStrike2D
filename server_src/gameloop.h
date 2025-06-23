@@ -35,6 +35,7 @@ class GameLoop : public Thread {
     std::atomic<bool> bomba_plantada;
     std::vector<ArmaEnSuelo> armas_en_suelo;
     BombaEnSuelo info_bomba;
+    bool hubo_jugadores;
     Bomba* bomba = nullptr;
     std::chrono::steady_clock::time_point tiempo_inicio_plantado;
     std::chrono::steady_clock::time_point tiempo_inicio_desactivado;

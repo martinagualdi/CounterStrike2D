@@ -83,6 +83,7 @@ struct InfoJugador {
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
     int muertes;
+    bool desconectar;
 };
 
 struct InfoMunicion {
@@ -146,6 +147,7 @@ struct Snapshot {
             info_jugador.eliminaciones_esta_ronda = jugador_ptr->get_eliminaciones_esta_ronda();
             info_jugador.eliminaciones_totales = jugador_ptr->get_eliminaciones_totales();
             info_jugador.muertes = jugador_ptr->get_muertes();
+            info_jugador.desconectar = jugador_ptr->debe_desconectar();
 
             info_jugadores.push_back(info_jugador);
         }

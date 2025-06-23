@@ -19,10 +19,13 @@ using namespace SDL2pp;
 
 Client::Client(const char *hostname, const char *servname, const char* username) : protocolo(hostname, servname), 
     username(username), cliente_id(-1), clienteActivo(true), cola_enviador(), cola_recibidor(), hilo_enviador(protocolo, cola_enviador),
-    hilo_recibidor(protocolo, cola_recibidor), puede_comprar(true) {}
+    hilo_recibidor(protocolo, cola_recibidor), puede_comprar(true) {
+        cliente_id = protocolo.recibirID();
+        hilo_recibidor.set_id(cliente_id);
+    }
 
 void Client::iniciar() {
-    cliente_id = protocolo.recibirID();
+    //cliente_id = protocolo.recibirID();
     int default_ancho = DEFAULT_ANCHO;
     int default_alto = DEFAULT_ALTO;
     LobbyWindow lobby(protocolo, username);
@@ -105,5 +108,7 @@ Client::~Client(){
     cola_enviador.close();
     cola_recibidor.close();
     hilo_enviador.join();
+    std::cout << "Hilo enviador cerrado." << std::endl;
     hilo_recibidor.join();
+    std::cout << "Hilo receptor cerrado." << std::endl;
 }

@@ -241,17 +241,13 @@ Bomba* Jugador::soltar_bomba() {
     return nullptr; 
 }
 
-Bomba* Jugador::levantar_bomba(Arma* bomba_del_suelo) {
-    if (!tiene_bomba ) {
-        Bomba* ver_bomba = dynamic_cast<Bomba*>(bomba_del_suelo);
-        if (ver_bomba->estaPlantada()){return nullptr;} 
-        bomba.reset(dynamic_cast<Bomba*>(bomba_del_suelo));
-        tiene_bomba = true;
-        plantando_bomba = false;
-        arma_en_mano= bomba.get(); 
-        return bomba.get();
-    }
-    return nullptr; // Ya tiene una bomba
+void Jugador::levantar_bomba(Arma* bomba_del_suelo) {
+    //Bomba* ver_bomba = dynamic_cast<Bomba*>(bomba_del_suelo);
+    //if (ver_bomba->estaPlantada()){return nullptr;} 
+    bomba.reset(dynamic_cast<Bomba*>(bomba_del_suelo));
+    tiene_bomba = true;
+    plantando_bomba = false;
+    arma_en_mano= bomba.get(); 
 }
 
 ArmaDeFuego* Jugador::levantar_arma(Arma* arma_del_suelo) {

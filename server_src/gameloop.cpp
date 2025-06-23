@@ -25,7 +25,8 @@ GameLoop::GameLoop(Queue<ComandoDTO> &queue_comandos, ListaQueues &queues_jugado
     rondas_ganadas_tt(0), 
     bomba_plantada(false),
     armas_en_suelo(),
-    info_bomba(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false) {}
+    info_bomba(0.0f, 0.0f, SIN_PLANTAR, Configuracion::get<int>("tiempo_pare_que_explote_bomba"), false, false, false),
+    hubo_jugadores(false) {}
 
 
 void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
@@ -58,6 +59,8 @@ void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
     std::vector<float> posicion_inicial = mapa.dar_posiciones_iniciales(jugador->get_equipo());
     jugador->definir_spawn(posicion_inicial[0], posicion_inicial[1]);
     jugadores.push_back(jugador);
+    if (!hubo_jugadores) 
+        hubo_jugadores = true; 
 }
 
 void GameLoop::volver_jugadores_a_spawn() {
@@ -253,6 +256,11 @@ void GameLoop::explosion(){
 
 void GameLoop::chequear_estados_jugadores(){
     for(Jugador *j: jugadores) {
+        if (j->debe_desconectar()) {
+            eliminar_jugador_de_partida(j->getId());
+            queues_jugadores.eliminar_queue(j->getId());
+            continue; // Si el jugador debe desconectar, no se procesa más
+        }
         j->reiniciar_compras();
         if (j->esta_disparando())
             j->dejar_de_disparar(); // Dejar de disparar para evitar múltiples disparos en un mismo frame
@@ -354,11 +362,11 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 jugador->set_skin_tipo(comando.skin);
                 break;
             case DESCONECTAR: {
-                /*if (jugador->posee_bomba()) {
+                if (jugador->posee_bomba()) {
                     Bomba* bomba = jugador->soltar_bomba();
                     armas_en_suelo.push_back(ArmaEnSuelo(bomba, jugador->getX(), jugador->getY()));
-                }*/
-                eliminar_jugador_de_partida(comando.id_jugador);
+                }
+                jugador->desconectar_ya();
                 break;
             }
             case ACCION_SOBRE_BOMBA:
@@ -418,14 +426,9 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     if (arma.pos_x >= min_pos_x_jugador && arma.pos_x <= max_pos_x_jugador &&
                         arma.pos_y >= min_pos_y_jugador && arma.pos_y <= max_pos_y_jugador) {
                         if (arma.getArma()->getCodigoArma() == BOMBA_TT && jugador->get_equipo() == TT && !bomba_plantada){
-                            Bomba* bomba_en_suelo = jugador->levantar_bomba(arma.getArma());
-                            if(bomba_en_suelo ) {
-                                jugador->asignar_bomba();
-                                armas_en_suelo.erase(armas_en_suelo.begin() + i); 
-                                armas_en_suelo.push_back(ArmaEnSuelo(bomba_en_suelo, jugador->getX(), jugador->getY()));
-                                break;
-                            }
-                        
+                            jugador->levantar_bomba(arma.getArma());
+                            armas_en_suelo.erase(armas_en_suelo.begin() + i); 
+                            break;
                         }else{
                             ArmaDeFuego* arma_suelta = jugador->levantar_arma(arma.getArma());
                             armas_en_suelo.erase(armas_en_suelo.begin() + i); 
@@ -433,8 +436,6 @@ void GameLoop::ejecucion_comandos_recibidos() {
                             armas_en_suelo.push_back(ArmaEnSuelo(arma_suelta, jugador->getX(), jugador->getY()));}
                             break;
                         }
-
-                         // Salir del bucle una vez que se levanta un arma
                     }
                     i++;
                 }
@@ -690,6 +691,10 @@ bool GameLoop::jugar_ronda(bool esperando) {
     while (activo && en_juego) {
         try {
             chequear_estados_jugadores();
+            if (hubo_jugadores && jugadores.empty()) {
+                activo = false;
+                return false;
+            }
             if (!esperando)
                 chequear_si_pueden_comprar(t_inicio);
             ejecucion_comandos_recibidos();

@@ -79,6 +79,7 @@ void Receiver::comunicacion_del_lobby() {
 }
 
 void Receiver::comunicacion_de_partida() {
+    bool desconectar = false;
     while (alive) {
         ComandoDTO comando;
         comando.id_jugador = player_id;
@@ -89,6 +90,10 @@ void Receiver::comunicacion_de_partida() {
         }
         try {
             queue_comandos->try_push(comando);
+            if (desconectar)
+                break;
+            if (comando.tipo == DESCONECTAR) 
+                desconectar = true;
         } catch (const ClosedQueue& e) {
             break;
         } catch (...) {

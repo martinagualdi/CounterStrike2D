@@ -45,6 +45,7 @@ class Jugador {
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
     int muertes;
+    bool desconectar;
 
   public:  
 
@@ -75,7 +76,8 @@ class Jugador {
       arma_en_mano(arma_secundaria.get()),
       eliminaciones_esta_ronda(0),
       eliminaciones_totales(0),
-      muertes(0) {}
+      muertes(0),
+      desconectar(false) {}
 
     // Getters, Setters y estados del jugador
     int getId() const { return id; }
@@ -120,6 +122,8 @@ class Jugador {
     bool tiene_la_bomba() const { return tiene_bomba; }
     void set_puede_plantar(bool puede_plantar) { this->puede_plantar_bomba = puede_plantar; }
     bool puede_plantar_bomba_ya() const { return puede_plantar_bomba; }
+    bool debe_desconectar() const { return desconectar; }
+    void desconectar_ya() { desconectar = true; }
 
     // Logicas
     void disparar();
@@ -150,7 +154,7 @@ class Jugador {
     Bomba* soltar_bomba();
 
     ArmaDeFuego* levantar_arma(Arma* arma_del_suelo);
-    Bomba* levantar_bomba(Arma* bomba_del_suelo);
+    void levantar_bomba(Arma* bomba_del_suelo);
 
     void quitar_bomba();
     void definir_spawn(float x, float y);

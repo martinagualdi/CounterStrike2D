@@ -75,6 +75,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(eliminaciones_totales); // Enviar las eliminaciones totales del jugador
         uint8_t muertes = static_cast<uint8_t>(j.muertes);
         buffer.push_back(muertes); // Enviar las muertes del jugador
+        uint8_t desconectar = j.desconectar ? 0x01 : 0x00;
+        buffer.push_back(desconectar); // Enviar si el jugador debe desconectar
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);

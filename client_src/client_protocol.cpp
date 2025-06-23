@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 31
+#define BYTES_JUGADORES 32
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 #define RW_CLOSE 2
@@ -107,6 +107,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[28]); // Enviar las eliminaciones de esta ronda
       info_jugador.eliminaciones_totales = static_cast<int>(buffer[29]); // Enviar las eliminaciones totales del jugador
       info_jugador.muertes = static_cast<int>(buffer[30]); // Enviar las muertes del jugador
+      info_jugador.desconectar = (buffer[31] == 0x01); // Enviar si el jugador debe desconectar
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }

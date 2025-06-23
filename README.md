@@ -22,7 +22,7 @@ Dentro de la carpeta 'documentation' se encuentran los 5 manuales e informes del
 - 'Enunciado CS2D'.
 
 ### Créditos
-Se han usado las siguiente bibliotecas desarrolladas por Di Paola, Martin:
+Se han usado las siguiente bibliotecas desarrolladas por [Di Paola, Martin](https://www.github.com/eldipa):
 
 - 'Socket'.
 - 'Resolver'.

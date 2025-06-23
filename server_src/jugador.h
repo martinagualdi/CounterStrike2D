@@ -37,7 +37,7 @@ class Jugador {
     bool acaba_de_comprar_arma;
     bool acaba_de_comprar_balas;
     enum Movimiento movimiento_actual = DETENER;
-    std::unique_ptr<Bomba> bomba; // Bomba del jugador, si la tiene
+    std::unique_ptr<Bomba> bomba; 
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
     std::unique_ptr<Cuchillo> cuchillo;
@@ -45,6 +45,7 @@ class Jugador {
     int eliminaciones_esta_ronda;
     int eliminaciones_totales;
     int muertes;
+    bool desconectar;
 
   public:  
 
@@ -75,9 +76,9 @@ class Jugador {
       arma_en_mano(arma_secundaria.get()),
       eliminaciones_esta_ronda(0),
       eliminaciones_totales(0),
-      muertes(0) {}
+      muertes(0),
+      desconectar(false) {}
 
-    // Getters, Setters y estados del jugador
     int getId() const { return id; }
     std::string getNombre() const { return nombre; }
     float getX() const { return x; }
@@ -120,6 +121,8 @@ class Jugador {
     bool tiene_la_bomba() const { return tiene_bomba; }
     void set_puede_plantar(bool puede_plantar) { this->puede_plantar_bomba = puede_plantar; }
     bool puede_plantar_bomba_ya() const { return puede_plantar_bomba; }
+    bool debe_desconectar() const { return desconectar; }
+    void desconectar_ya() { desconectar = true; }
 
     // Logicas
     void disparar();
@@ -150,7 +153,7 @@ class Jugador {
     Bomba* soltar_bomba();
 
     ArmaDeFuego* levantar_arma(Arma* arma_del_suelo);
-    Bomba* levantar_bomba(Arma* bomba_del_suelo);
+    void levantar_bomba(Arma* bomba_del_suelo);
 
     void quitar_bomba();
     void definir_spawn(float x, float y);

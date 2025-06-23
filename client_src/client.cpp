@@ -19,19 +19,29 @@ using namespace SDL2pp;
 
 Client::Client(const char *hostname, const char *servname, const char* username) : protocolo(hostname, servname), 
     username(username), cliente_id(-1), clienteActivo(true), cola_enviador(), cola_recibidor(), hilo_enviador(protocolo, cola_enviador),
-    hilo_recibidor(protocolo, cola_recibidor), puede_comprar(true) {}
+    hilo_recibidor(protocolo, cola_recibidor), puede_comprar(true) {
+        cliente_id = protocolo.recibirID();
+        hilo_recibidor.set_id(cliente_id);
+    }
 
 void Client::iniciar() {
-    cliente_id = protocolo.recibirID();
     int default_ancho = DEFAULT_ANCHO;
     int default_alto = DEFAULT_ALTO;
     LobbyWindow lobby(protocolo, username);
     int result = lobby.exec();
-    if (result != QDialog::Accepted) return;
+
+    if (result != QDialog::Accepted || !lobby.lobbySalioBien()) {
+        protocolo.enviar_salir_lobby();
+        return;
+    }
+
     std::string mapa_inicial = protocolo.recibir_mapa();
     InfoConfigClient infoConfig = protocolo.recibir_configuracion_inicial();
+
     hilo_enviador.start();
     hilo_recibidor.start();
+    hilos_iniciados = true;
+
     Configuracion::cargar_path(RUTA_CONFIG_CLIENT(CLIENT_CONFIG_PATH).c_str());
     int ancho_ventana = Configuracion::get<int>("ancho_ventana");
     int alto_ventana = Configuracion::get<int>("alto_ventana");
@@ -100,10 +110,12 @@ void Client::iniciar() {
 }
 
 Client::~Client(){
-    hilo_enviador.stop();
-    hilo_recibidor.stop();
-    cola_enviador.close();
-    cola_recibidor.close();
-    hilo_enviador.join();
-    hilo_recibidor.join();
+    if (hilos_iniciados) {
+        hilo_enviador.stop();
+        hilo_recibidor.stop();
+        cola_enviador.close();
+        cola_recibidor.close();
+        hilo_enviador.join();
+        hilo_recibidor.join();
+    }
 }

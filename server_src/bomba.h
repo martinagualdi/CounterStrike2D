@@ -6,7 +6,7 @@
 
 class Bomba : public Arma {
     bool activada;
-    bool desactivada; // Si se desactiva se acaba el juego
+    bool desactivada; 
     bool detonada;
     int tiempo_para_detonar;
     bool plantada;
@@ -19,7 +19,7 @@ public:
     
     Bomba()
 : Arma("Bomba", 1.0f, 5000.0f, 0, 100, false,1), activada(false), desactivada(false), detonada(false), 
-tiempo_para_detonar(Configuracion::get<int>("tiempo_pare_que_explote_bomba")) {}
+tiempo_para_detonar(Configuracion::get<int>("tiempo_pare_que_explote_bomba")), plantada(false) {}
     void desactivar() { desactivada = true; }
     bool fueDesactivada() const { return desactivada; }
     void activar(float x, float y);

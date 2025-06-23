@@ -6,7 +6,7 @@ build:
 	cmake --build  build/ $(EXTRA_COMPILE)
 
 run-tests:
-	./taller_tests
+	valgrind ./taller_tests
 
 all: clean build run-tests
 
@@ -18,9 +18,10 @@ clean:
 	rm -f client server taller_editor taller_tests
 
 install:
-	mkdir -p build-and-test/
+	make clean
 	cmake -S . -B ./build -DCMAKE_BUILD_TYPE=debug -DTALLER_TESTS=ON -DINSTALADO=ON $(EXTRA_GENERATE)
 	cmake --build build/ $(EXTRA_COMPILE)
+	make run-tests
 	chmod +x uninstall.sh
 	sudo bash ./install.sh
 

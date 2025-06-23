@@ -22,6 +22,7 @@ private:
     ClientSender hilo_enviador;
     ClientReceiver hilo_recibidor;
     bool puede_comprar;
+    bool hilos_iniciados = false;
     
 public:
 

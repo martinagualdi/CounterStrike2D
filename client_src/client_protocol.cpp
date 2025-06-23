@@ -2,7 +2,7 @@
 #include "../common_src/prefijos_protocolo.h"
 #include <netinet/in.h>
 
-#define BYTES_JUGADORES 31
+#define BYTES_JUGADORES 32
 #define BYTES_BALAS 11
 #define BYTES_ARMAS 11
 #define RW_CLOSE 2
@@ -71,7 +71,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = static_cast<size_t>(largo_jugadores); // largo_jugadores / BYTES_JUGADORES; 
+   size_t num_jugadores = static_cast<size_t>(largo_jugadores); 
    Snapshot snapshot;
    while (num_jugadores > 0) {
       InfoJugador info_jugador;
@@ -107,6 +107,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
       info_jugador.eliminaciones_esta_ronda = static_cast<int>(buffer[28]); // Enviar las eliminaciones de esta ronda
       info_jugador.eliminaciones_totales = static_cast<int>(buffer[29]); // Enviar las eliminaciones totales del jugador
       info_jugador.muertes = static_cast<int>(buffer[30]); // Enviar las muertes del jugador
+      info_jugador.desconectar = (buffer[31] == 0x01); // Enviar si el jugador debe desconectar
       snapshot.info_jugadores.push_back(info_jugador);
       num_jugadores--;
    }
@@ -199,6 +200,13 @@ int ProtocoloCliente::recibirID() {
    socket.recvall(&id_jugador, sizeof(id_jugador));
    id_jugador = ntohs(id_jugador);
    return id_jugador;
+}
+
+void ProtocoloCliente::enviar_salir_lobby() {
+   uint8_t comando = PREFIJO_SALIR;
+   if (!socket.sendall(&comando, sizeof(comando))) {
+      throw std::runtime_error("Error al enviar el comando de listar partidas");
+   }
 }
 
 void ProtocoloCliente::enviar_crear_partida(std::string username) {

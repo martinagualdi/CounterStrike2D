@@ -17,7 +17,6 @@ int main(int argc, char* argv[]){
             std::string port_str = std::to_string(port);
             std::string username_str = username.toStdString();
 
-            // Obtener punteros const char* que pasan al constructor
             const char* host_cstr = host_str.c_str();
             const char* port_cstr = port_str.c_str();
             const char* username_cstr = username_str.c_str();

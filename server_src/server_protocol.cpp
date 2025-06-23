@@ -75,6 +75,8 @@ bool ServerProtocol::enviar_a_cliente(const Snapshot& snapshot) {
         buffer.push_back(eliminaciones_totales); // Enviar las eliminaciones totales del jugador
         uint8_t muertes = static_cast<uint8_t>(j.muertes);
         buffer.push_back(muertes); // Enviar las muertes del jugador
+        uint8_t desconectar = j.desconectar ? 0x01 : 0x00;
+        buffer.push_back(desconectar); // Enviar si el jugador debe desconectar
     }
     uint16_t largo_balas = htons(static_cast<uint16_t>(snapshot.balas_disparadas.size() * BYTES_BALAS));
     buffer.push_back(reinterpret_cast<uint8_t*>(&largo_balas)[0]);
@@ -186,7 +188,7 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
     skt.recvall(&codigo, sizeof(codigo));
     std::vector<std::string> comando;
     if (codigo == PREFIJO_CREAR_PARTIDA) {
-        comando.push_back("crear");
+        comando.push_back(COMANDO_CREAR);
         uint16_t largo;
         skt.recvall(&largo, sizeof(largo));
         largo = ntohs(largo);
@@ -195,7 +197,7 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
         std::string username(buffer.begin(), buffer.end());
         comando.push_back(username);
     }else if (codigo == PREFIJO_UNIRSE_PARTIDA) {
-        comando.push_back("unirse");
+        comando.push_back(COMANDO_UNIRSE);
         uint16_t id_partida;
         skt.recvall(&id_partida, sizeof(id_partida));
         comando.push_back(std::to_string(ntohs(id_partida)));
@@ -207,7 +209,9 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
         std::string nombre(buffer.begin(), buffer.end());
         comando.push_back(nombre);
     } else if(codigo == PREFIJO_LISTAR) {
-        comando.push_back("listar");
+        comando.push_back(COMANDO_LISTAR);
+    }else if (codigo == PREFIJO_SALIR){
+        comando.push_back(COMANDO_SALIR);
     }
     return comando;
 }

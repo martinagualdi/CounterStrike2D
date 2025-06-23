@@ -19,13 +19,6 @@ int main(int argc, char *argv[]) {
     try {
         const char *config_file = argv[1];
 
-        /*YAML::Node config = YAML::LoadFile(config_file);
-        if (!config["puerto"]) {
-            std::cerr << "Error: el archivo de configuración no contiene 'puerto'\n";
-            return RET_ERROR;
-        }*/
-
-        //std::string port = config["puerto"].as<std::string>();
         Configuracion::cargar_path(config_file);
         Server server((Configuracion::get<std::string>("puerto")).c_str());
         server.start();

@@ -53,7 +53,6 @@ void MonitorPartidas::eliminar_jugador_de_partida(int id_partida, int id_jugador
     if (it != partidas.end()) {
         if (it->second->eliminar_jugador(id_jugador)) {
             partidas.erase(it);
-            std::cout << "[MonitorPartidas] Partida con id " << id_partida << " eliminada, ya no quedan jugadores." << std::endl;
         }
     }
 }

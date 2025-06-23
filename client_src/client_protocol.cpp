@@ -71,7 +71,7 @@ Snapshot ProtocoloCliente::recibirSnapshot() {
    uint16_t largo_jugadores;
    socket.recvall(&largo_jugadores, sizeof(largo_jugadores));
    largo_jugadores = ntohs(largo_jugadores);
-   size_t num_jugadores = static_cast<size_t>(largo_jugadores); // largo_jugadores / BYTES_JUGADORES; 
+   size_t num_jugadores = static_cast<size_t>(largo_jugadores); 
    Snapshot snapshot;
    while (num_jugadores > 0) {
       InfoJugador info_jugador;

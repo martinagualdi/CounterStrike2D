@@ -33,16 +33,10 @@ bool Partida::eliminar_jugador(int id_jugador) {
     jugadores_queues.eliminar_queue(id_jugador);
     gameloop.eliminar_jugador_de_partida(id_jugador);
     cant_jugadores--;
-    std::cout << "[Partida] Se elimino jugador de id: " << id_jugador << std::endl;
     return cant_jugadores == 0;
 }
 
 Partida::~Partida() {
-    std::cout << "[Partida] Se esta eliminando la partida con codigo: " << codigo_partida << std::endl;
-    //queue_comandos.close();
-    // gameloop.stop();
     activa = false;
     gameloop.join();
-    std::cout << "[Partida] Se termino la eliminacion de la partida con codigo: " << codigo_partida << std::endl;
-
 }

@@ -21,8 +21,7 @@ class Acceptor : public Thread {
     std::list<ClientHandler *> clients;
     std::atomic<bool> aceptando_clientes;
 
-    // Recorre la lista de clientes y elimina a los clientes que ya no se encuentran activos,
-    // asegurando que no hay memoria ocupada por threads que ya terminaron
+  
     void recolectar();
 
     // Corta la conexion del thread con el cliente verdadero, elimina su queue de mensajes y luego
@@ -36,7 +35,6 @@ class Acceptor : public Thread {
     // cliente. En cada iteracion se encarga de eliminar a los clientes que ya hayan terminado
     virtual void run() override;
 
-    // Cambia el atomics 'aceptando_clientes' a false para no aceptar nuevos clientes
     void dejar_de_aceptar();
 
     virtual ~Acceptor();

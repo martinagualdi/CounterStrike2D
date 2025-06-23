@@ -37,7 +37,7 @@ class Jugador {
     bool acaba_de_comprar_arma;
     bool acaba_de_comprar_balas;
     enum Movimiento movimiento_actual = DETENER;
-    std::unique_ptr<Bomba> bomba; // Bomba del jugador, si la tiene
+    std::unique_ptr<Bomba> bomba; 
     std::unique_ptr<ArmaDeFuego> arma_principal;
     std::unique_ptr<ArmaDeFuego> arma_secundaria;
     std::unique_ptr<Cuchillo> cuchillo;

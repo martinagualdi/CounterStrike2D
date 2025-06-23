@@ -25,7 +25,6 @@ Mapa::Mapa(std::string yamlPath) {
             tipo = PISO;
         } else if(tipo_str == "arma"){
             tipo = ARMA;
-            /* HAY QUE MODIFICAR PARA QUE SE MUESTRE EL PISO Y ARRIBA EL ARMA, AGREGAR EL ARMA AL VECTOR DE ARMASDEFAULTENMAPA */
             std::string aux = nodo["imagen"].as<std::string>();
             const std::string prefix = "weapons/";
             const std::string suffix = "_m.bmp";
@@ -90,8 +89,7 @@ bool Mapa::verificar_zona_bombas(float pos_x, float pos_y) {
     else if (cantidad_zonas_bombas == 2) {
         return en_posicion_de_bomba_a(pos_x, pos_y) || en_posicion_de_bomba_b(pos_x, pos_y);
     } else {
-        std::cout << "Error: Cantidad de zonas de bombas no válida: " << cantidad_zonas_bombas << std::endl;
-        return false; // No hay zonas de bombas definidas
+        return false; 
     }
 }
 
@@ -122,8 +120,7 @@ bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
     for (const ElementoDeMapa &elemento : elementos) {
         if (elemento.tipo == OBSTACULO) {
             if (pos_x < 0 || pos_x > ancho_mapa || pos_y < 0 || pos_y > alto_mapa) {
-                std::cout << "Bala fuera de los limites del mapa" << std::endl;
-                return true; // La bala está fuera de los límites del mapa
+                return true; 
             }
             float max_pos_x_elemento = elemento.area.x + elemento.area.ancho;
             float min_pos_x_elemento = elemento.area.x;
@@ -131,7 +128,6 @@ bool Mapa::bala_colision_contra_pared(float pos_x, float pos_y) {
             float min_pos_y_elemento = elemento.area.y;
             if (pos_x >= min_pos_x_elemento && pos_x <= max_pos_x_elemento &&
                 pos_y >= min_pos_y_elemento && pos_y <= max_pos_y_elemento) {
-                std::cout << "Bala colisiona con pared" << std::endl;
                 return true; 
             }
         }
@@ -149,18 +145,12 @@ std::vector<float> Mapa::dar_posiciones_iniciales(enum Equipo equipo) {
     else
         area_inicio = inicio_ct;
 
-    // std::cout << "Area inicio: x=" << area_inicio.x << " y=" << area_inicio.y
-    //           << " ancho=" << area_inicio.ancho << " alto=" << area_inicio.alto << std::endl;
 
 
     std::uniform_real_distribution<float> dist_x(area_inicio.x + 20, area_inicio.x + area_inicio.ancho - 20);
     std::uniform_real_distribution<float> dist_y(area_inicio.y + 20, area_inicio.y + area_inicio.alto - 20) ;
-    std::cout << "Generando posición inicial aleatoria en el área: "
-              << "x=[" << area_inicio.x << ", " << area_inicio.x + area_inicio.ancho << "] "
-              << "y=[" << area_inicio.y << ", " << area_inicio.y + area_inicio.alto << "]" << std::endl;
     float x = dist_x(gen);
     float y = dist_y(gen);
-    std::cout << "Posición inicial: (" << x << ", " << y << ")" << std::endl;
     std::vector<float> posicion_inicial{x, y};
     return posicion_inicial;
 }

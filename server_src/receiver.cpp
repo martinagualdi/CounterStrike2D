@@ -100,18 +100,15 @@ void Receiver::comunicacion_de_partida() {
             break;
         }
     }
-    std::cout << "[Receiver] El thread Receiver ha terminado de recibir mensajes del cliente. Id: " << player_id << std::endl;
     alive = false;
 }
 
 void Receiver::run() {
     comunicacion_del_lobby();
     comunicacion_de_partida();
-    std::cout << "[Receiver] El thread Receiver ha recibido el mensaje de desconexion del cliente." << std::endl;
     monitor_partidas.eliminar_jugador_de_partida(game_id, player_id);
     queue_enviadora.close();
     sender.join();
-    std::cout << "[Receiver] El thread Receiver ha terminado su ejecucion." << std::endl;
 }
 
 Receiver::~Receiver() {}

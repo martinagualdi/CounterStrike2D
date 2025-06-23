@@ -96,13 +96,21 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
             float dy = jugador->getY() - jugador_tirador->getY();
             float distancia = std::sqrt(dx * dx + dy * dy);
             if (!esperando) {
-                jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
+                if(jugador->esta_vivo()){
+                    jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
+                }else{
+                    return true;
+                }
                 if (!jugador->esta_vivo()) {
                     jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
                     ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
                     if (arma_que_suelta) {
-                        ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); // Deja su arma principal en el suelo
+                        ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); 
                         armas_en_suelo.push_back(arma);
+                    }
+                    if (jugador->posee_bomba()) {
+                        Bomba* bomba = jugador->soltar_bomba();
+                        armas_en_suelo.push_back(ArmaEnSuelo(bomba, jugador->getX(), jugador->getY()));
                     }
                 }
             }
@@ -120,46 +128,46 @@ void GameLoop::ejecutar_movimiento(Jugador *jugador) {
         case ARRIBA:
             nuevo_y += VELOCIDAD;
             if (mapa.limite_alto() < nuevo_y) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case ABAJO:
             nuevo_y -= VELOCIDAD;
             if (nuevo_y < 0) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case IZQUIERDA:
             nuevo_x -= VELOCIDAD;
             if (nuevo_x < 0) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DERECHA:
             nuevo_x += VELOCIDAD;
             if (mapa.limite_ancho() < nuevo_x) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DIAGONAL_SUP_IZQ:
             nuevo_x -= velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             if (nuevo_x < 0 || mapa.limite_alto() < nuevo_y) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DIAGONAL_SUP_DER:
             nuevo_x += velocidad_diagonal;
             nuevo_y += velocidad_diagonal;
             if (mapa.limite_ancho() < nuevo_x || mapa.limite_alto() < nuevo_y) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DIAGONAL_INF_IZQ:
             nuevo_x -= velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             if (nuevo_x < 0 || nuevo_y < 0) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DIAGONAL_INF_DER:
             nuevo_x += velocidad_diagonal;
             nuevo_y -= velocidad_diagonal;
             if (mapa.limite_ancho() < nuevo_x || nuevo_y < 0) 
-                return; // Evitar que el jugador se mueva fuera del mapa
+                return; 
             break;
         case DETENER:
             break;
@@ -186,7 +194,6 @@ Jugador *GameLoop::findJugador(int id_jugador_buscado) {
 }
 
 enum Equipo GameLoop::se_termino_ronda(auto& t_inicio) {
-    // Verificar si todos los jugadores de un equipo han muerto
     bool ct_vivos = false;
     bool tt_vivos = false;
     if (equipo_ct.empty()) {
@@ -225,7 +232,7 @@ enum Equipo GameLoop::se_termino_ronda(auto& t_inicio) {
                 tt_vivos = true;
         }
         if (ct_vivos && tt_vivos) 
-            return NONE; // Si ambos equipos tienen jugadores vivos, no se ha terminado la ronda
+            return NONE; 
     }
 
     if (!ct_vivos || !tt_vivos) {
@@ -279,19 +286,19 @@ void GameLoop::chequear_si_pueden_comprar(auto t_inicio) {
                 jugador->en_posicion_de_compra(true);
                 cantidad++;
                 if (!algun_jugador_puede_comprar)
-                    algun_jugador_puede_comprar = true; // Al menos un jugador puede comprar
+                    algun_jugador_puede_comprar = true; 
             } else {
                 jugador->en_posicion_de_compra(false);
             }
         }
         if (cantidad == 0) 
-            algun_jugador_puede_comprar = false; // Si no hay jugadores en posición de compra, ninguno puede comprar
+            algun_jugador_puede_comprar = false; 
     } else {
         if (algun_jugador_puede_comprar) {
             for (Jugador *jugador : jugadores) {
-                jugador->en_posicion_de_compra(false); // Desactivar la compra para todos los jugadores
+                jugador->en_posicion_de_compra(false); 
             }
-            algun_jugador_puede_comprar = false; // Ningún jugador puede comprar
+            algun_jugador_puede_comprar = false; 
         }
     }
 }
@@ -339,17 +346,14 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 break;
             case CAMBIAR_ARMA:
                 jugador->cambiar_arma_en_mano();
-                std::cout << "Jugador de ID: " << jugador->getId() << " ha cambiado su arma a: " 
-                            << jugador->get_nombre_arma_en_mano() << std::endl;
                 break;
             case COMPRAR:
                 if (!jugador->puede_comprar_ahora()) {
-                    std::cout << "Jugador de ID: " << jugador->getId() << " no puede comprar en este momento." << std::endl;
                     break;; // Si el jugador no puede comprar, no se procesa el comando
                 }
                 if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                     if (!jugador->comprarBalas(comando.compra)) {
-                        std::cout << "Jugador de ID: " << jugador->getId() << " no tiene dinero suficiente para comprar balas, no tiene arma principal o llego al maximo de balas." << std::endl;
+                        break;
                     }
                 } else {
                     ArmaDeFuego* arma_a_soltar = jugador->comprarArma(comando.compra);
@@ -376,14 +380,12 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         jugador->empezar_a_plantar();
                         jugador_plantando = jugador;
                         tiempo_inicio_plantado = std::chrono::steady_clock::now();
-                        std::cout << "Jugador " << jugador->getId() << " comenzó a plantar la bomba." << std::endl;
                     }else if(bomba_plantada && jugador->get_equipo() == CT &&
                         mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())) {
                         //Desactivar bomba
                         jugador->empezar_a_desactivar();
                         jugador_desactivando = jugador;
                         tiempo_inicio_desactivado = std::chrono::steady_clock::now();
-                        std::cout << "Jugador " << jugador->getId() << " comenzó a desactivar la bomba." << std::endl;
                         
                     }
                 }
@@ -391,13 +393,11 @@ void GameLoop::ejecucion_comandos_recibidos() {
                     if (jugador == jugador_plantando) {
                         jugador_plantando = nullptr;
                         jugador->cancelar_plantado_bomba();
-                        std::cout << "Jugador " << jugador->getId() << " interrumpió el plantado de la bomba." << std::endl;
                     }else if (jugador==jugador_desactivando){
                         jugador_desactivando = nullptr;
                         jugador->cancelar_desactivado_bomba();
-                        std::cout << "Jugador " << jugador->getId() << " interrumpió el desactivado de la bomba." << std::endl;
                     }
-                    
+
                 }
                 break;
             case DROPEAR: {
@@ -512,7 +512,6 @@ void GameLoop::reiniciar_estado_bomba(){
         tiempo_inicio_plantado = std::chrono::steady_clock::time_point();
         for (Jugador *jugador : jugadores) {
             if (jugador->posee_bomba()) {
-                std::cout << "Elimino bomba de jugador" << std::endl;
                 jugador->quitar_bomba();
                 break;
             }
@@ -527,14 +526,12 @@ void GameLoop::chequear_bomba_plantada() {
         if (t_transcurrido >= Configuracion::get<int>("tiempo_plantado_bomba")) {
             bomba_plantada = true;
             jugador_plantando->plantar_bomba(jugador_plantando->getX(), jugador_plantando->getY());
-            int id_jugador = jugador_plantando->getId();
             bomba= jugador_plantando->soltar_bomba(); 
             if (bomba) {
                 info_bomba = BombaEnSuelo (jugador_plantando->getX(), jugador_plantando->getY(), PLANTADA, bomba->getTiempoParaDetonar(),
                 false, true, false);
             }
             jugador_plantando = nullptr;
-            std::cout << "Bomba plantada por el jugador " << id_jugador << std::endl;
             
         }
     }
@@ -550,9 +547,7 @@ void GameLoop::chequear_bomba_desactivada(){
             jugador_desactivando->desactivar_bomba();
             bomba->desactivar();
             bomba->setPlantada(false);
-            int id_jugador = jugador_desactivando->getId();
             jugador_desactivando= nullptr;
-            std::cout << "Bomba desactivada por el jugador " << id_jugador<< std::endl;
         }
     }else{
        if (bomba_plantada){
@@ -646,7 +641,6 @@ bool GameLoop::esperando_jugadores() {
 
 void GameLoop::asignar_bomba_si_es_necesario(bool esperando) {
     if (!esperando) {
-        // Buscar jugadores TT vivos y sin bomba
         std::vector<Jugador*> tts_sin_bomba;
         for (Jugador* jugador : equipo_tt) {
             if (jugador->esta_vivo() && !jugador->posee_bomba()) {
@@ -683,7 +677,6 @@ void GameLoop::reiniciar_dinero_jugadores() {
 
 bool GameLoop::jugar_ronda(bool esperando) {
     bool en_juego = true;
-    std::cout << "Iniciando ronda " << ronda_actual << std::endl;
     auto t_inicio = std::chrono::steady_clock::now();
     asignar_bomba_si_es_necesario(esperando);
     colocar_armas_del_mapa();
@@ -720,7 +713,7 @@ bool GameLoop::jugar_ronda(bool esperando) {
         }
     }
     constexpr int tiempo_entre_rondas = 4;
-    int t_restante = 0; // o el valor que quieras mostrar en el cliente
+    int t_restante = 0; 
      
     esperar_entre_rondas(tiempo_entre_rondas, t_restante, eq_ganador);
 
@@ -728,14 +721,12 @@ bool GameLoop::jugar_ronda(bool esperando) {
 }
 
 void GameLoop::run() {
-    std::cout << "Iniciando el GameLoop..." << std::endl;
     jugar_ronda(true);
     while (activo) {
         jugar_ronda(false);
         if (chequear_si_termino_partida()) 
             activo = false;
     }
-    std::cout << "[Gameloop] Se termino la partida" << std::endl;
     queue_comandos.close(); 
 }
 
@@ -748,21 +739,18 @@ void GameLoop::eliminar_jugador_de_partida(int id_jugador) {
             equipo_tt.erase(std::remove(equipo_tt.begin(), equipo_tt.end(), jugador), equipo_tt.end());
         }
         jugadores.erase(std::remove(jugadores.begin(), jugadores.end(), jugador), jugadores.end());
-        delete jugador; // Liberar memoria
-        std::cout << "[Gameloop] Se elimino jugador de id: " << id_jugador << std::endl;
+        delete jugador;
     }
 }
 
 GameLoop::~GameLoop() {
-    std::cout << "[Gameloop] Destruyendo GameLoop..." << std::endl;
     for (Jugador *jugador : jugadores) {
-        delete jugador; // Liberar memoria de los jugadores
+        delete jugador;
     }
     for (ArmaEnSuelo &arma : armas_en_suelo) {
-        delete arma.getArma(); // Liberar memoria de las armas en el suelo
+        delete arma.getArma(); 
     }
     if (bomba) {
-        delete bomba; // Liberar memoria de la bomba si existe
+        delete bomba; 
     }
-    std::cout << "[Gameloop] Se destruyo el GameLoop" << std::endl;
 }

@@ -28,7 +28,7 @@ public:
 ; 
 
     virtual int accion(float distancia)=0;
-    virtual bool puedeAccionar()=0; // Verifica si se puede disparar (ej. si hay munición)
+    virtual bool puedeAccionar()=0;
     virtual int getBalas()  =0; 
     virtual std::string getNombre() const { return nombre; }
     virtual bool esAutomatica() const { return es_automatica; }

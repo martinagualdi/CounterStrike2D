@@ -6,7 +6,7 @@
 
 class Bomba : public Arma {
     bool activada;
-    bool desactivada; // Si se desactiva se acaba el juego
+    bool desactivada; 
     bool detonada;
     int tiempo_para_detonar;
     bool plantada;

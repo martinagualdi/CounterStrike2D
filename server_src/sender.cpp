@@ -17,7 +17,6 @@ void Sender::run() {
         }
     }
     is_alive = false;
-    std::cout << "[Sender] El thread Sender ha terminado su ejecucion, para cliente de id: " << player_id << std::endl;
 }
 
 Sender::~Sender() {}

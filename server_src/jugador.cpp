@@ -33,8 +33,6 @@ void Jugador::cancelar_plantado_bomba() {
     if (tiene_bomba && plantando_bomba) {
         plantando_bomba = false;
         bomba->reiniciar();
-    } else {
-        std::cout << "No se puede cancelar el plantado de la bomba, no se está plantando." << std::endl;
     }
 }
 
@@ -47,9 +45,7 @@ void Jugador::cancelar_desactivado_bomba(){
 void Jugador::empezar_a_plantar() {
     if (tiene_bomba && !bomba->estaActivada()) {
         plantando_bomba = true;
-    } else {
-        std::cout << "No se puede empezar a plantar la bomba, ya está activada o no se tiene una." << std::endl;
-    }
+    } 
 }
 
 void Jugador::empezar_a_desactivar() {
@@ -65,9 +61,7 @@ void Jugador::plantar_bomba(float x, float y) {
         plantando_bomba = false;
         bomba->activar(x,y); 
         bomba->setPlantada(true);
-    } else {
-        std::cout << "No se puede plantar la bomba, ya está activada o no se tiene una." << std::endl;
-    }
+    } 
 }
 
 std::string Jugador::get_nombre_arma_en_mano() {
@@ -161,7 +155,7 @@ bool Jugador::comprarBalas(enum Compra tipo_bala) {
             }
             break;
         default:
-            return false; // No se compró nada
+            return false; 
     }
     return false;
 }
@@ -242,8 +236,6 @@ Bomba* Jugador::soltar_bomba() {
 }
 
 void Jugador::levantar_bomba(Arma* bomba_del_suelo) {
-    //Bomba* ver_bomba = dynamic_cast<Bomba*>(bomba_del_suelo);
-    //if (ver_bomba->estaPlantada()){return nullptr;} 
     bomba.reset(dynamic_cast<Bomba*>(bomba_del_suelo));
     tiene_bomba = true;
     plantando_bomba = false;

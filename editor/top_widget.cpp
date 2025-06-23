@@ -23,6 +23,18 @@
 #define TIPO_PISO "piso"
 #define TIPO_OTRO "otro"
 
+#define ARMAS "weapons"
+#define OBSTACULOS "obstaculo"
+#define PISOS "piso"
+#define PROTECCION "proteccion_disparos"
+#define PLANTACION "plantacion_bombas"
+
+#define PATH_PLANTACION_1 "plantacion_bombas/plantacion1.png"
+#define PATH_PLANTACION_2 "plantacion_bombas/plantacion2.png"
+
+#define TEXTO_CT "CT"
+#define TEXTO_TT "TT"
+
 TopWidget::TopWidget(QWidget* parent) : QGraphicsView(parent){
     setScene(new QGraphicsScene(this));
     setAcceptDrops(true);
@@ -313,11 +325,11 @@ void TopWidget::dropEvent(QDropEvent* event) {
             item->setZValue(1);
 
             QString tipo = TIPO_OTRO;
-            if(path.contains("weapons"))
+            if(path.contains(ARMAS))
                 tipo = TIPO_ARMA;
-            else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
+            else if(path.contains(OBSTACULOS)||path.contains(PROTECCION))
                 tipo = TIPO_OBSTACULO;
-            else if(path.contains("piso")){
+            else if(path.contains(PISOS)){
                 eliminarPisoEnCelda(x, y);
                 tipo = TIPO_PISO;
             }
@@ -342,7 +354,7 @@ void TopWidget::dropEvent(QDropEvent* event) {
 void TopWidget::eliminarPisoEnCelda(int x, int y) {
     const QList<QGraphicsItem*> items = scene()->items();
     for (QGraphicsItem* item : items) {
-        if (item->zValue() == zValueParaTipo("piso") && item->data(1).toString() == "piso") {
+        if (item->zValue() == zValueParaTipo(PISOS) && item->data(1).toString() == PISOS) {
             QPointF pos = item->pos();
             if (int(pos.x()) == x && int(pos.y()) == y) {
                 scene()->removeItem(item);
@@ -525,12 +537,12 @@ QColor TopWidget::colorParaTipo(const QString& tipo) const {
     if (tipo == TIPO_ZONA_CT) return QColor(0, 0, 255, 50);
     if (tipo == TIPO_ZONA_TT) return QColor(0, 255, 0, 50);
     if (tipo == TIPO_ZONA_B) return QColor(255, 0, 0, 50);
-    return QColor(100, 100, 100, 50);  // fallback
+    return QColor(100, 100, 100, 50);
 }
 
 QString TopWidget::textoParaTipo(const QString& tipo) const {
-    if (tipo == TIPO_ZONA_CT) return "CT";
-    if (tipo == TIPO_ZONA_TT) return "TT";
+    if (tipo == TIPO_ZONA_CT) return TEXTO_CT;
+    if (tipo == TIPO_ZONA_TT) return TEXTO_TT;
     return "";
 }
 
@@ -540,8 +552,8 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
     });
 
     QString imagenRelativa = (cantidad == 0)
-        ? QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion1.png"))
-        : QString::fromStdString(RUTA_IMAGENES("plantacion_bombas/plantacion2.png"));
+        ? QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_1))
+        : QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_2));
     
     QPixmap pix(imagenRelativa);
     if (!pix.isNull()) {
@@ -576,13 +588,13 @@ void TopWidget::agregarElemento(const QString& path, int x, int y) {
         item->setZValue(1);
 
         QString tipo = TIPO_OTRO;
-        if (path.contains("plantacion_bombas"))
+        if (path.contains(PLANTACION))
             tipo = TIPO_BOMBSITE;
-        else if(path.contains("weapons"))
+        else if(path.contains(ARMAS))
             tipo = TIPO_ARMA;
-        else if(path.contains("obstaculo")||path.contains("proteccion_disparos"))
+        else if(path.contains(OBSTACULOS)||path.contains(PROTECCION))
             tipo = TIPO_OBSTACULO;
-        else if(path.contains("piso"))
+        else if(path.contains(PISOS))
             tipo = TIPO_PISO;
         item->setData(0, path);
         item->setData(1, tipo);
@@ -606,10 +618,10 @@ void TopWidget::agregarZona(const QRectF& rect, const QString& tipo, const QUuid
 
     if (tipo == TIPO_ZONA_CT) {
         color = QColor(0, 0, 255, 50);
-        texto = "CT";
+        texto = TEXTO_CT;
     } else if (tipo == TIPO_ZONA_TT) {
         color = QColor(0, 255, 0, 50);
-        texto = "TT";
+        texto = TEXTO_TT;
     } else if (tipo == TIPO_ZONA_B) {
         color = QColor(255, 0, 0, 50);
     }

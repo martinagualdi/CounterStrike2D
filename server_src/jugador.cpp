@@ -91,7 +91,7 @@ ArmaDeFuego* Jugador::comprarArma(enum Compra arma) {
     int precio = Configuracion::get<int>(str_precio);
     ArmaDeFuego* arma_a_soltar = nullptr;
     if(dinero < precio) {
-        return arma_a_soltar; // No tiene suficiente dinero
+        return arma_a_soltar;
     }
     switch (arma) {
         case C_AK47:

@@ -79,7 +79,6 @@ class Jugador {
       muertes(0),
       desconectar(false) {}
 
-    // Getters, Setters y estados del jugador
     int getId() const { return id; }
     std::string getNombre() const { return nombre; }
     float getX() const { return x; }

@@ -4,6 +4,14 @@
 #include <iostream>
 #include <random>
 
+#define TIPO_ARMA "arma"
+#define TIPO_ZONA_B "zona_bombas"
+#define TIPO_ZONA_CT "inicio_ct"
+#define TIPO_ZONA_TT "inicio_tt"
+#define TIPO_OBSTACULO "obstaculo"
+#define TIPO_PISO "piso"
+
+
 Mapa::Mapa(std::string yamlPath) {
     YAML::Node data = YAML::LoadFile(yamlPath);
     this->ancho_mapa = data["ancho_max_mapa"].as<int>();
@@ -19,11 +27,11 @@ Mapa::Mapa(std::string yamlPath) {
         );
         std::string tipo_str = nodo["tipo"].as<std::string>();
         TipoElementoMapa tipo = {};
-        if(tipo_str == "obstaculo"){
+        if(tipo_str == TIPO_OBSTACULO){
             tipo = OBSTACULO;
-        } else if(tipo_str == "piso"){
+        } else if(tipo_str == TIPO_PISO){
             tipo = PISO;
-        } else if(tipo_str == "arma"){
+        } else if(tipo_str == TIPO_ARMA){
             tipo = ARMA;
             std::string aux = nodo["imagen"].as<std::string>();
             const std::string prefix = "weapons/";
@@ -50,11 +58,11 @@ Mapa::Mapa(std::string yamlPath) {
         int y = nodo["y"].as<int>();
         int ancho = nodo["ancho"].as<int>();
         int alto = nodo["alto"].as<int>();
-        if (tipo_str == "inicio_ct") {
+        if (tipo_str == TIPO_ZONA_CT) {
             inicio_ct = definir_inicio(x, y, ancho, alto);
-        } else if (tipo_str == "inicio_tt"){
+        } else if (tipo_str == TIPO_ZONA_TT){
             inicio_tt = definir_inicio(x, y, ancho, alto);
-        } else if (tipo_str == "zona_bombas") {
+        } else if (tipo_str == TIPO_ZONA_B) {
             if (!zona_bombas_definida) {
                 zona_bombas.zona_bombas_a = definir_inicio(x, y, ancho, alto);
                 zona_bombas_definida = true;

@@ -6,6 +6,12 @@
 #include "enums_jugador.h"
 #include "configuracion.h"
 
+#define COMANDO_SALIR "salir"
+#define COMANDO_CREAR "crear"
+#define COMANDO_LISTAR "listar"
+#define COMANDO_UNIRSE "unirse"
+
+
 enum Tipo {
     MOVIMIENTO, 
     ROTACION,

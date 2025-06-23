@@ -36,7 +36,6 @@ void GameLoop::agregar_jugador_a_partida(const int id, std::string& nombre) {
     bool puede_tt = equipo_tt.size() < static_cast<size_t>(cant_min_tt);
 
     if (puede_ct && puede_tt) {
-        // Si puedo unirme a ambos equipos
         if (ultimo_unido_ct) {
             jugador->establecer_equipo(TT);
             equipo_tt.push_back(jugador);
@@ -102,7 +101,7 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
                     return true;
                 }
                 if (!jugador->esta_vivo()) {
-                    jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
+                    jugador_tirador->sumar_eliminacion();
                     ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
                     if (arma_que_suelta) {
                         ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); 
@@ -349,7 +348,7 @@ void GameLoop::ejecucion_comandos_recibidos() {
                 break;
             case COMPRAR:
                 if (!jugador->puede_comprar_ahora()) {
-                    break;; // Si el jugador no puede comprar, no se procesa el comando
+                    break;
                 }
                 if (comando.compra == BALAS_PRIMARIA || comando.compra == BALAS_SECUNDARIA) {
                     if (!jugador->comprarBalas(comando.compra)) {
@@ -382,7 +381,6 @@ void GameLoop::ejecucion_comandos_recibidos() {
                         tiempo_inicio_plantado = std::chrono::steady_clock::now();
                     }else if(bomba_plantada && jugador->get_equipo() == CT &&
                         mapa.verificar_zona_bombas(jugador->getX(), jugador->getY())) {
-                        //Desactivar bomba
                         jugador->empezar_a_desactivar();
                         jugador_desactivando = jugador;
                         tiempo_inicio_desactivado = std::chrono::steady_clock::now();
@@ -465,7 +463,7 @@ void GameLoop::disparar_rafagas_restantes() {
                     balas_disparadas.push_back(bala_disparada);
 
                     ak47->tick_rafaga();
-                    proximo = ahora + std::chrono::milliseconds(80); // 80ms entre balas
+                    proximo = ahora + std::chrono::milliseconds(80);
                 }
             }
         }
@@ -490,10 +488,9 @@ void GameLoop::chequear_colisiones(bool esperando) {
 void GameLoop::chequear_si_equipo_gano(enum Equipo& eq_ganador, bool& en_juego, auto& t_inicio) {
     eq_ganador = se_termino_ronda(t_inicio);
     if (eq_ganador != NONE) {
-        // Reiniciar la ronda
         balas_disparadas.clear();
         ronda_actual++;
-        en_juego = false; // Terminar el bucle de juego
+        en_juego = false;
     }
 }
 

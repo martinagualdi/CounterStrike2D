@@ -24,6 +24,7 @@ public:
     void enviar_crear_partida(std::string username);
     void enviar_unirse_partida(int id_partida, std::string& nombre);
     void enviar_listar_partida();
+    void enviar_salir_lobby();
     std::string recibir_lista_partidas();
     void enviar_mensaje(const std::string& mensaje);
     std::string recibir_mapa();

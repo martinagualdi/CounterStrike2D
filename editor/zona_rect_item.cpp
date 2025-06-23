@@ -5,6 +5,14 @@
 #include <QGraphicsScene>
 #include <QInputDialog>
 
+#define TEXTO_CT "CT"
+#define TEXTO_TT "TT"
+#define TEXTO_BOMBA "BOMBAS"
+
+#define ZONA_CT "inicio_ct"
+#define ZONA_TT "inicio_tt"
+#define ZONA_BOMBA "zona_bombas"
+
 ZonaRectItem::ZonaRectItem(const QRectF& rect, const QString& tipo, QUuid id, QGraphicsItem* parent)
     : QGraphicsRectItem(rect, parent), label(nullptr), tipo(tipo), id(id) {
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
@@ -39,12 +47,12 @@ void ZonaRectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
     Q_UNUSED(event);
     bool ok = false;
     QString nuevoTipo = QInputDialog::getItem(nullptr, "Cambiar tipo de zona", "Nuevo tipo:",
-        { "inicio_ct", "inicio_tt", "zona_bombas" }, 0, false, &ok);
+        { ZONA_CT, ZONA_TT, ZONA_BOMBA }, 0, false, &ok);
     if (ok) {
         tipo = nuevoTipo;
-        setTexto(nuevoTipo == "inicio_ct" ? "CT" : (nuevoTipo == "inicio_tt" ? "TT" : "BOMBAS"));
-        QColor color = (tipo == "inicio_ct") ? QColor(0, 0, 255, 50) :
-                       (tipo == "inicio_tt") ? QColor(0, 255, 0, 50) :
+        setTexto(nuevoTipo == ZONA_CT ? TEXTO_CT : (nuevoTipo == ZONA_TT ? TEXTO_TT : TEXTO_BOMBA));
+        QColor color = (tipo == ZONA_CT) ? QColor(0, 0, 255, 50) :
+                       (tipo == ZONA_TT) ? QColor(0, 255, 0, 50) :
                        QColor(255, 0, 0, 50);
         setColor(color);
         emit tipoZonaCambiado(this, tipo);

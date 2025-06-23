@@ -97,19 +97,20 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
             if (!esperando) {
                 if(jugador->esta_vivo()){
                     jugador->recibir_danio(jugador_tirador->get_arma_actual()->accion(distancia));
-                }else{
-                    return true;
-                }
-                if (!jugador->esta_vivo()) {
-                    jugador_tirador->sumar_eliminacion();
-                    ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
-                    if (arma_que_suelta) {
-                        ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); 
-                        armas_en_suelo.push_back(arma);
-                    }
-                    if (jugador->posee_bomba()) {
-                        Bomba* bomba = jugador->soltar_bomba();
-                        armas_en_suelo.push_back(ArmaEnSuelo(bomba, jugador->getX(), jugador->getY()));
+                    if (!jugador->esta_vivo()) {
+                        jugador->setMovimiento(DETENER);
+                        jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
+                        if (jugador->posee_bomba()) {
+                            Bomba* bomba = jugador->soltar_bomba();
+                            armas_en_suelo.push_back(ArmaEnSuelo(bomba, jugador->getX(), jugador->getY()));
+                        } else {
+                            ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
+                            if (arma_que_suelta) {
+                                ArmaEnSuelo arma(arma_que_suelta, jugador->getX(), jugador->getY()); 
+                                armas_en_suelo.push_back(arma);
+                            }
+                        }
+
                     }
                 }
             }

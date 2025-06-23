@@ -998,6 +998,11 @@ TEST(ArmasTest, JugadorSueltaArmaPrincipal) {
         int tiempo = 60;
         Snapshot snap(jugadores, balas, armas, bomba, tiempo, 0, 0, 0, 0, Equipo::NONE, false);
         proto.enviar_a_cliente(snap);
+
+        for (auto& arma : armas) {
+            delete arma.arma;
+        }
+
     });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(kDelay));

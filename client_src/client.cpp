@@ -29,11 +29,19 @@ void Client::iniciar() {
     int default_alto = DEFAULT_ALTO;
     LobbyWindow lobby(protocolo, username);
     int result = lobby.exec();
-    if (result != QDialog::Accepted) return;
+
+    if (result != QDialog::Accepted || !lobby.lobbySalioBien()) {
+        protocolo.enviar_salir_lobby();
+        return;
+    }
+
     std::string mapa_inicial = protocolo.recibir_mapa();
     InfoConfigClient infoConfig = protocolo.recibir_configuracion_inicial();
+
     hilo_enviador.start();
     hilo_recibidor.start();
+    hilos_iniciados = true;
+
     Configuracion::cargar_path(RUTA_CONFIG_CLIENT(CLIENT_CONFIG_PATH).c_str());
     int ancho_ventana = Configuracion::get<int>("ancho_ventana");
     int alto_ventana = Configuracion::get<int>("alto_ventana");
@@ -102,10 +110,12 @@ void Client::iniciar() {
 }
 
 Client::~Client(){
-    hilo_enviador.stop();
-    hilo_recibidor.stop();
-    cola_enviador.close();
-    cola_recibidor.close();
-    hilo_enviador.join();
-    hilo_recibidor.join();
+    if (hilos_iniciados) {
+        hilo_enviador.stop();
+        hilo_recibidor.stop();
+        cola_enviador.close();
+        cola_recibidor.close();
+        hilo_enviador.join();
+        hilo_recibidor.join();
+    }
 }

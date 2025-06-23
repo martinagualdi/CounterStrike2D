@@ -10,7 +10,6 @@
 #include <QMessageBox>
 #include <QTimer>
 
-
 LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& username)
     : QDialog(nullptr), protocolo(protocolo), username(username) {
 
@@ -85,6 +84,14 @@ LobbyWindow::LobbyWindow(ProtocoloCliente& protocolo, const std::string& usernam
     mediaPlayer->play();
 }
 
+void LobbyWindow::closeEvent(QCloseEvent* event) {
+    MensajePopup popup("Cerrando", "La partida se esta cerrando...", this);
+    popup.exec();
+
+    mediaPlayer->stop();
+    event->accept();
+}
+
 void LobbyWindow::onCrearClicked() {
     protocolo.enviar_crear_partida(username);
 
@@ -125,6 +132,7 @@ void LobbyWindow::fadeOutAudioAndClose() {
         } else {
             fadeTimer->stop();
             mediaPlayer->stop();
+            exitoLobby = true;
             accept(); 
         }
     });

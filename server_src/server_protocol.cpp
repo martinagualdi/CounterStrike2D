@@ -188,7 +188,7 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
     skt.recvall(&codigo, sizeof(codigo));
     std::vector<std::string> comando;
     if (codigo == PREFIJO_CREAR_PARTIDA) {
-        comando.push_back("crear");
+        comando.push_back(COMANDO_CREAR);
         uint16_t largo;
         skt.recvall(&largo, sizeof(largo));
         largo = ntohs(largo);
@@ -197,7 +197,7 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
         std::string username(buffer.begin(), buffer.end());
         comando.push_back(username);
     }else if (codigo == PREFIJO_UNIRSE_PARTIDA) {
-        comando.push_back("unirse");
+        comando.push_back(COMANDO_UNIRSE);
         uint16_t id_partida;
         skt.recvall(&id_partida, sizeof(id_partida));
         comando.push_back(std::to_string(ntohs(id_partida)));
@@ -209,7 +209,9 @@ std::vector<std::string> ServerProtocol::recibir_inicio_juego() {
         std::string nombre(buffer.begin(), buffer.end());
         comando.push_back(nombre);
     } else if(codigo == PREFIJO_LISTAR) {
-        comando.push_back("listar");
+        comando.push_back(COMANDO_LISTAR);
+    }else if (codigo == PREFIJO_SALIR){
+        comando.push_back(COMANDO_SALIR);
     }
     return comando;
 }

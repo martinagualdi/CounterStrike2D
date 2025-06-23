@@ -202,6 +202,13 @@ int ProtocoloCliente::recibirID() {
    return id_jugador;
 }
 
+void ProtocoloCliente::enviar_salir_lobby() {
+   uint8_t comando = PREFIJO_SALIR;
+   if (!socket.sendall(&comando, sizeof(comando))) {
+      throw std::runtime_error("Error al enviar el comando de listar partidas");
+   }
+}
+
 void ProtocoloCliente::enviar_crear_partida(std::string username) {
    uint8_t comando = PREFIJO_CREAR_PARTIDA;
    uint16_t largo = static_cast<uint16_t>(username.size());

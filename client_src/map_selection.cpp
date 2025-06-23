@@ -17,7 +17,7 @@ MapSelectionDialog::MapSelectionDialog(const QVector<QPair<QString, QString>>& m
     listaMapas = new QListWidget(this);
     previewLabel = new QLabel("Previsualización del mapa", this);
     QPushButton* okButton = new QPushButton("Aceptar", this);
-    QPushButton* cancelButton = new QPushButton("Cancelar", this);  // Nuevo botón
+    QPushButton* cancelButton = new QPushButton("Cancelar", this);
 
     previewLabel->setMinimumSize(256, 256);
     previewLabel->setMaximumSize(256, 256);
@@ -125,7 +125,7 @@ void MapSelectionDialog::mostrarPreview(QListWidgetItem* item) {
     QString nombreMapa = item->text();
     QString rutaMiniatura = mapaToMiniatura.value(nombreMapa);
 
-    QString fullPath = RUTA_SERVER("") + rutaMiniatura;
+    QString fullPath = RUTA_SERVER(rutaMiniatura);
 
     if (QFile::exists(fullPath)) {
         QPixmap miniatura(fullPath);

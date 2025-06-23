@@ -8,6 +8,7 @@
 #include <QString>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QCloseEvent>
 #include "client_protocol.h" 
 
 class LobbyWindow : public QDialog{
@@ -15,15 +16,17 @@ class LobbyWindow : public QDialog{
 
 public:
     explicit LobbyWindow(ProtocoloCliente& protocolo, const std::string& username);
+    bool lobbySalioBien() const { return exitoLobby; }
 
 signals:
     void partidaSeleccionada();
 
-private slots:
+protected:
     void onCrearClicked();
     void onListarClicked();
     void onUnirseClicked();
     void fadeOutAudioAndClose();
+    void closeEvent(QCloseEvent* event) override;
 
 private:
     ProtocoloCliente& protocolo;
@@ -36,6 +39,8 @@ private:
     QLabel* mensajeLabel;
     QMediaPlayer* mediaPlayer;
     QAudioOutput* audioOutput;
+
+    bool exitoLobby = false;
 };
 
 #endif // LOBBYWINDOW_H

@@ -30,7 +30,6 @@ private:
 
     void cortar_conexion();
 
-    // Devuelve la queue de mensajes del cliente
     Queue<Snapshot> &get_queue() {
         return this->queue_enviadora;
     }

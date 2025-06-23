@@ -27,6 +27,28 @@
 #include <QDir>
 #include <QFileInfo>
 
+#define TAB_ARMAS "Armas"
+#define TAB_FONDOS "Fondos"
+#define TAB_DUST "Dust"
+#define TAB_INFERNO "Inferno"
+#define TAB_AZTECA "Azteca"
+#define TAB_PROTECCION "Proteccion anti disparos"
+
+#define PATH_FONDOS "backgrounds/"
+#define PATH_ARMAS "weapons/"
+#define PATH_DUST "dust/"
+#define PATH_INFERNO "inferno/"
+#define PATH_AZTECA "aztec/"
+#define PATH_PROTECCION "proteccion_disparos/"
+
+#define ARMA_AWP_PERMITIDA "awp_m.bmp"
+#define ARMA_AK_PERMITIDA "ak47_m.bmp"
+#define ARMA_M3_PERMITIDA "m3_m.bmp"
+
+#define BOTON_ZONA "Marcar Zona"
+#define BOTON_GUARDAR "Guardar"
+#define BOTON_PINCEL "Activar Pincel Piso"
+
 MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -36,14 +58,14 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
     topBarLayout->setContentsMargins(5, 5, 5, 0);
     topBarLayout->addStretch(); 
 
-    QPushButton* botonZonaInicio = new QPushButton("Marcar Zona");
+    QPushButton* botonZonaInicio = new QPushButton(BOTON_ZONA);
     botonZonaInicio->setFixedSize(180, 30);
     topBarLayout->addWidget(botonZonaInicio);
     connect(botonZonaInicio, &QPushButton::clicked, [this]() {
         topWidget->setDropMode(DropMode::ZONA_INICIO);
     });
 
-    QPushButton* botonPincelPiso = new QPushButton("Activar Pincel Piso");
+    QPushButton* botonPincelPiso = new QPushButton(BOTON_PINCEL);
     botonPincelPiso->setFixedSize(180, 30);
     topBarLayout->addWidget(botonPincelPiso);
     connect(botonPincelPiso, &QPushButton::clicked, [this]() {
@@ -51,7 +73,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         topWidget->activarPincelPiso();
     });
 
-    QPushButton* saveButton = new QPushButton("Guardar");
+    QPushButton* saveButton = new QPushButton(BOTON_GUARDAR);
     saveButton->setFixedSize(100, 30);
     topBarLayout->addWidget(saveButton);
     connect(saveButton, &QPushButton::clicked, this, &MainWindow::guardarMapa);
@@ -69,19 +91,17 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         QString dirPath;
     };
 
-    QString basePath = "/var/CounterStrike2D/assets/";
-
     TabInfo tabs[] = {
-        { "Fondos", QString::fromStdString(RUTA_IMAGENES("backgrounds/")) },
-        { "Azteca", QString::fromStdString(RUTA_IMAGENES("aztec/")) },
-        { "Dust", QString::fromStdString(RUTA_IMAGENES("dust/")) },
-        { "Inferno", QString::fromStdString(RUTA_IMAGENES("inferno/")) },
-        { "Armas", QString::fromStdString(RUTA_IMAGENES("weapons/")) },
-        { "Proteccion anti disparos", QString::fromStdString(RUTA_IMAGENES("proteccion_disparos/")) },
+        { TAB_FONDOS, QString::fromStdString(RUTA_IMAGENES(PATH_FONDOS)) },
+        { TAB_AZTECA, QString::fromStdString(RUTA_IMAGENES(PATH_AZTECA)) },
+        { TAB_DUST, QString::fromStdString(RUTA_IMAGENES(PATH_DUST)) },
+        { TAB_INFERNO, QString::fromStdString(RUTA_IMAGENES(PATH_INFERNO)) },
+        { TAB_ARMAS, QString::fromStdString(RUTA_IMAGENES(PATH_ARMAS)) },
+        { TAB_PROTECCION, QString::fromStdString(RUTA_IMAGENES(PATH_PROTECCION)) },
     };
 
 
-    QStringList armasPermitidas = { "ak47_m.bmp", "m3_m.bmp", "awp_m.bmp"};
+    QStringList armasPermitidas = { ARMA_AK_PERMITIDA, ARMA_M3_PERMITIDA, ARMA_AWP_PERMITIDA};
 
     for (const auto& tab : tabs) {
         QScrollArea* scrollArea = new QScrollArea;
@@ -96,19 +116,19 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
         hLayout->setContentsMargins(5, 5, 5, 5);
 
         QDir dir(tab.dirPath);
-        QStringList filters = (tab.name == "Armas")
+        QStringList filters = (tab.name == TAB_ARMAS)
                             ? QStringList() << "*.bmp"
                             : QStringList() << "*.png" << "*.jpg";
         QStringList images = dir.entryList(filters, QDir::Files);
 
         for (const QString& imgName : images) {
-            if (tab.name == "Armas" && !armasPermitidas.contains(imgName))
+            if (tab.name == TAB_ARMAS && !armasPermitidas.contains(imgName))
                 continue;
 
             QString fullPath = dir.absoluteFilePath(imgName);
 
             QPixmap pixmap;
-            if (tab.name == "Armas") {
+            if (tab.name == TAB_ARMAS) {
                 QImage img(fullPath);
                 img = img.convertToFormat(QImage::Format_ARGB32);
                 QRgb magenta = qRgb(255, 0, 255);
@@ -125,7 +145,7 @@ MainWindow::MainWindow(QWidget* parent) : QWidget(parent) {
                 pixmap = QPixmap(fullPath);
             }
 
-            if (tab.name == "Fondos") {
+            if (tab.name == TAB_FONDOS) {
                 auto* clickable = new ClickableLabel(fullPath);
                 connect(clickable, &ClickableLabel::clicked, this, [this](const QString& path) {
                     topWidget->setDropMode(DropMode::FONDO);
@@ -223,7 +243,7 @@ void MainWindow::copiarMapaA(const QString& destinoDirectorio, const QString& or
     QDir dir(destinoDirectorio);
     dir.mkpath(".");
 
-    QString destinoYaml = dir.filePath(nombreArchivo);  // arma correctamente la ruta sin importar si termina en "/"
+    QString destinoYaml = dir.filePath(nombreArchivo);
     QFile::remove(destinoYaml);
     if (!QFile::copy(origenYaml, destinoYaml)) {
         qWarning() << "Error al copiar YAML a" << destinoYaml;

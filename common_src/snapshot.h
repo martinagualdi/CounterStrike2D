@@ -8,7 +8,7 @@
 #include "../server_src/municion.h"
 
 
-/*Structs para enviar la informacion necesaria para dibujar el juevo en "client"*/
+/*Structs para enviar la informacion necesaria para dibujar el nuevo en "client"*/
 
 struct ArmaEnSuelo {
     Arma *arma;

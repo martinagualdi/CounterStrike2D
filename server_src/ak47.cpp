@@ -38,7 +38,7 @@ void Ak47::tick_rafaga() {
         rafaga_restante--;
         municion_actual--; 
         if (rafaga_restante == 0) {
-            rafaga_activa = false; // Termina la ráfaga
+            rafaga_activa = false;
         }
     }
 }

@@ -57,9 +57,8 @@ void Client::iniciar() {
         Point dimensionVentana = window.GetSize();
         ancho_ventana = dimensionVentana.GetX();
         alto_ventana = dimensionVentana.GetY();
-        default_ancho = dimensionVentana.GetX();
-        default_alto = dimensionVentana.GetY();
-    }else if(ancho_ventana != default_ancho && alto_ventana != default_alto) {
+    }
+    if(ancho_ventana != default_ancho && alto_ventana != default_alto) {
         renderer.SetLogicalSize(default_ancho, default_alto);
     }
     ClientMap mapa(mapa_inicial, renderer);

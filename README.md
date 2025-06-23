@@ -10,7 +10,7 @@
 - Thiago Baez - 110703
 
 ### Corrector
-Leonardo Giamperi
+[Leonardo Giampieri Mutti](https://github.com/leogm99)
 
 ### Manuales e Informes (Técnicos y de uso)
 Dentro de la carpeta 'documentation' se encuentran los 5 manuales e informes del juego.

@@ -52,7 +52,7 @@ void Client::iniciar() {
     SDL_ShowCursor(SDL_DISABLE);
     Window window(CS2D_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ancho_ventana, alto_ventana, SDL_WINDOW_SHOWN);
     Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if(fullscreen)  {
+    if(fullscreen) {
         window.SetFullscreen(SDL_WINDOW_FULLSCREEN_DESKTOP);
         Point dimensionVentana = window.GetSize();
         ancho_ventana = dimensionVentana.GetX();

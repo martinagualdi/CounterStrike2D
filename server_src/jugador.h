@@ -98,6 +98,7 @@ class Jugador {
     void set_skin_tipo(enum SkinTipos skin) { this->skin_tipo = skin; }
     bool esta_vivo() { return vivo; }
     bool esta_moviendose() const { return moviendose == true; }
+    void no_esta_moviendose() { moviendose = false; }
     bool esta_disparando() const {  return disparando; }
     void dejar_de_disparar() { disparando = false; }
     bool esta_plantando_bomba() const { return plantando_bomba; }

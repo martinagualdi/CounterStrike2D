@@ -35,8 +35,6 @@ public:
 
     void enviar_lista_mapas(const std::vector<std::pair<std::string, std::string>>& mapas);
 
-    void enviar_precios_mercado();
-
 };
 
 #endif

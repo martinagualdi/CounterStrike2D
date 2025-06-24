@@ -612,6 +612,11 @@ bool GameLoop::chequear_si_termino_partida() {
 
 void GameLoop::esperar_entre_rondas(int segundos, int t_restante, enum Equipo eq_ganador){
     auto t_inicio = std::chrono::steady_clock::now();
+    for (Jugador *jugador : jugadores) {
+        jugador->reiniciar_compras();
+        jugador->setMovimiento(DETENER);
+        jugador->no_esta_moviendose();
+    }
     while (true) {
         auto t_actual = std::chrono::steady_clock::now();
         auto t_transcurrido = std::chrono::duration_cast<std::chrono::seconds>(t_actual - t_inicio).count();

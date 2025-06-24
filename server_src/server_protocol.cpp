@@ -290,12 +290,3 @@ void ServerProtocol::enviar_lista_mapas(const std::vector<std::pair<std::string,
         skt.sendall((uint8_t*)imagen_miniatura.data(), largo_img);
     }
 }
-
-void ServerProtocol::enviar_precios_mercado() {
-    std::vector<uint8_t> buffer;
-
-    push_back_uint16_t(buffer, Configuracion::get<int>("precio_ak47"));
-    push_back_uint16_t(buffer, Configuracion::get<int>("precio_awp"));
-    push_back_uint16_t(buffer, Configuracion::get<int>("precio_m3"));
-    skt.sendall(buffer.data(), buffer.size());
-}

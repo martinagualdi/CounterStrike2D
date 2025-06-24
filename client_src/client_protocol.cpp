@@ -341,18 +341,6 @@ std::vector<std::pair<std::string, std::string>> ProtocoloCliente::recibir_lista
     return resultado;
 }
 
-std::vector<uint16_t> ProtocoloCliente::recibir_precios_mercado() {
-    uint16_t precio_ak, precio_awp, precio_m3;
-    socket.recvall(&precio_ak, sizeof(precio_ak));
-    socket.recvall(&precio_awp, sizeof(precio_awp));
-    socket.recvall(&precio_m3, sizeof(precio_m3));
-    precio_ak = ntohs(precio_ak);
-    precio_awp = ntohs(precio_awp);
-    precio_m3 = ntohs(precio_m3);
-    return {precio_ak, precio_awp, precio_m3};
-}
-
-
 ProtocoloCliente::~ProtocoloCliente(){
    socket.shutdown(RW_CLOSE);
    socket.close();

@@ -269,6 +269,9 @@ void Jugador::reiniciar() {
     vivo = true;
     moviendose = false;
     movimiento_actual = DETENER;
+    arma_en_mano = cuchillo.get();
+    arma_secundaria.reset(new Glock());
+    arma_en_mano = arma_secundaria.get();
 }
 
 Jugador::~Jugador() {

@@ -1,4 +1,4 @@
 ancho_ventana: 960 # valores recomendados de resolucion para mantener la relacion: 
 alto_ventana: 720 # (ancho, alto): 640x480, 800x600, 960x720, 1024x768
 fullscreen: false ## false -> Dimension fija, true -> Fullscreen
-fps: 30
+fps: 30 ## mantener en 30 es lo mejor

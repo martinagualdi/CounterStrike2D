@@ -183,7 +183,7 @@ Texture Dibujador::crearMascaraFOV(float radio_centro, float angulo_fov, Uint8 a
 
     SDL_Surface* sdl_surface = SDL_CreateRGBSurfaceWithFormatFrom(
     pixels.data(), tam_mascara_fov, tam_mascara_fov, 32, tam_mascara_fov * 4, SDL_PIXELFORMAT_RGBA8888);
-    SDL2pp::Surface surface(sdl_surface); // Esto toma posesión y lo libera solom
+    Surface surface(sdl_surface);
     Texture tex(renderer, surface);
     return tex;
 }
@@ -1001,7 +1001,7 @@ void Dibujador::renderizar(Snapshot &snapshot) {
         dibujar_bomba_plantada();
     dibujar_balas();
     dibujar_jugadores();
-    if(eventHandler.skinSeleccionado())
+    if(eventHandler.skinSeleccionado() && !eventHandler.mercadoAbierto() && principal->esta_vivo)
         dibujar_vision_de_campo(principal->angulo);
     dibujar_sight();
     dibujar_hud();

@@ -1,62 +1,61 @@
-puerto: "8080"
+puerto: "8080" #string
 
-cantidad_min_ct: 1
-cantidad_min_tt: 1
+cantidad_min_ct: 2 # (int)
+cantidad_min_tt: 2 # (int)
 
-ronda_por_partida: 2
-rondas_por_bando: 1
+ronda_por_partida: 6 # (int)
+rondas_por_bando: 3 # (int)
 
-#segundos
-tiempo_por_ronda: 300
-tiempo_max_para_comprar: 30
-tiempo_plantado_bomba: 3
-tiempo_desactivacion_bomba: 5
-tiempo_pare_que_explote_bomba: 30
+tiempo_por_ronda: 60 #segundos (int)
+tiempo_max_para_comprar: 30 #segundos (int)
+tiempo_plantado_bomba: 3 #segundos (int)
+tiempo_desactivacion_bomba: 5 #segundos (int)
+tiempo_pare_que_explote_bomba: 20 #segundos (int)
 
-dinero_inicial: 1500
-dinero_por_eliminacion: 50
+dinero_inicial: 1500 # (int)
+dinero_por_eliminacion: 50 # (int)
 
-precio_awp: 200
-precio_ak47: 150
-precio_m3: 100
-precio_municion_principal: 5
-precio_municion_secundaria: 2
+precio_awp: 200 # (int)
+precio_ak47: 150 # (int)
+precio_m3: 100 # (int)
+precio_municion_principal: 5 # (int)
+precio_municion_secundaria: 2 # (int)
 
-vida_inicial: 100
+vida_inicial: 100 # (int)
 
-danio_min_cuchillo: 15
-danio_max_cuchillo: 30
-precision_cuchillo: 1.0
+danio_min_cuchillo: 15 # (int)
+danio_max_cuchillo: 30 # (int)
+precision_cuchillo: 1.0 # (float)
 
-danio_min_glock: 5
-danio_max_glock: 30
-precision_glock: 0.9
-balas_glock: 20
-balas_max_glock: 60
+danio_min_glock: 5 # (int)
+danio_max_glock: 30 # (int)
+precision_glock: 0.9 # (float)
+balas_glock: 20 # (int)
+balas_max_glock: 60 # (int)
 
-danio_min_awp: 100
-danio_max_awp: 100 
-precision_awp: 0.6
-balas_awp: 10
-balas_max_awp: 30
+danio_min_awp: 100 # (int)
+danio_max_awp: 100  # (int)
+precision_awp: 0.6 # (float)
+balas_awp: 10 # (int)
+balas_max_awp: 30 # (int)
 
 #danio por bala de la rafaga
-danio_min_ak47: 2
-danio_max_ak47: 20
-precision_ak47: 0.8
-balas_ak47: 30
-balas_max_ak47: 90
+danio_min_ak47: 2 # (int)
+danio_max_ak47: 20 # (int)
+precision_ak47: 0.8 # (float)
+balas_ak47: 30 # (int)
+balas_max_ak47: 90 # (int)
 
 #danio por perdigon
-danio_min_m3: 5
-danio_max_m3: 80
-precision_m3: 0.7
-balas_m3: 10
-balas_max_m3: 30
+danio_min_m3: 5 # (int)
+danio_max_m3: 80 # (int)
+precision_m3: 0.7 # (float)
+balas_m3: 10 # (int)
+balas_max_m3: 30 # (int)
 
-angulo_cono_vision: 45
-opacidad: 200
-radio_vision:  60   # de 60 a 100 para valores logicos 
+angulo_cono_vision: 45 # entero
+opacidad: 150 # entero: Minimo 0, Máximo 255
+radio_vision:  60   # entero de 60 a 100 para valores logicos 
 
 
 

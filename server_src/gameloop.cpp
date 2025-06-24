@@ -101,8 +101,16 @@ bool GameLoop::bala_golpea_jugador(const Municion &bala, bool esperando) {
                         jugador->setMovimiento(DETENER);
                         jugador_tirador->sumar_eliminacion(); // Si el jugador muere, sumar eliminación al tirador
                         if (jugador->posee_bomba()) {
+                            if (jugador== jugador_plantando) {
+                                jugador->cancelar_plantado_bomba();
+                                jugador_plantando = nullptr; 
+                            }
                             Bomba* bomba = jugador->soltar_bomba();
                             armas_en_suelo.push_back(ArmaEnSuelo(bomba, jugador->getX(), jugador->getY()));
+                            ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
+                            if (arma_que_suelta) {
+                                delete arma_que_suelta; 
+                            }
                         } else {
                             ArmaDeFuego* arma_que_suelta = jugador->soltar_arma_pricipal();
                             if (arma_que_suelta) {

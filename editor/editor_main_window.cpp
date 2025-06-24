@@ -360,16 +360,32 @@ void MainWindow::cargarDesdeYAML(const QString& ruta) {
     topWidget->setDropMode(DropMode::FONDO);
     topWidget->setBackgroundPath(fondoPath);
 
+    // ================================
+    // CARGAR ELEMENTOS (ordenados por prioridad)
+    // ================================
     const auto& elementos = root["elementos"];
+    std::map<int, std::vector<YAML::Node>> elementosPorPrioridad;
+
     for (const auto& elemento : elementos) {
-        QString imagenRel = QString::fromStdString(elemento["imagen"].as<std::string>());
-        QString imagenPath = RUTA_BASE_IMAGENES + imagenRel;
-        QString tipo = QString::fromStdString(elemento["tipo"].as<std::string>());
-        int x = elemento["x"].as<int>();
-        int y = elemento["y"].as<int>();
-        topWidget->agregarElemento(imagenPath, x, y);
+        int prioridad = 1;
+        if (elemento["prioridad"])
+            prioridad = elemento["prioridad"].as<int>();
+        elementosPorPrioridad[prioridad].push_back(elemento);
     }
 
+    for (const auto& [prioridad, lista] : elementosPorPrioridad) {
+        for (const auto& elemento : lista) {
+            QString imagenRel = QString::fromStdString(elemento["imagen"].as<std::string>());
+            QString imagenPath = RUTA_BASE_IMAGENES + imagenRel;
+            int x = elemento["x"].as<int>();
+            int y = elemento["y"].as<int>();
+            topWidget->agregarElemento(imagenPath, x, y);
+        }
+    }
+
+    // ================================
+    // CARGAR ZONAS
+    // ================================
     const auto& zonas = root["zonas"];
     for (const auto& zona : zonas) {
         QString tipoZona = QString::fromStdString(zona["tipo"].as<std::string>());

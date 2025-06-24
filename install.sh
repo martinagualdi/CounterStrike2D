@@ -60,7 +60,7 @@ Type=Application
 Name=CounterStrike2D Editor
 Exec=/usr/bin/$TP_NAME-editor
 Icon=$TP_NAME-editor
-Terminal=true
+Terminal=false
 Categories=Game;
 EOF
 
@@ -71,7 +71,7 @@ Type=Application
 Name=CounterStrike2D Cliente
 Exec=/usr/bin/$TP_NAME-client 
 Icon=$TP_NAME-client
-Terminal=true
+Terminal=false
 Categories=Game;
 EOF
 

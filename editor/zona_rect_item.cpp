@@ -48,19 +48,41 @@ void ZonaRectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
     bool ok = false;
     QString nuevoTipo = QInputDialog::getItem(nullptr, "Cambiar tipo de zona", "Nuevo tipo:",
         { ZONA_CT, ZONA_TT, ZONA_BOMBA }, 0, false, &ok);
-    if (ok) {
-        tipo = nuevoTipo;
-        setTexto(nuevoTipo == ZONA_CT ? TEXTO_CT : (nuevoTipo == ZONA_TT ? TEXTO_TT : TEXTO_BOMBA));
-        QColor color = (tipo == ZONA_CT) ? QColor(0, 0, 255, 50) :
-                       (tipo == ZONA_TT) ? QColor(0, 255, 0, 50) :
-                       QColor(255, 0, 0, 50);
-        setColor(color);
-        emit tipoZonaCambiado(this, tipo);
+    if (!ok || nuevoTipo == tipo) return;
+
+    if (tipo == ZONA_BOMBA && nuevoTipo != ZONA_BOMBA && imagenBombsite) {
+        scene()->removeItem(imagenBombsite);
+        delete imagenBombsite;
+        imagenBombsite = nullptr;
     }
+
+    tipo = nuevoTipo;
+
+    if (tipo == ZONA_CT) {
+        setTexto(TEXTO_CT);
+        setColor(QColor(0, 0, 255, 50));
+    } else if (tipo == ZONA_TT) {
+        setTexto(TEXTO_TT);
+        setColor(QColor(0, 255, 0, 50));
+    } else if (tipo == ZONA_BOMBA) {
+        setTexto(TEXTO_BOMBA);
+        setColor(QColor(255, 0, 0, 50));
+
+        if (!imagenBombsite)
+            emit tipoZonaCambiado(this, tipo);
+    }
+
+    emit tipoZonaCambiado(this, tipo);
 }
+
 
 QVariant ZonaRectItem::itemChange(GraphicsItemChange change, const QVariant& value) {
     if (change == ItemPositionHasChanged) {
+        if (imagenBombsite) {
+            QPointF centro = this->sceneBoundingRect().center();
+            QPointF nuevaPos = centro - QPointF(imagenBombsite->pixmap().width() / 2, imagenBombsite->pixmap().height() / 2);
+            imagenBombsite->setPos(nuevaPos);
+        }
         if (!resizing)
             emit zonaRectActualizado(this);
     }
@@ -109,4 +131,13 @@ void ZonaRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
         QGraphicsRectItem::mouseReleaseEvent(event);
     }
 }
+
+void ZonaRectItem::setImagenBombsite(QGraphicsPixmapItem* imagen) {
+    imagenBombsite = imagen;
+}
+
+QGraphicsPixmapItem* ZonaRectItem::getImagenBombsite() const {
+    return imagenBombsite;
+}
+
 

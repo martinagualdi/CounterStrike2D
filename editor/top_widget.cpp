@@ -267,9 +267,16 @@ void TopWidget::eliminarZona(ZonaRectItem* zonaItem) {
         });
     zonasInicio.erase(it, zonasInicio.end());
 
+    // Eliminar imagen de bombsite si está asociada
+    if (zonaItem->getImagenBombsite()) {
+        scene()->removeItem(zonaItem->getImagenBombsite());
+        delete zonaItem->getImagenBombsite();
+    }
+
     scene()->removeItem(zonaItem);
     delete zonaItem;
 }
+
 
 void TopWidget::keyPressEvent(QKeyEvent* event) {
     if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
@@ -459,7 +466,7 @@ void TopWidget::mouseReleaseEvent(QMouseEvent* event) {
         scene()->addItem(zonaItem);
 
         if (tipo == TIPO_ZONA_B)
-            agregarImagenBomba(rect);
+            agregarImagenBomba(rect, zonaItem);
 
         ZonaMapa zona;
         zona.rect = rect;
@@ -512,12 +519,22 @@ void TopWidget::conectarCambioTipo(ZonaRectItem* zonaItem) {
     connect(zonaItem, &ZonaRectItem::tipoZonaCambiado, this,
         [this](ZonaRectItem* item, const QString& nuevoTipo) {
             for (ZonaMapa& zona : zonasInicio) {
-                if (zona.rect == item->rect()) {
+                if (zona.id == item->getId()) {
                     zona.tipo = nuevoTipo;
                     break;
                 }
             }
-    });
+
+            if (nuevoTipo == TIPO_ZONA_B && !item->getImagenBombsite()) {
+                agregarImagenBomba(item->rect(), item);
+            }
+
+            if (nuevoTipo != TIPO_ZONA_B && item->getImagenBombsite()) {
+                scene()->removeItem(item->getImagenBombsite());
+                delete item->getImagenBombsite();
+                item->setImagenBombsite(nullptr);
+            }
+        });
 
 }
 
@@ -546,14 +563,23 @@ QString TopWidget::textoParaTipo(const QString& tipo) const {
     return "";
 }
 
-void TopWidget::agregarImagenBomba(const QRectF& rect) {
-    int cantidad = std::count_if(zonasInicio.begin(), zonasInicio.end(), [](const ZonaMapa& z) {
-        return z.tipo == TIPO_ZONA_B;
-    });
+void TopWidget::agregarImagenBomba(const QRectF& rect, ZonaRectItem* zonaItem) {
+    // Determinar si ya existe una imagen con plantacion1
+    bool existePlantacion1 = false;
+    for (QGraphicsItem* item : scene()->items()) {
+        if (auto* pixmapItem = dynamic_cast<QGraphicsPixmapItem*>(item)) {
+            QString tipo = pixmapItem->data(1).toString();
+            QString imagen = pixmapItem->data(0).toString();
+            if (tipo == TIPO_BOMBSITE && imagen.contains(PATH_PLANTACION_1)) {
+                existePlantacion1 = true;
+                break;
+            }
+        }
+    }
 
-    QString imagenRelativa = (cantidad == 0)
-        ? QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_1))
-        : QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_2));
+    QString imagenRelativa = existePlantacion1
+        ? QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_2))
+        : QString::fromStdString(RUTA_IMAGENES(PATH_PLANTACION_1));
     
     QPixmap pix(imagenRelativa);
     if (!pix.isNull()) {
@@ -571,6 +597,7 @@ void TopWidget::agregarImagenBomba(const QRectF& rect) {
         item->setData(4, item->zValue());
 
         scene()->addItem(item);
+        zonaItem->setImagenBombsite(item);
     }
 }
 

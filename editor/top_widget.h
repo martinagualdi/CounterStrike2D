@@ -89,7 +89,7 @@ private:
     void conectarActualizacionRect(ZonaRectItem* item);
     QColor colorParaTipo(const QString& tipo) const;
     QString textoParaTipo(const QString& tipo) const;
-    void agregarImagenBomba(const QRectF& rect);
+    void agregarImagenBomba(const QRectF& rect, ZonaRectItem* zonaItem);
     void limpiarPreviewZona();
     void eliminarZona(ZonaRectItem* zonaItem);
     int pedirDimensionMapa(const QString& titulo, const QString& label, int valorPorDefecto);

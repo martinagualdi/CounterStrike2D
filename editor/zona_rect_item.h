@@ -15,6 +15,8 @@ public:
     QString getTipo() const { return tipo; }
     QRectF oldRect() const { return originalRect; }
     QUuid getId() const {return id;}
+    void setImagenBombsite(QGraphicsPixmapItem* imagen);
+    QGraphicsPixmapItem* getImagenBombsite() const;
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
@@ -22,6 +24,7 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
 
 private:
     QGraphicsTextItem* label;
@@ -31,6 +34,7 @@ private:
     QRectF originalRect;
     const qreal resizeMargin = 10.0;
     QUuid id;
+    QGraphicsPixmapItem* imagenBombsite = nullptr;
 signals:
     void tipoZonaCambiado(ZonaRectItem* zona, const QString& nuevoTipo);
     void zonaRectActualizado(ZonaRectItem* zona);

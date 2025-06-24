@@ -30,3 +30,10 @@ Se han usado las siguiente bibliotecas desarrolladas por [Di Paola, Martin](http
 - 'LibError'.
 - 'Queue'.
 - 'Thread'.
+
+### Interfaz gráfica del juego
+<img width="960" alt="image" src="https://github.com/user-attachments/assets/21c8d0fa-85dc-4929-9945-fd419d719437" />
+
+### Interfaz gráfica del editor
+<img width="805" alt="image" src="https://github.com/user-attachments/assets/42b44441-c74b-422f-902b-939c010424fa" />
+

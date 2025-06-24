@@ -124,7 +124,6 @@ void Sonido::reproducirDisparos() {
             int count = 0;
             int channels = Mix_AllocateChannels(-1);
             for (int c = 0; c < channels; ++c) {
-                // SOLO contás los sonidos activos que realmente se están escuchando (volumen no-cero)
                 if (Mix_GetChunk(c) == chunk && Mix_Playing(c) && Mix_Volume(c, -1) > 0)
                     count++;
             }

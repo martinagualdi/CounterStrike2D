@@ -171,9 +171,7 @@ Texture Dibujador::crearMascaraFOV(float radio_centro, float angulo_fov, Uint8 a
             float dist = std::sqrt(dx*dx + dy*dy);
 
             bool visible = false;
-            // Visible si está en el círculo pequeño
             if (dist < radio_centro) visible = true;
-            // O si está dentro del FOV
             else if (estaEnFOV(x, y)) visible = true;
             Uint8 a = visible ? 0 : alpha_fondo;
             Uint32 color = (0 << 24) | (0 << 16) | (0 << 8) | a;
@@ -284,7 +282,7 @@ void Dibujador::dibujar_balas() {
         convertir_a_pantalla(bala.pos_x, bala.pos_y, x_pixel, y_pixel);
         float angulo_bala = convertir_angulo(bala.angulo_disparo);
         float angle_rad = bala.angulo_disparo * M_PI / 180.0f;
-        float OFFSET_ADELANTE = TAM_PLAYER; // ajustá este valor
+        float OFFSET_ADELANTE = TAM_PLAYER;
 
         float origen_x = x_pixel + std::cos(angle_rad) * OFFSET_ADELANTE;
         float origen_y = y_pixel - std::sin(angle_rad) * OFFSET_ADELANTE;

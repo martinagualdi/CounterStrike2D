@@ -258,14 +258,14 @@ En ambos casos tener las siguientes consideraciones:
 
 Una vez posicionado un objeto se podrá mover (haciendo click sobre el mismo y arrastrando) y eliminar (haciendo click sobre el mismo y presionando la tecla de delete). 
 
-Para guardar un mapa se debe presionar el boton de **Guardar** y se abrirá automaticamente la carpeta **editor/mapas**. Al guardar un mapa se guardarán dos cosas: un **.yaml** y un **.jpg**, este ultimo es una imagen que se usaŕa de previsualizacion para la seleccion de mapa en el cliente. 
+Para guardar un mapa se debe presionar el boton de **Guardar** y se abrirá automaticamente la carpeta **editor/mapas**. Al guardar un mapa se guardarán dos cosas: un **.yaml** y un **.jpg**, este ultimo es una imagen que se usará de previsualizacion para la selecciíón de mapa en el cliente. 
 
 Al confirmar el guardado, ambos archivos se copiarán automaticamente en **server_src/mapas_disponibles**. 
 **OBS:** en caso de estar ejecutando el editor con la aplicacion generada por el instalador, los archivos tambien se copiarán en las rutas correspondientes para ser utilizadas tanto por el editor como por el server desde este modo sin necesidad de recompilar. 
 
-Al momento de editar un mapa ya existe se abre automaticamente esa carpeta (del editor) para que se seleccione el mapa deseado (el .yaml). Al finalizar la edición se debe guardar con el mismo nombre para reemplazar ambos archivos existentes por los nuevos que contienen los cambios realizados. 
+Al momento de editar un mapa ya existente se abre automaticamente esa carpeta (del editor) para que se seleccione el mapa deseado (el .yaml). Al finalizar la edición se debe guardar con el mismo nombre para reemplazar ambos archivos existentes por los nuevos que contienen los cambios realizados. 
 
-Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion de bombas el editor cuenta con un boton **Marcar zona** una vez presionado se habilita para marcar una zona cualquiera con el cursor. Al finalizar la seleccion se consultara a que zona hace referencia lo marcado (inicio_ct, inicio_tt o zona_bombas). 
+Para marcar tanto la zonas de inicio de CT y TT como para la zona de plantacion de bombas el editor cuenta con un boton **Marcar zona** una vez presionado se habilita para marcar una zona cualquiera con el cursor. Al finalizar la seleccion se consultará a que zona hace referencia lo marcado (inicio_ct, inicio_tt o zona_bombas). 
 
 **IMPORTANTE 1:** un mapa no podrá ser guardado si:
 
